@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GroceryApp.Views.CustomerOrderDetailPage"
+             Title="Sasti Dukan - Order Detail">
+    <VerticalStackLayout Padding="20" Spacing="10">
+        <Label Text="{Binding Order.OrderId, StringFormat='Order #{0}'}" FontSize="18" FontAttributes="Bold"/>
+        <Label Text="{Binding Order.Status}"/>
+        <CollectionView ItemsSource="{Binding OrderItems}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <StackLayout Padding="10" Spacing="5">
+                        <Label Text="{Binding ProductName}" FontAttributes="Bold"/>
+                        <Label Text="{Binding TotalPrice, StringFormat='Total: ₹{0:F2}'}"/>
+                    </StackLayout>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </VerticalStackLayout>
+</ContentPage>

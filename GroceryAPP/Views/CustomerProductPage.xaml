@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GroceryApp.Views.CustomerProductPage"
+             x:DataType="local:CustomerProductViewModel"
+             Title="सस्ती दुकान - Products"
+             BackgroundColor="#fafafa"
+             xmlns:local="clr-namespace:GroceryApp.ViewModels"
+             xmlns:models="clr-namespace:GroceryApp.Models">
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Padding="16,12,16,90">
+                <!-- Enhanced Header -->
+                <VerticalStackLayout Margin="0,0,0,16" Spacing="4">
+                    <Label Text="{Binding CategoryName}" FontSize="28" FontAttributes="Bold" TextColor="#1a1a1a">
+                        <Label.Shadow>
+                            <Shadow Brush="#000000" Opacity="0.1" Radius="2" Offset="0,2"/>
+                        </Label.Shadow>
+                    </Label>
+                    <HorizontalStackLayout Spacing="6">
+                        <Label Text="⚡" FontSize="13"/>
+                        <Label Text="Fast Delivery" FontSize="12" TextColor="#00b366" FontAttributes="Bold"/>
+                        <Label Text="•" FontSize="12" TextColor="#999999"/>
+                        <Label Text="Fresh Products" FontSize="12" TextColor="#666666"/>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            
+            <Label Text="{Binding ErrorMessage}" 
+                   IsVisible="{Binding HasError}" 
+                   TextColor="#e74c3c" 
+                   FontSize="12" 
+                   Margin="0,10"/>
+            
+            <!-- Products Grid - Enhanced 2 Column -->
+            <CollectionView ItemsSource="{Binding Products}" SelectionMode="None">
+                <CollectionView.ItemsLayout>
+                    <GridItemsLayout Orientation="Vertical" Span="2" HorizontalItemSpacing="10" VerticalItemSpacing="12"/>
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:Product">
+                        <!-- Premium Product Card -->
+                        <Frame Padding="0" CornerRadius="14" HasShadow="False" BorderColor="#f0f0f0" BackgroundColor="#ffffff">
+                            <Frame.Shadow>
+                                <Shadow Brush="#000000" Opacity="0.06" Radius="10" Offset="0,3"/>
+                            </Frame.Shadow>
+                            <VerticalStackLayout Spacing="0">
+                                <!-- Product Image Container -->
+                                <Frame Padding="10" CornerRadius="14,14,0,0" HasShadow="False" BackgroundColor="#f8f8f8" Margin="0">
+                                    <Image Source="{Binding ImageUrl}" 
+                                           Aspect="AspectFit"
+                                           HeightRequest="100"
+                                           WidthRequest="100"
+                                           HorizontalOptions="Center"/>
+                                </Frame>
+                                
+                                <!-- Product Info Section -->
+                                <VerticalStackLayout Spacing="3" Padding="10,8,10,10">
+                                    <!-- Product Name -->
+                                    <Label Text="{Binding Name}" 
+                                           FontSize="13" 
+                                           FontAttributes="Bold" 
+                                           TextColor="#1a1a1a"
+                                           MaxLines="2"
+                                           LineBreakMode="TailTruncation"/>
+                                    
+                                    <!-- Price & Add Button Row -->
+                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="4" Margin="0,6,0,0">
+                                        <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                                            <Label Text="{Binding Price, StringFormat='₹{0:F0}'}" 
+                                                   FontSize="16" 
+                                                   FontAttributes="Bold" 
+                                                   TextColor="#00b366"/>
+                                        </VerticalStackLayout>
+                                        
+                                        <!-- Enhanced Add Button -->
+                                        <Button Grid.Column="1"
+                                                Text="Add" 
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.AddToCartCommand}"
+                                                CommandParameter="{Binding .}"
+                                                BackgroundColor="#00b366"
+                                                TextColor="White"
+                                                FontSize="11"
+                                                FontAttributes="Bold"
+                                                Padding="12,6"
+                                                CornerRadius="8"
+                                                WidthRequest="70"
+                                                HeightRequest="30">
+                                            <Button.Shadow>
+                                                <Shadow Brush="#00b366" Opacity="0.3" Radius="4" Offset="0,2"/>
+                                            </Button.Shadow>
+                                        </Button>
+                                    </Grid>
+                                </VerticalStackLayout>
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+            
+            <ActivityIndicator IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}" Color="#00b366" Margin="0,24"/>
+        </VerticalStackLayout>
+        </ScrollView>
+        
+        <!-- Enhanced Floating Cart Button -->
+        <Button Text="🛒" 
+                FontSize="24"
+                WidthRequest="64"
+                HeightRequest="64"
+                CornerRadius="32"
+                BackgroundColor="#00b366"
+                TextColor="White"
+                Clicked="OnCartClicked"
+                HorizontalOptions="End"
+                VerticalOptions="End"
+                Margin="20">
+            <Button.Shadow>
+                <Shadow Brush="#00b366" Opacity="0.4" Radius="12" Offset="0,6"/>
+            </Button.Shadow>
+        </Button>
+    </Grid>
+</ContentPage>

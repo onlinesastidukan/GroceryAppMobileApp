@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:GroceryApp.Converters"
+             x:Class="GroceryApp.Views.CustomerCategoryPage"
+             Title="सस्ती दुकान"
+             BackgroundColor="#ffffff">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:CategoryToIconConverter x:Key="CategoryIconConverter"/>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <Grid Padding="0">
+        <VerticalStackLayout Padding="16,12,16,0" Spacing="16">
+            <!-- Enhanced Header -->
+            <VerticalStackLayout Spacing="4">
+                <Label Text="सस्ती दुकान" FontSize="32" FontAttributes="Bold" TextColor="#1a1a1a">
+                    <Label.Shadow>
+                        <Shadow Brush="#000000" Opacity="0.1" Radius="2" Offset="0,2"/>
+                    </Label.Shadow>
+                </Label>
+                <HorizontalStackLayout Spacing="6">
+                    <Label Text="⚡" FontSize="14"/>
+                    <Label Text="Fast Delivery" FontSize="13" TextColor="#00b366" FontAttributes="Bold"/>
+                    <Label Text="•" FontSize="13" TextColor="#999999"/>
+                    <Label Text="🌿 Fresh Groceries" FontSize="13" TextColor="#666666"/>
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+            
+            <Label Text="{Binding ErrorMessage}" 
+                   IsVisible="{Binding HasError}" 
+                   TextColor="#e74c3c" 
+                   FontSize="12"/>
+            
+            <!-- Categories Grid with Dynamic Icons-->
+            <CollectionView x:Name="CategoriesCollectionView" 
+                            ItemsSource="{Binding Categories}"
+                            SelectionMode="Single"
+                            SelectionChanged="OnCategorySelected">
+                <CollectionView.ItemsLayout>
+                    <GridItemsLayout Orientation="Vertical" Span="2" HorizontalItemSpacing="12" VerticalItemSpacing="12"/>
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <!-- Enhanced Category Card -->
+                        <Frame Padding="0" 
+                               CornerRadius="16" 
+                               HasShadow="False" 
+                               BackgroundColor="#ffffff" 
+                               BorderColor="#e8e8e8">
+                            <Frame.Shadow>
+                                <Shadow Brush="#000000" Opacity="0.06" Radius="8" Offset="0,2"/>
+                            </Frame.Shadow>
+                            <VerticalStackLayout Spacing="10" Padding="14">
+                                <!-- Dynamic Icon Circle -->
+                                <Frame Padding="0" 
+                                       WidthRequest="56" 
+                                       HeightRequest="56" 
+                                       CornerRadius="28" 
+                                       HasShadow="False" 
+                                       BackgroundColor="#e8f5e9"
+                                       HorizontalOptions="Center">
+                                    <Frame.Shadow>
+                                        <Shadow Brush="#00b366" Opacity="0.15" Radius="6" Offset="0,2"/>
+                                    </Frame.Shadow>
+                                    <Label Text="{Binding Name, Converter={StaticResource CategoryIconConverter}}" 
+                                           FontSize="32" 
+                                           HorizontalOptions="Center" 
+                                           VerticalOptions="Center"
+                                           HorizontalTextAlignment="Center"
+                                           VerticalTextAlignment="Center"/>
+                                </Frame>
+                                
+                                <!-- Category Info -->
+                                <VerticalStackLayout Spacing="3" HorizontalOptions="Center">
+                                    <Label Text="{Binding Name}" 
+                                           FontSize="14" 
+                                           FontAttributes="Bold" 
+                                           TextColor="#1a1a1a"
+                                           HorizontalTextAlignment="Center"
+                                           MaxLines="2"
+                                           LineBreakMode="TailTruncation"/>
+                                    <Label Text="{Binding Description}" 
+                                           FontSize="11" 
+                                           TextColor="#666666"
+                                           HorizontalTextAlignment="Center"
+                                           MaxLines="2"
+                                           LineBreakMode="TailTruncation"/>
+                                </VerticalStackLayout>
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+            
+            <ActivityIndicator IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}" Color="#00b366" Margin="0,20"/>
+        </VerticalStackLayout>
+        
+        <!-- Floating Cart Button with Shadow -->
+        <Button Text="🛒" 
+                FontSize="24"
+                WidthRequest="64"
+                HeightRequest="64"
+                CornerRadius="32"
+                BackgroundColor="#00b366"
+                TextColor="White"
+                Clicked="OnCartClicked"
+                HorizontalOptions="End"
+                VerticalOptions="End"
+                Margin="20">
+            <Button.Shadow>
+                <Shadow Brush="#00b366" Opacity="0.4" Radius="12" Offset="0,6"/>
+            </Button.Shadow>
+        </Button>
+    </Grid>
+</ContentPage>

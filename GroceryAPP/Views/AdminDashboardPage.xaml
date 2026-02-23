@@ -1,0 +1,244 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GroceryApp.Views.AdminDashboardPage"
+             Title="Sasti Dukan - Admin">
+    
+    <Grid>
+        <!-- Main Content -->
+        <ScrollView x:Name="MainContent">
+        <VerticalStackLayout Padding="20" Spacing="20" BackgroundColor="#f8f9fa">
+            <!-- Header with Hamburger Menu -->
+            <Grid ColumnDefinitions="Auto,*" Margin="0,10" ColumnSpacing="15">
+                <!-- Hamburger Menu Button -->
+                <Frame Grid.Column="0"
+                       Padding="8"
+                       WidthRequest="44"
+                       HeightRequest="44"
+                       CornerRadius="8"
+                       BackgroundColor="#f0f0f0"
+                       HasShadow="False"
+                       VerticalOptions="Center">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnMenuClicked"/>
+                    </Frame.GestureRecognizers>
+                    <Label Text="☰"
+                           FontSize="24"
+                           TextColor="#1a1a1a"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           HorizontalTextAlignment="Center"
+                           VerticalTextAlignment="Center"/>
+                </Frame>
+                
+                <!-- Title -->
+                <VerticalStackLayout Grid.Column="1" Spacing="4">
+                    <Label Text="सस्ती दुकान" FontSize="32" FontAttributes="Bold" TextColor="#1a1a1a" FontFamily="{x:Null}"/>
+                    <Label Text="Admin Dashboard" FontSize="16" TextColor="#666666"/>
+                </VerticalStackLayout>
+            </Grid>
+            
+            <!-- Error Message -->
+            <Label Text="{Binding ErrorMessage}" 
+                   IsVisible="{Binding HasError}" 
+                   TextColor="White" 
+                   BackgroundColor="#dc3545"
+                   FontSize="14"
+                   Padding="12"
+                   Margin="0,10"/>
+            
+            <!-- Loading Indicator -->
+            <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                               IsVisible="{Binding IsLoading}" 
+                               Color="#00b366" 
+                               Scale="1.5"
+                               Margin="0,20"/>
+            
+            <!-- Statistics Cards -->
+            <Label Text="Quick Statistics" FontSize="18" FontAttributes="Bold" TextColor="#1a1a1a" Margin="0,10,0,0"/>
+            
+            <!-- First Row - Orders & Revenue -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                <!-- Total Orders Card -->
+                <Frame Grid.Column="0" Padding="0" CornerRadius="16" HasShadow="False" BorderColor="Transparent" Margin="0">
+                    <Frame.Background>
+                        <LinearGradientBrush>
+                            <GradientStop Color="#007AFF" Offset="0"/>
+                            <GradientStop Color="#0055CC" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Frame.Background>
+                    <VerticalStackLayout Spacing="8" Padding="16" HorizontalOptions="Center" VerticalOptions="Center">
+                        <Label Text="{Binding TotalOrders}" FontSize="32" FontAttributes="Bold" TextColor="White" HorizontalTextAlignment="Center"/>
+                        <Label Text="Total Orders" FontSize="13" TextColor="#E8F4FF" HorizontalTextAlignment="Center"/>
+                    </VerticalStackLayout>
+                    <Frame.Shadow>
+                        <Shadow Brush="#007AFF" Opacity="0.3" Radius="12" Offset="0,4"/>
+                    </Frame.Shadow>
+                </Frame>
+                
+                <!-- Revenue Card -->
+                <Frame Grid.Column="1" Padding="0" CornerRadius="16" HasShadow="False" BorderColor="Transparent" Margin="0">
+                    <Frame.Background>
+                        <LinearGradientBrush>
+                            <GradientStop Color="#28a745" Offset="0"/>
+                            <GradientStop Color="#1e7e34" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Frame.Background>
+                    <VerticalStackLayout Spacing="8" Padding="16" HorizontalOptions="Center" VerticalOptions="Center">
+                        <Label Text="{Binding TotalRevenue, StringFormat='₹{0:F0}'}" FontSize="28" FontAttributes="Bold" TextColor="White" HorizontalTextAlignment="Center" FontFamily="{x:Null}"/>
+                        <Label Text="Revenue Earned" FontSize="13" TextColor="#E8F5E9" HorizontalTextAlignment="Center"/>
+                    </VerticalStackLayout>
+                    <Frame.Shadow>
+                        <Shadow Brush="#28a745" Opacity="0.3" Radius="12" Offset="0,4"/>
+                    </Frame.Shadow>
+                </Frame>
+            </Grid>
+            
+            <!-- Second Row - Products & Categories -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                <!-- Products Card -->
+                <Frame Grid.Column="0" Padding="0" CornerRadius="16" HasShadow="False" BorderColor="Transparent" Margin="0">
+                    <Frame.Background>
+                        <LinearGradientBrush>
+                            <GradientStop Color="#ffc107" Offset="0"/>
+                            <GradientStop Color="#ff8800" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Frame.Background>
+                    <VerticalStackLayout Spacing="8" Padding="16" HorizontalOptions="Center" VerticalOptions="Center">
+                        <Label Text="{Binding TotalProducts}" FontSize="32" FontAttributes="Bold" TextColor="White" HorizontalTextAlignment="Center"/>
+                        <Label Text="Products" FontSize="13" TextColor="#FFFBEE" HorizontalTextAlignment="Center"/>
+                    </VerticalStackLayout>
+                    <Frame.Shadow>
+                        <Shadow Brush="#ff8800" Opacity="0.3" Radius="12" Offset="0,4"/>
+                    </Frame.Shadow>
+                </Frame>
+                
+                <!-- Categories Card -->
+                <Frame Grid.Column="1" Padding="0" CornerRadius="16" HasShadow="False" BorderColor="Transparent" Margin="0">
+                 
+            <!-- Categories Button -->
+            <Button Text="Manage Categories" 
+                    Clicked="OnCategoriesClicked"
+                    BackgroundColor="#6f42c1"
+                    TextColor="White"
+                    FontSize="16"
+                    FontAttributes="Bold"
+                    Padding="16,14"
+                    CornerRadius="12"
+                    BorderWidth="0">
+                <Button.Shadow>
+                    <Shadow Brush="#6f42c1" Opacity="0.3" Radius="8" Offset="0,4"/>
+                </Button.Shadow>
+            </Button>
+            
+            <!-- Footer Spacing -->
+            <BoxView HeightRequest="20" Color="Transparent"/>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
+    </ScrollView>
+        
+        <!-- Side Menu (Left Drawer) -->
+        <Frame x:Name="SideMenu"
+               Padding="0"
+               BackgroundColor="White"
+               CornerRadius="0"
+               HasShadow="True"
+               IsVisible="False"
+               TranslationX="-300"
+               WidthRequest="280"
+               HorizontalOptions="Start"
+               VerticalOptions="Fill">
+            <Frame.Shadow>
+                <Shadow Brush="#000000" Opacity="0.3" Radius="20" Offset="5,0"/>
+            </Frame.Shadow>
+            
+            <VerticalStackLayout Spacing="0">
+                <!-- Menu Header -->
+                <Frame Padding="0" BackgroundColor="#007AFF" CornerRadius="0" HasShadow="False" Margin="0">
+                    <VerticalStackLayout Padding="20,30,20,20" Spacing="8">
+                        <Label Text="🛒" FontSize="36" TextColor="White" HorizontalTextAlignment="Center"/>
+                        <Label Text="Admin Menu" FontSize="20" FontAttributes="Bold" TextColor="White" HorizontalTextAlignment="Center"/>
+                    </VerticalStackLayout>
+                </Frame>
+                
+                <!-- Menu Items -->
+                <VerticalStackLayout Spacing="0" Padding="0,10">
+                    
+                    <!-- View Orders -->
+                    <Frame Padding="0" BackgroundColor="Transparent" Margin="0" HasShadow="False" CornerRadius="0">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnMenuOrdersClicked"/>
+                        </Frame.GestureRecognizers>
+                        <Grid Padding="20,15" ColumnDefinitions="Auto,*" ColumnSpacing="15">
+                            <Label Grid.Column="0" Text="📦" FontSize="22"/>
+                            <Label Grid.Column="1" Text="View Orders" FontSize="16" TextColor="#1a1a1a" VerticalOptions="Center"/>
+                        </Grid>
+                    </Frame>
+                    
+                    <BoxView HeightRequest="1" Color="#e0e0e0" Margin="20,0"/>
+                    
+                    <!-- Manage Products -->
+                    <Frame Padding="0" BackgroundColor="Transparent" Margin="0" HasShadow="False" CornerRadius="0">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnMenuProductsClicked"/>
+                        </Frame.GestureRecognizers>
+                        <Grid Padding="20,15" ColumnDefinitions="Auto,*" ColumnSpacing="15">
+                            <Label Grid.Column="0" Text="🛍️" FontSize="22"/>
+                            <Label Grid.Column="1" Text="Manage Products" FontSize="16" TextColor="#1a1a1a" VerticalOptions="Center"/>
+                        </Grid>
+                    </Frame>
+                    
+                    <BoxView HeightRequest="1" Color="#e0e0e0" Margin="20,0"/>
+                    
+                    <!-- Manage Categories -->
+                    <Frame Padding="0" BackgroundColor="Transparent" Margin="0" HasShadow="False" CornerRadius="0">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnMenuCategoriesClicked"/>
+                        </Frame.GestureRecognizers>
+                        <Grid Padding="20,15" ColumnDefinitions="Auto,*" ColumnSpacing="15">
+                            <Label Grid.Column="0" Text="📁" FontSize="22"/>
+                            <Label Grid.Column="1" Text="Manage Categories" FontSize="16" TextColor="#1a1a1a" VerticalOptions="Center"/>
+                        </Grid>
+                    </Frame>
+                    
+                    <BoxView HeightRequest="1" Color="#e0e0e0" Margin="20,0"/>
+                    
+                    <!-- Logout -->
+                    <Frame Padding="0" BackgroundColor="Transparent" Margin="0,20,0,0" HasShadow="False" CornerRadius="0">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnMenuLogoutClicked"/>
+                        </Frame.GestureRecognizers>
+                        <Grid Padding="20,15" ColumnDefinitions="Auto,*" ColumnSpacing="15">
+                            <Label Grid.Column="0" Text="🚪" FontSize="22"/>
+                            <Label Grid.Column="1" Text="Logout" FontSize="16" TextColor="#dc3545" FontAttributes="Bold" VerticalOptions="Center"/>
+                        </Grid>
+                    </Frame>
+                    
+                </VerticalStackLayout>
+                
+                <!-- Close Menu Button -->
+                <Button Text="✕ Close Menu"
+                        Clicked="OnCloseMenuClicked"
+                        BackgroundColor="#f5f5f5"
+                        TextColor="#666666"
+                        FontSize="14"
+                        Margin="20"
+                        CornerRadius="8"
+                        VerticalOptions="EndAndExpand"/>
+                
+            </VerticalStackLayout>
+        </Frame>
+        
+        <!-- Overlay (Dimmed Background) -->
+        <BoxView x:Name="Overlay"
+                 BackgroundColor="#000000"
+                 Opacity="0"
+                 IsVisible="False"
+                 InputTransparent="False">
+            <BoxView.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnOverlayTapped"/>
+            </BoxView.GestureRecognizers>
+        </BoxView>
+        
+    </Grid

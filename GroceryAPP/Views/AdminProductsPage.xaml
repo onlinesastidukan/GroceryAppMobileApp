@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GroceryApp.Views.AdminProductsPage"
+             Title="सस्ती दुकान - Manage Products"
+             BackgroundColor="#ffffff">
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="16">
+        <Grid Margin="0,0,0,12">
+            <VerticalStackLayout Spacing="2">
+                <Label Text="Products" FontSize="28" FontAttributes="Bold" TextColor="#1a1a1a" VerticalOptions="Center"/>
+                <Label Text="Manage your inventory" FontSize="13" TextColor="#666666"/>
+            </VerticalStackLayout>
+            <Button Text="+ Add" 
+                    Clicked="OnAddProductClicked" 
+                    BackgroundColor="#00b366" 
+                    TextColor="White" 
+                    FontSize="13" 
+                    FontAttributes="Bold" 
+                    Padding="14,8" 
+                    CornerRadius="10" 
+                    HorizontalOptions="End"
+                    VerticalOptions="Center">
+                <Button.Shadow>
+                    <Shadow Brush="#00b366" Opacity="0.3" Radius="6" Offset="0,3"/>
+                </Button.Shadow>
+            </Button>
+        </Grid>
+        <CollectionView ItemsSource="{Binding Products}" SelectionMode="None">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="12"/>
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Padding="0" CornerRadius="14" HasShadow="False" BorderColor="#e8e8e8" Margin="0">
+                        <Frame.Shadow>
+                            <Shadow Brush="#000000" Opacity="0.05" Radius="8" Offset="0,2"/>
+                        </Frame.Shadow>
+                        <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="95,*" Padding="14" ColumnSpacing="14" RowSpacing="12">
+                            <!-- Product Image -->
+                            <Frame Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" 
+                                   Padding="8" 
+                                   CornerRadius="10" 
+                                   HasShadow="False" 
+                                   BackgroundColor="#f8f8f8"
+                                   WidthRequest="95"
+                                   HeightRequest="95">
+                                <Image Source="{Binding ImageUrl}" 
+                                       Aspect="AspectFit"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center"/>
+                            </Frame>
+                            
+                            <!-- Product Info -->
+                            <VerticalStackLayout Grid.Row="0" Grid.Column="1" Spacing="4">
+                                <Label Text="{Binding Name}" FontSize="16" FontAttributes="Bold" TextColor="#1a1a1a" MaxLines="2" LineBreakMode="TailTruncation"/>
+                                <Label Text="{Binding Description}" FontSize="12" TextColor="#666666" MaxLines="2" LineBreakMode="TailTruncation"/>
+                                <Label Text="{Binding Price, StringFormat='₹{0:F2}'}" FontSize="18" FontAttributes="Bold" TextColor="#00b366" Margin="0,4,0,0"/>
+                            </VerticalStackLayout>
+                            
+                            <!-- Action Buttons -->
+                            <HorizontalStackLayout Grid.Row="1" Grid.Column="1" Spacing="8">
+                                <Button Text="✏️ Edit" 
+                                        Clicked="OnEditProductClicked"
+                                        BackgroundColor="#3498db" 
+                                        TextColor="White"
+                                        FontSize="12"
+                                        Padding="14,8"
+                                        CornerRadius="8"
+                                        HorizontalOptions="FillAndExpand"
+                                        CommandParameter="{Binding .}">
+                                    <Button.Shadow>
+                                        <Shadow Brush="#3498db" Opacity="0.2" Radius="4" Offset="0,2"/>
+                                    </Button.Shadow>
+                                </Button>
+                                <Button Text="🗑️ Delete" 
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeleteProductCommand}" 
+                                        CommandParameter="{Binding .}"
+                                        BackgroundColor="#e74c3c" 
+                                        TextColor="White"
+                                        FontSize="12"
+                                        Padding="14,8"
+                                        CornerRadius="8"
+                                        HorizontalOptions="FillAndExpand">
+                                    <Button.Shadow>
+                                        <Shadow Brush="#e74c3c" Opacity="0.2" Radius="4" Offset="0,2"/>
+                                    </Button.Shadow>
+                                </Button>
+                            </HorizontalStackLayout>
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

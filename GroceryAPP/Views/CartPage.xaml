@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GroceryApp.Views.CartPage"
+             Title="Sasti Dukan - Cart"
+             BackgroundColor="#ffffff">
+    <ScrollView>
+        <VerticalStackLayout Spacing="16" Padding="16,12,16,80">
+            <!-- Header -->
+            <VerticalStackLayout Spacing="2">
+                <Label Text="Your Cart" FontSize="28" FontAttributes="Bold" TextColor="#1a1a1a"/>
+                <Label Text="Review your items" FontSize="12" TextColor="#666666"/>
+            </VerticalStackLayout>
+            
+            <Label Text="{Binding ErrorMessage}" 
+                   IsVisible="{Binding HasError}" 
+                   TextColor="#e74c3c" 
+                   FontSize="12"
+                   Margin="0,0,0,8"/>
+            
+            <!-- Cart Items -->
+            <CollectionView ItemsSource="{Binding CartItems}" SelectionMode="None">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="10"/>
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="#e8e8e8" Margin="0">
+                            <Grid RowDefinitions="*" ColumnDefinitions="70,*,Auto" Padding="12" ColumnSpacing="12">
+                                <!-- Product Image Placeholder -->
+                                <Frame Grid.Column="0" 
+                                       Padding="8" 
+                                       CornerRadius="8" 
+                                       HasShadow="False" 
+                                       BackgroundColor="#f8f8f8"
+                                       WidthRequest="70"
+                                       HeightRequest="70">
+                                    <Label Text="🛒" 
+                                           FontSize="32" 
+                                           HorizontalOptions="Center" 
+                                           VerticalOptions="Center"/>
+                                </Frame>
+                                
+                                <!-- Product Info -->
+                                <VerticalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+                                    <Label Text="{Binding ProductName}" FontSize="14" FontAttributes="Bold" TextColor="#1a1a1a" MaxLines="2" LineBreakMode="TailTruncation"/>
+                                    <Label Text="{Binding TotalPrice, StringFormat='₹{0:F0}'}" FontSize="17" FontAttributes="Bold" TextColor="#00b366"/>
+                                </VerticalStackLayout>
+                                
+                                <!-- Remove Button -->
+                                <Button Grid.Column="2"
+                                        Text="Remove" 
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RemoveFromCartCommand}"
+                                        CommandParameter="{Binding .}"
+                                        BackgroundColor="#ffebee"
+                                        TextColor="#e74c3c"
+                                        FontSize="11"
+                                        FontAttributes="Bold"
+                                        Padding="10,6"
+                                        CornerRadius="6"
+                                        VerticalOptions="Center"/>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+            
+            <ActivityIndicator IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}" Color="#00b366" Margin="0,12"/>
+            
+            <!-- Order Summary Card -->
+            <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="#e8e8e8" Margin="0,8,0,0">
+                <VerticalStackLayout Spacing="12" Padding="16">
+                    <!-- Total -->
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="Total Amount" FontSize="15" TextColor="#666666" VerticalOptions="Center"/>
+                        <Label Grid.Column="1" Text="{Binding TotalPrice, StringFormat='₹{0:F2}'}" FontSize="24" FontAttributes="Bold" TextColor="#1a1a1a" VerticalOptions="Center"/>
+                    </Grid>
+                    
+                    <BoxView HeightRequest="1" BackgroundColor="#f0f0f0" Margin="0,4"/>
+                    
+                    <!-- Delivery Address -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Delivery Address" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
+                        <Frame Padding="0" CornerRadius="8" HasShadow="False" BorderColor="#e8e8e8">
+                            <Entry Text="{Binding DeliveryAddress}" 
+                                   Placeholder="Enter your full delivery address"
+                                   BackgroundColor="Transparent"
+                                   FontSize="13"
+                                   Margin="12,8"/>
+                        </Frame>
+                    </VerticalStackLayout>
+                    
+                    <!-- Place Order Button -->
+                    <Button Text="Place Order" 
+                            Clicked="OnPlaceOrderClicked" 
+                            BackgroundColor="#00b366" 
+                            TextColor="White"
+                            FontSize="15"
+                            FontAttributes="Bold"
+                            Padding="16,12"
+                            CornerRadius="10"
+                            Margin="0,4,0,0"/>
+                </VerticalStackLayout>
+            </Frame>
+            
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

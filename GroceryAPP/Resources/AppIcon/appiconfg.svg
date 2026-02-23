@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="456" height="456" viewBox="0 0 456 456" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <!-- Shopping Cart Icon -->
+    <g transform="translate(228, 228)">
+        <!-- Cart Body -->
+        <path d="M -80 -40 L -60 60 Q -60 75 -45 75 L 100 75 Q 115 75 115 60 L 135 -40 Z" 
+              stroke="white" stroke-width="8" fill="none" stroke-linejoin="round"/>
+        <!-- Cart Handle -->
+        <path d="M -80 -40 L -60 -80 Q -40 -110 0 -110 Q 40 -110 60 -80 L 80 -40" 
+              stroke="white" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Wheel 1 -->
+        <circle cx="-30" cy="80" r="12" stroke="white" stroke-width="6" fill="none"/>
+        <!-- Wheel 2 -->
+        <circle cx="85" cy="80" r="12" stroke="white" stroke-width="6" fill="none"/>
+    </g>
+</svg>

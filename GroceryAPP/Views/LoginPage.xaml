@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GroceryApp.Views.LoginPage"
+             Title="सस्ती दुकान"
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="#ffffff">
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="20" VerticalOptions="Center">
+            
+            <!-- App Logo & Title -->
+            <VerticalStackLayout Spacing="8" Margin="0,40,0,20" HorizontalOptions="Center">
+                <!-- Emoji Logo -->
+                <Frame Padding="0" 
+                       WidthRequest="90" 
+                       HeightRequest="90" 
+                       CornerRadius="45" 
+                       HasShadow="False" 
+                       BackgroundColor="#e8f5e9"
+                       HorizontalOptions="Center">
+                    <Frame.Shadow>
+                        <Shadow Brush="#00b366" Opacity="0.2" Radius="12" Offset="0,4"/>
+                    </Frame.Shadow>
+                    <Label Text="🛒" 
+                           FontSize="48" 
+                           HorizontalOptions="Center" 
+                           VerticalOptions="Center"
+                           HorizontalTextAlignment="Center"
+                           VerticalTextAlignment="Center"/>
+                </Frame>
+                
+                <!-- App Name -->
+                <Label Text="सस्ती दुकान" 
+                       FontSize="36" 
+                       FontAttributes="Bold" 
+                       HorizontalTextAlignment="Center" 
+                       TextColor="#1a1a1a">
+                    <Label.Shadow>
+                        <Shadow Brush="#000000" Opacity="0.1" Radius="2" Offset="0,2"/>
+                    </Label.Shadow>
+                </Label>
+                <Label Text="Your Neighborhood Grocery Store" 
+                       FontSize="14" 
+                       HorizontalTextAlignment="Center" 
+                       TextColor="#666666"/>
+            </VerticalStackLayout>
+            
+            <!-- Login Form Card -->
+            <Frame Padding="0" CornerRadius="20" HasShadow="False" BorderColor="#e8e8e8" Margin="0,10,0,0">
+                <Frame.Shadow>
+                    <Shadow Brush="#000000" Opacity="0.08" Radius="16" Offset="0,4"/>
+                </Frame.Shadow>
+                <VerticalStackLayout Spacing="18" Padding="24,28">
+                    
+                    <!-- User ID Field -->
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="User ID" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
+                        <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="#e0e0e0">
+                            <Entry x:Name="UserIdEntry" 
+                                   Placeholder="Enter your user ID"
+                                   BackgroundColor="Transparent"
+                                   FontSize="15"
+                                   Margin="16,12"/>
+                        </Frame>
+                    </VerticalStackLayout>
+                    
+                    <!-- Password Field -->
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Password" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
+                        <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="#e0e0e0">
+                            <Entry x:Name="PasswordEntry" 
+                                   Placeholder="Enter your password"
+                                   IsPassword="True"
+                                   BackgroundColor="Transparent"
+                                   FontSize="15"
+                                   Margin="16,12"/>
+                        </Frame>
+                    </VerticalStackLayout>
+                    
+                    <!-- Error Label -->
+                    <Label x:Name="ErrorLabel" 
+                           Text="" 
+                           TextColor="#e74c3c" 
+                           FontSize="13"
+                           IsVisible="False"
+                           HorizontalTextAlignment="Center"/>
+                    
+                    <!-- Login Button -->
+                    <Button x:Name="LoginButton" 
+                            Text="🔐 Login" 
+                            BackgroundColor="#00b366" 
+                            TextColor="White" 
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            Padding="16,14"
+                            CornerRadius="12"
+                            Margin="0,8,0,0"
+                            Clicked="OnLoginClicked">
+                        <Button.Shadow>
+                            <Shadow Brush="#00b366" Opacity="0.4" Radius="10" Offset="0,5"/>
+                        </Button.Shadow>
+                    </Button>
+                    
+                    <!-- Register Button -->
+                    <Button x:Name="RegisterButton" 
+                            Text="Create New Account" 
+                            BackgroundColor="#f5f5f5" 
+                            TextColor="#00b366"
+                            FontSize="14"
+                            FontAttributes="Bold"
+                            Padding="16,12"
+                            CornerRadius="12"
+                            Clicked="OnRegisterClicked"/>
+                    
+                </VerticalStackLayout>
+            </Frame>
+            
+            <!-- Loading Indicator -->
+            <ActivityIndicator x:Name="LoadingIndicator" 
+                               IsRunning="False" 
+                               IsVisible="False" 
+                               Color="#00b366"
+                               Margin="0,20"/>
+            
+            <!-- Footer -->
+            <VerticalStackLayout Spacing="4" Margin="0,20,0,20" HorizontalOptions="Center">
+                <HorizontalStackLayout Spacing="6" HorizontalOptions="Center">
+                    <Label Text="⚡" FontSize="14"/>
+                    <Label Text="Fast Delivery" FontSize="12" TextColor="#666666"/>
+                    <Label Text="•" FontSize="12" TextColor="#999999"/>
+                    <Label Text="🌿 Fresh Products" FontSize="12" TextColor="#666666"/>
+                </HorizontalStackLayout>
+                <Label Text="Made with ❤️ for local businesses" 
+                       FontSize="11" 
+                       TextColor="#999999"
+                       HorizontalTextAlignment="Center"/>
+            </VerticalStackLayout>
+            
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
