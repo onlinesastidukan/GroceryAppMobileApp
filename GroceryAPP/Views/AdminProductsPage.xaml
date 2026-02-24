@@ -4,8 +4,7 @@
              x:Class="GroceryApp.Views.AdminProductsPage"
              Title="सस्ती दुकान - Manage Products"
              BackgroundColor="#ffffff">
-    <ScrollView>
-        <VerticalStackLayout Padding="16" Spacing="16">
+    <VerticalStackLayout Padding="16" Spacing="16">
         <Grid Margin="0,0,0,12">
             <VerticalStackLayout Spacing="2">
                 <Label Text="Products" FontSize="28" FontAttributes="Bold" TextColor="#1a1a1a" VerticalOptions="Center"/>
@@ -26,10 +25,16 @@
                 </Button.Shadow>
             </Button>
         </Grid>
-        <CollectionView ItemsSource="{Binding Products}" SelectionMode="None">
+        <CollectionView ItemsSource="{Binding Products}" SelectionMode="None" VerticalOptions="FillAndExpand">
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout Orientation="Vertical" ItemSpacing="12"/>
             </CollectionView.ItemsLayout>
+            <CollectionView.EmptyView>
+                <Label Text="No products found"
+                       TextColor="#999999"
+                       HorizontalTextAlignment="Center"
+                       Margin="0,20,0,0"/>
+            </CollectionView.EmptyView>
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Frame Padding="0" CornerRadius="14" HasShadow="False" BorderColor="#e8e8e8" Margin="0">
@@ -93,5 +98,4 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
     </VerticalStackLayout>
-    </ScrollView>
 </ContentPage>

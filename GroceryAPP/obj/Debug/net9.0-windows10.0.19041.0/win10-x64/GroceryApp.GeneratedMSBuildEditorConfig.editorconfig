@@ -1,5 +1,7 @@
 is_global = true
 build_property.TargetFramework = net9.0-windows10.0.19041.0
+build_property.TargetFrameworkIdentifier = .NETCoreApp
+build_property.TargetFrameworkVersion = v9.0
 build_property.TargetPlatformMinVersion = 10.0.17763.0
 build_property.UsingMicrosoftNETSdkWeb = 
 build_property.ProjectTypeGuids = 9A19103F-16F7-4668-BE54-9A1E7A4F7556
@@ -70,6 +72,12 @@ build_metadata.AdditionalFiles.ManifestResourceName = GroceryApp.Views.AdminDash
 build_metadata.AdditionalFiles.TargetPath = Views\AdminDashboardPage.xaml
 build_metadata.AdditionalFiles.RelativePath = Views\AdminDashboardPage.xaml
 
+[E:/Rohit_Mundhe/WOrk/GroceryApp/Views/AdminEditProductPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = GroceryApp.Views.AdminEditProductPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Views\AdminEditProductPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Views\AdminEditProductPage.xaml
+
 [E:/Rohit_Mundhe/WOrk/GroceryApp/Views/AdminOrderDetailPage.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = GroceryApp.Views.AdminOrderDetailPage.xaml
@@ -129,6 +137,12 @@ build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = GroceryApp.Views.LoginPage.xaml
 build_metadata.AdditionalFiles.TargetPath = Views\LoginPage.xaml
 build_metadata.AdditionalFiles.RelativePath = Views\LoginPage.xaml
+
+[E:/Rohit_Mundhe/WOrk/GroceryApp/Views/RegisterPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = GroceryApp.Views.RegisterPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Views\RegisterPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Views\RegisterPage.xaml
 
 [E:/Rohit_Mundhe/WOrk/GroceryApp/Views/SplashPage.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml

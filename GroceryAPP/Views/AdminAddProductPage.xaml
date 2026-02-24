@@ -4,8 +4,9 @@
              x:Class="GroceryApp.Views.AdminAddProductPage"
              Title="सस्ती दुकान - Add Product"
              BackgroundColor="#ffffff">
-    <ScrollView>
-        <VerticalStackLayout Padding="16" Spacing="20">
+    <Grid RowDefinitions="0.55*,0.45*" Padding="16" RowSpacing="12">
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Spacing="20">
             
             <!-- Header -->
             <VerticalStackLayout Spacing="4">
@@ -95,9 +96,10 @@
                 </VerticalStackLayout>
             </Frame>
             
-            <ActivityIndicator IsRunning="{Binding IsLoading}" 
-                               IsVisible="{Binding IsLoading}" 
-                               Color="#00b366" 
+            <ActivityIndicator x:Name="ProductsLoading"
+                               IsRunning="False"
+                               IsVisible="False"
+                               Color="#00b366"
                                Margin="0,12"/>
             
             <!-- Action Buttons -->
@@ -122,7 +124,54 @@
                         Padding="16,10"
                         CornerRadius="12"/>
             </VerticalStackLayout>
-            
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Existing Products -->
+        <VerticalStackLayout Grid.Row="1" Spacing="8" Margin="0,2,0,0">
+            <Label Text="Existing Products" FontSize="18" FontAttributes="Bold" TextColor="#1a1a1a"/>
+            <CollectionView x:Name="ProductsCollectionView"
+                            SelectionMode="None"
+                            VerticalOptions="FillAndExpand">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="10"/>
+                </CollectionView.ItemsLayout>
+                <CollectionView.EmptyView>
+                    <Label Text="No products yet" TextColor="#999999" HorizontalTextAlignment="Center"/>
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="#e8e8e8">
+                            <Grid Padding="12" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="6">
+                                <VerticalStackLayout Grid.Row="0" Grid.Column="0" Spacing="2">
+                                    <Label Text="{Binding Name}" FontSize="15" FontAttributes="Bold" TextColor="#1a1a1a"/>
+                                    <Label Text="{Binding Price, StringFormat='₹{0:F2}'}" FontSize="13" TextColor="#00b366"/>
+                                </VerticalStackLayout>
+                                <HorizontalStackLayout Grid.Row="1" Grid.Column="0" Spacing="8">
+                                    <Button Text="Edit"
+                                            Clicked="OnEditExistingProductClicked"
+                                            CommandParameter="{Binding .}"
+                                            BackgroundColor="#3498db"
+                                            TextColor="White"
+                                            FontSize="12"
+                                            Padding="12,6"
+                                            CornerRadius="8"/>
+                                    <Button Text="Delete"
+                                            Clicked="OnDeleteExistingProductClicked"
+                                            CommandParameter="{Binding .}"
+                                            BackgroundColor="#e74c3c"
+                                            TextColor="White"
+                                            FontSize="12"
+                                            Padding="12,6"
+                                            CornerRadius="8"/>
+                                </HorizontalStackLayout>
+                                <Label Grid.Row="0" Grid.Column="1" Text="{Binding Stock}" FontSize="12" TextColor="#666666" HorizontalTextAlignment="End"/>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
         </VerticalStackLayout>
-    </ScrollView>
+    </Grid>
 </ContentPage>

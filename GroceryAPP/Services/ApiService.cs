@@ -100,10 +100,9 @@ public class ApiService
                         UserId = loginResponse.UserId,
                         Role = loginResponse.Role,
                         Token = loginResponse.Token,
-                        FullName = loginRequest.UserId,
-                        Email = "",
-                        PhoneNumber = "",
-                        Address = ""
+                        FullName = loginResponse.FullName,
+                        MobileNumber = loginResponse.MobileNumber,
+                        Address = loginResponse.Address
                     };
                     
                     SetAuthToken(authData.Token);
@@ -186,12 +185,12 @@ public class ApiService
             if (response.IsSuccessStatusCode)
             {
                 var registerResponse = JsonSerializer.Deserialize<RegisterResponse>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                
-                return new ApiResponse<RegisterResponse> 
-                { 
-                    Success = true, 
-                    Message = "Registration successful",
-                    Data = registerResponse 
+
+                return new ApiResponse<RegisterResponse>
+                {
+                    Success = registerResponse?.Success ?? true,
+                    Message = registerResponse?.Message ?? "Registration successful",
+                    Data = registerResponse
                 };
             }
             else
@@ -212,29 +211,6 @@ public class ApiService
                 Success = false, 
                 Message = $"Error: {ex.Message}" 
             };
-        }
-    }
-
-    public async Task<ApiResponse> UpdateAddressAsync(UpdateAddressRequest request)
-    {
-        try
-        {
-            var response = await _httpClient.PutAsJsonAsync("user/address", request);
-            var content = await response.Content.ReadAsStringAsync();
-            
-            if (response.IsSuccessStatusCode)
-            {
-                return new ApiResponse { Success = true, Message = "Address updated successfully" };
-            }
-            else
-            {
-                return new ApiResponse { Success = false, Message = "Failed to update address" };
-            }
-        }
-        catch (Exception ex)
-        {
-            Log($"[API] UpdateAddress error: {ex.Message}");
-            return new ApiResponse { Success = false, Message = $"Error: {ex.Message}" };
         }
     }
 
@@ -560,18 +536,23 @@ public class ApiService
     {
         try
         {
-            System.Diagnostics.Debug.WriteLine("[API] Fetching all products from GET /api/products");
-            var response = await _httpClient.GetAsync($"products");
+            var requestPath = "products";
+            var requestUri = new Uri(_httpClient.BaseAddress!, requestPath);
+            var hasAuthHeader = _httpClient.DefaultRequestHeaders.Authorization != null;
+            System.Diagnostics.Debug.WriteLine($"[API] Fetching all products from GET {requestUri} (AuthHeaderPresent={hasAuthHeader})");
+            var response = await _httpClient.GetAsync(requestPath);
             var content = await response.Content.ReadAsStringAsync();
             System.Diagnostics.Debug.WriteLine($"[API] Products response status: {response.StatusCode}");
+            System.Diagnostics.Debug.WriteLine($"[API] Products response preview: {Preview(content, 300)}");
             
             if (response.IsSuccessStatusCode)
             {
                 try
                 {
                     var wrappedResponse = JsonSerializer.Deserialize<ApiResponse<List<Product>>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    if (wrappedResponse != null && wrappedResponse.Success)
+                    if (wrappedResponse?.Data != null)
                     {
+                        wrappedResponse.Success = true;
                         return wrappedResponse;
                     }
                 }
@@ -586,6 +567,33 @@ public class ApiService
                         Message = "Products loaded",
                         Data = directList 
                     };
+                }
+
+                // Some backend versions wrap arrays in { data }, { items }, or { products }.
+                try
+                {
+                    using var document = JsonDocument.Parse(content);
+                    if (document.RootElement.ValueKind == JsonValueKind.Object)
+                    {
+                        var list = TryReadProductArray(document.RootElement, "data")
+                            ?? TryReadProductArray(document.RootElement, "items")
+                            ?? TryReadProductArray(document.RootElement, "products")
+                            ?? TryReadProductArray(document.RootElement, "result");
+
+                        if (list != null)
+                        {
+                            return new ApiResponse<List<Product>>
+                            {
+                                Success = true,
+                                Message = "Products loaded",
+                                Data = list
+                            };
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[API] Product envelope parse error: {ex.Message}");
                 }
                 
                 return new ApiResponse<List<Product>> { Success = false, Message = "Failed to parse products" };
@@ -611,11 +619,18 @@ public class ApiService
             
             if (response.IsSuccessStatusCode)
             {
-                return JsonSerializer.Deserialize<ApiResponse<Product>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                var product = JsonSerializer.Deserialize<Product>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (product != null)
+                {
+                    return new ApiResponse<Product> { Success = true, Message = "Product created", Data = product };
+                }
+
+                return new ApiResponse<Product> { Success = false, Message = "Failed to parse product response" };
             }
             else
             {
-                return new ApiResponse<Product> { Success = false, Message = "Failed to create product" };
+                var message = string.IsNullOrWhiteSpace(content) ? "Failed to create product" : content;
+                return new ApiResponse<Product> { Success = false, Message = message };
             }
         }
         catch (Exception ex)
@@ -633,11 +648,18 @@ public class ApiService
             
             if (response.IsSuccessStatusCode)
             {
-                return JsonSerializer.Deserialize<ApiResponse>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                var product = JsonSerializer.Deserialize<Product>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (product != null)
+                {
+                    return new ApiResponse { Success = true, Message = "Product updated" };
+                }
+
+                return new ApiResponse { Success = true, Message = "Product updated" };
             }
             else
             {
-                return new ApiResponse { Success = false, Message = "Failed to update product" };
+                var message = string.IsNullOrWhiteSpace(content) ? "Failed to update product" : content;
+                return new ApiResponse { Success = false, Message = message };
             }
         }
         catch (Exception ex)
@@ -655,11 +677,13 @@ public class ApiService
             
             if (response.IsSuccessStatusCode)
             {
-                return JsonSerializer.Deserialize<ApiResponse>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                var message = string.IsNullOrWhiteSpace(content) ? "Product deleted" : content;
+                return new ApiResponse { Success = true, Message = message };
             }
             else
             {
-                return new ApiResponse { Success = false, Message = "Failed to delete product" };
+                var message = string.IsNullOrWhiteSpace(content) ? "Failed to delete product" : content;
+                return new ApiResponse { Success = false, Message = message };
             }
         }
         catch (Exception ex)
@@ -724,11 +748,18 @@ public class ApiService
             
             if (response.IsSuccessStatusCode)
             {
-                return JsonSerializer.Deserialize<ApiResponse<Category>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                var category = JsonSerializer.Deserialize<Category>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (category != null)
+                {
+                    return new ApiResponse<Category> { Success = true, Message = "Category created", Data = category };
+                }
+
+                return new ApiResponse<Category> { Success = false, Message = "Failed to parse category response" };
             }
             else
             {
-                return new ApiResponse<Category> { Success = false, Message = "Failed to create category" };
+                var message = string.IsNullOrWhiteSpace(content) ? "Failed to create category" : content;
+                return new ApiResponse<Category> { Success = false, Message = message };
             }
         }
         catch (Exception ex)
@@ -746,11 +777,18 @@ public class ApiService
             
             if (response.IsSuccessStatusCode)
             {
-                return JsonSerializer.Deserialize<ApiResponse>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                var category = JsonSerializer.Deserialize<Category>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (category != null)
+                {
+                    return new ApiResponse { Success = true, Message = "Category updated" };
+                }
+
+                return new ApiResponse { Success = true, Message = "Category updated" };
             }
             else
             {
-                return new ApiResponse { Success = false, Message = "Failed to update category" };
+                var message = string.IsNullOrWhiteSpace(content) ? "Failed to update category" : content;
+                return new ApiResponse { Success = false, Message = message };
             }
         }
         catch (Exception ex)
@@ -768,11 +806,13 @@ public class ApiService
             
             if (response.IsSuccessStatusCode)
             {
-                return JsonSerializer.Deserialize<ApiResponse>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                var message = string.IsNullOrWhiteSpace(content) ? "Category deleted" : content;
+                return new ApiResponse { Success = true, Message = message };
             }
             else
             {
-                return new ApiResponse { Success = false, Message = "Failed to delete category" };
+                var message = string.IsNullOrWhiteSpace(content) ? "Failed to delete category" : content;
+                return new ApiResponse { Success = false, Message = message };
             }
         }
         catch (Exception ex)
@@ -823,5 +863,28 @@ public class ApiService
             System.Diagnostics.Debug.WriteLine($"[API] GetAllOrdersAdmin error: {ex.Message}");
             return new ApiResponse<List<Order>> { Success = false, Message = $"Error: {ex.Message}" };
         }
+    }
+
+    private static List<Product>? TryReadProductArray(JsonElement root, string propertyName)
+    {
+        if (!root.TryGetProperty(propertyName, out var candidate) || candidate.ValueKind != JsonValueKind.Array)
+        {
+            return null;
+        }
+
+        try
+        {
+            return JsonSerializer.Deserialize<List<Product>>(candidate.GetRawText(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private static string Preview(string? value, int maxLen)
+    {
+        if (string.IsNullOrEmpty(value)) return "<empty>";
+        return value.Length <= maxLen ? value : value.Substring(0, maxLen) + "...";
     }
 }

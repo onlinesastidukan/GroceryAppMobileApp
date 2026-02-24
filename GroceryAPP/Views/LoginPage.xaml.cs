@@ -80,6 +80,7 @@ public partial class LoginPage : ContentPage
 
 	private async void OnRegisterClicked(object sender, EventArgs e)
 	{
-		await DisplayAlert("Info", "Registration not implemented yet", "OK");
+		var registerPage = Application.Current.Handler.MauiContext.Services.GetService<RegisterPage>();
+		await Navigation.PushAsync(registerPage);
 	}
 }

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GroceryApp.Views.AdminEditProductPage"
+             Title="सस्ती दुकान - Edit Product"
+             BackgroundColor="#ffffff">
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="20">
+
+            <!-- Header -->
+            <VerticalStackLayout Spacing="4">
+                <Label Text="Edit Product" FontSize="28" FontAttributes="Bold" TextColor="#1a1a1a"/>
+                <Label Text="Update product details" FontSize="13" TextColor="#666666"/>
+            </VerticalStackLayout>
+
+            <Label x:Name="ErrorLabel"
+                   IsVisible="False"
+                   TextColor="#e74c3c"
+                   FontSize="13"
+                   Margin="0,0,0,8"/>
+
+            <!-- Form Card -->
+            <Frame Padding="0" CornerRadius="16" HasShadow="False" BorderColor="#e8e8e8" Margin="0">
+                <VerticalStackLayout Spacing="16" Padding="16">
+
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Product Name" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
+                        <Frame Padding="0" CornerRadius="10" HasShadow="False" BorderColor="#e0e0e0">
+                            <Entry x:Name="ProductNameEntry"
+                                   Placeholder="e.g., Fresh Tomatoes"
+                                   BackgroundColor="Transparent"
+                                   FontSize="14"
+                                   Margin="12,8"/>
+                        </Frame>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Price (₹)" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
+                        <Frame Padding="0" CornerRadius="10" HasShadow="False" BorderColor="#e0e0e0">
+                            <Entry x:Name="PriceEntry"
+                                   Placeholder="0.00"
+                                   Keyboard="Numeric"
+                                   BackgroundColor="Transparent"
+                                   FontSize="14"
+                                   Margin="12,8"/>
+                        </Frame>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Description" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
+                        <Frame Padding="0" CornerRadius="10" HasShadow="False" BorderColor="#e0e0e0">
+                            <Editor x:Name="DescriptionEditor"
+                                    Placeholder="Product details and benefits"
+                                    HeightRequest="120"
+                                    BackgroundColor="Transparent"
+                                    FontSize="14"
+                                    Margin="12,8"/>
+                        </Frame>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Stock Quantity" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
+                        <Frame Padding="0" CornerRadius="10" HasShadow="False" BorderColor="#e0e0e0">
+                            <Entry x:Name="StockQuantityEntry"
+                                   Placeholder="0"
+                                   Keyboard="Numeric"
+                                   BackgroundColor="Transparent"
+                                   FontSize="14"
+                                   Margin="12,8"/>
+                        </Frame>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Photo URL" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
+                        <Frame Padding="0" CornerRadius="10" HasShadow="False" BorderColor="#e0e0e0">
+                            <Entry x:Name="PhotoUrlEntry"
+                                   Placeholder="https://example.com/image.jpg"
+                                   BackgroundColor="Transparent"
+                                   FontSize="14"
+                                   Margin="12,8"/>
+                        </Frame>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Category" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
+                        <Frame Padding="0" CornerRadius="10" HasShadow="False" BorderColor="#e0e0e0">
+                            <Picker x:Name="CategoryPicker"
+                                    Title="Select Category"
+                                    BackgroundColor="Transparent"
+                                    FontSize="14"
+                                    Margin="12,8"/>
+                        </Frame>
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+            </Frame>
+
+            <ActivityIndicator x:Name="LoadingIndicator"
+                               IsRunning="False"
+                               IsVisible="False"
+                               Color="#00b366"
+                               Margin="0,12"/>
+
+            <!-- Action Buttons -->
+            <VerticalStackLayout Spacing="10">
+                <Button Text="✅ Update Product"
+                        Clicked="OnSaveClicked"
+                        BackgroundColor="#00b366"
+                        TextColor="White"
+                        FontSize="15"
+                        FontAttributes="Bold"
+                        Padding="16,12"
+                        CornerRadius="12">
+                    <Button.Shadow>
+                        <Shadow Brush="#00b366" Opacity="0.3" Radius="8" Offset="0,4"/>
+                    </Button.Shadow>
+                </Button>
+                <Button Text="Cancel"
+                        Clicked="OnCancelClicked"
+                        BackgroundColor="#f5f5f5"
+                        TextColor="#666666"
+                        FontSize="14"
+                        Padding="16,10"
+                        CornerRadius="12"/>
+            </VerticalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GroceryApp.Views.RegisterPage"
+             Title="Create Account"
+             BackgroundColor="#ffffff">
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="20" VerticalOptions="Center">
+
+            <!-- Header -->
+            <VerticalStackLayout Spacing="8" Margin="0,20,0,10" HorizontalOptions="Center">
+                <Frame Padding="0"
+                       WidthRequest="80"
+                       HeightRequest="80"
+                       CornerRadius="40"
+                       HasShadow="False"
+                       BackgroundColor="#e8f5e9"
+                       HorizontalOptions="Center">
+                    <Frame.Shadow>
+                        <Shadow Brush="#00b366" Opacity="0.2" Radius="10" Offset="0,4"/>
+                    </Frame.Shadow>
+                    <Label Text="🧾"
+                           FontSize="38"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           HorizontalTextAlignment="Center"
+                           VerticalTextAlignment="Center"/>
+                </Frame>
+
+                  <Label Text="Create Account"
+                      FontSize="28"
+                       FontAttributes="Bold"
+                       HorizontalTextAlignment="Center"
+                       TextColor="#1a1a1a"/>
+                  <Label Text="User ID, name, mobile, and address"
+                       FontSize="12"
+                       HorizontalTextAlignment="Center"
+                       TextColor="#666666"/>
+            </VerticalStackLayout>
+
+            <!-- Form Card -->
+            <Frame Padding="0" CornerRadius="18" HasShadow="False" BorderColor="#e8e8e8">
+                <Frame.Shadow>
+                    <Shadow Brush="#000000" Opacity="0.08" Radius="16" Offset="0,4"/>
+                </Frame.Shadow>
+                <VerticalStackLayout Spacing="16" Padding="22,22">
+
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="User ID" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
+                        <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="#e0e0e0">
+                            <Entry x:Name="UserIdEntry"
+                                   Placeholder="Choose a unique user ID"
+                                ReturnType="Next"
+                                   BackgroundColor="Transparent"
+                                   FontSize="15"
+                                   Margin="16,12"/>
+                        </Frame>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Full Name" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
+                        <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="#e0e0e0">
+                            <Entry x:Name="FullNameEntry"
+                                   Placeholder="Enter your full name"
+                                ReturnType="Next"
+                                   BackgroundColor="Transparent"
+                                   FontSize="15"
+                                   Margin="16,12"/>
+                        </Frame>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Password" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
+                        <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="#e0e0e0">
+                            <Entry x:Name="PasswordEntry"
+                                   Placeholder="Create a password"
+                                   IsPassword="True"
+                                ReturnType="Next"
+                                   BackgroundColor="Transparent"
+                                   FontSize="15"
+                                   Margin="16,12"/>
+                        </Frame>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Mobile Number" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
+                        <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="#e0e0e0">
+                            <Entry x:Name="MobileEntry"
+                                   Placeholder="Enter mobile number"
+                                   Keyboard="Telephone"
+                                ReturnType="Next"
+                                   BackgroundColor="Transparent"
+                                   FontSize="15"
+                                   Margin="16,12"/>
+                        </Frame>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Address" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
+                        <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="#e0e0e0">
+                            <Editor x:Name="AddressEntry"
+                                    Placeholder="Enter delivery address"
+                                    AutoSize="TextChanges"
+                                    BackgroundColor="Transparent"
+                                    FontSize="15"
+                                    HeightRequest="90"
+                                    Margin="16,10"/>
+                        </Frame>
+                    </VerticalStackLayout>
+
+                    <Label x:Name="ErrorLabel"
+                           Text=""
+                           TextColor="#e74c3c"
+                           FontSize="12"
+                           IsVisible="False"
+                           HorizontalTextAlignment="Center"/>
+
+                    <Button x:Name="CreateAccountButton"
+                            Text="✅ Create Account"
+                            BackgroundColor="#00b366"
+                            TextColor="White"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            Padding="16,14"
+                            CornerRadius="12"
+                            Clicked="OnCreateAccountClicked">
+                        <Button.Shadow>
+                            <Shadow Brush="#00b366" Opacity="0.4" Radius="10" Offset="0,5"/>
+                        </Button.Shadow>
+                    </Button>
+
+                    <Button x:Name="BackToLoginButton"
+                            Text="Back to Login"
+                            BackgroundColor="#f5f5f5"
+                            TextColor="#00b366"
+                            FontSize="14"
+                            FontAttributes="Bold"
+                            Padding="16,12"
+                            CornerRadius="12"
+                            Clicked="OnBackToLoginClicked"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <ActivityIndicator x:Name="LoadingIndicator"
+                               IsRunning="False"
+                               IsVisible="False"
+                               Color="#00b366"
+                               Margin="0,20"/>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -240,8 +240,10 @@ public partial class AdminProductsViewModel : BaseViewModel
         {
             IsLoading = true;
             ClearError();
+            System.Diagnostics.Debug.WriteLine("[ADMIN PRODUCTS VM] InitializeAsync started");
 
             var response = await _apiService.GetAllProductsAdminAsync();
+            System.Diagnostics.Debug.WriteLine($"[ADMIN PRODUCTS VM] API response -> Success={response?.Success}, Message={response?.Message}, DataCount={response?.Data?.Count ?? 0}");
             if (response?.Success == true && response.Data != null)
             {
                 Products.Clear();
@@ -249,19 +251,23 @@ public partial class AdminProductsViewModel : BaseViewModel
                 {
                     Products.Add(product);
                 }
+                System.Diagnostics.Debug.WriteLine($"[ADMIN PRODUCTS VM] Products collection populated. Final count={Products.Count}");
             }
             else
             {
                 SetError(response?.Message ?? "Failed to load products");
+                System.Diagnostics.Debug.WriteLine($"[ADMIN PRODUCTS VM] Failed to load products. ErrorMessage={ErrorMessage}");
             }
         }
         catch (Exception ex)
         {
             SetError($"Error: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"[ADMIN PRODUCTS VM] Exception in InitializeAsync: {ex.Message}");
         }
         finally
         {
             IsLoading = false;
+            System.Diagnostics.Debug.WriteLine("[ADMIN PRODUCTS VM] InitializeAsync finished");
         }
     }
 

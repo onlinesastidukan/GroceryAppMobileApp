@@ -1,0 +1,188 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "E:\\Rohit_Mundhe\\WOrk\\GroceryApp\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{BF34FCE5-B5F8-46D6-B078-707CF283B296}|GroceryApp.csproj|e:\\rohit_mundhe\\work\\groceryapp\\services\\apiservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF34FCE5-B5F8-46D6-B078-707CF283B296}|GroceryApp.csproj|solutionrelative:services\\apiservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF34FCE5-B5F8-46D6-B078-707CF283B296}|GroceryApp.csproj|e:\\rohit_mundhe\\work\\groceryapp\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF34FCE5-B5F8-46D6-B078-707CF283B296}|GroceryApp.csproj|solutionrelative:services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF34FCE5-B5F8-46D6-B078-707CF283B296}|GroceryApp.csproj|e:\\rohit_mundhe\\work\\groceryapp\\views\\loginpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF34FCE5-B5F8-46D6-B078-707CF283B296}|GroceryApp.csproj|solutionrelative:views\\loginpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF34FCE5-B5F8-46D6-B078-707CF283B296}|GroceryApp.csproj|e:\\rohit_mundhe\\work\\groceryapp\\viewmodels\\adminviewmodels.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF34FCE5-B5F8-46D6-B078-707CF283B296}|GroceryApp.csproj|solutionrelative:viewmodels\\adminviewmodels.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF34FCE5-B5F8-46D6-B078-707CF283B296}|GroceryApp.csproj|e:\\rohit_mundhe\\work\\groceryapp\\views\\admincategoriespage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF34FCE5-B5F8-46D6-B078-707CF283B296}|GroceryApp.csproj|solutionrelative:views\\admincategoriespage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF34FCE5-B5F8-46D6-B078-707CF283B296}|GroceryApp.csproj|e:\\rohit_mundhe\\work\\groceryapp\\views\\adminaddproductpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF34FCE5-B5F8-46D6-B078-707CF283B296}|GroceryApp.csproj|solutionrelative:views\\adminaddproductpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF34FCE5-B5F8-46D6-B078-707CF283B296}|GroceryApp.csproj|e:\\rohit_mundhe\\work\\groceryapp\\views\\adminaddproductpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{BF34FCE5-B5F8-46D6-B078-707CF283B296}|GroceryApp.csproj|solutionrelative:views\\adminaddproductpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF34FCE5-B5F8-46D6-B078-707CF283B296}|GroceryApp.csproj|e:\\rohit_mundhe\\work\\groceryapp\\views\\adminaddcategorypage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF34FCE5-B5F8-46D6-B078-707CF283B296}|GroceryApp.csproj|solutionrelative:views\\adminaddcategorypage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF34FCE5-B5F8-46D6-B078-707CF283B296}|GroceryApp.csproj|e:\\rohit_mundhe\\work\\groceryapp\\views\\admincategoriespage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{BF34FCE5-B5F8-46D6-B078-707CF283B296}|GroceryApp.csproj|solutionrelative:views\\admincategoriespage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF34FCE5-B5F8-46D6-B078-707CF283B296}|GroceryApp.csproj|e:\\rohit_mundhe\\work\\groceryapp\\viewmodels\\customerviewmodels.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF34FCE5-B5F8-46D6-B078-707CF283B296}|GroceryApp.csproj|solutionrelative:viewmodels\\customerviewmodels.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "AuthService.cs",
+              "DocumentMoniker": "E:\\Rohit_Mundhe\\WOrk\\GroceryApp\\Services\\AuthService.cs",
+              "RelativeDocumentMoniker": "Services\\AuthService.cs",
+              "ToolTip": "E:\\Rohit_Mundhe\\WOrk\\GroceryApp\\Services\\AuthService.cs",
+              "RelativeToolTip": "Services\\AuthService.cs",
+              "ViewState": "AgIAAA8AAAAAAAAAAADgvxYAAAAEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-24T04:46:30.81Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "AdminViewModels.cs",
+              "DocumentMoniker": "E:\\Rohit_Mundhe\\WOrk\\GroceryApp\\ViewModels\\AdminViewModels.cs",
+              "RelativeDocumentMoniker": "ViewModels\\AdminViewModels.cs",
+              "ToolTip": "E:\\Rohit_Mundhe\\WOrk\\GroceryApp\\ViewModels\\AdminViewModels.cs",
+              "RelativeToolTip": "ViewModels\\AdminViewModels.cs",
+              "ViewState": "AgIAAE0BAAAAAAAAAADgv1kBAAAjAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-24T04:46:30.794Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "LoginPage.xaml.cs",
+              "DocumentMoniker": "E:\\Rohit_Mundhe\\WOrk\\GroceryApp\\Views\\LoginPage.xaml.cs",
+              "RelativeDocumentMoniker": "Views\\LoginPage.xaml.cs",
+              "ToolTip": "E:\\Rohit_Mundhe\\WOrk\\GroceryApp\\Views\\LoginPage.xaml.cs",
+              "RelativeToolTip": "Views\\LoginPage.xaml.cs",
+              "ViewState": "AgIAABwAAAAAAAAAAADgvygAAAADAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-24T04:46:30.81Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "ApiService.cs",
+              "DocumentMoniker": "E:\\Rohit_Mundhe\\WOrk\\GroceryApp\\Services\\ApiService.cs",
+              "RelativeDocumentMoniker": "Services\\ApiService.cs",
+              "ToolTip": "E:\\Rohit_Mundhe\\WOrk\\GroceryApp\\Services\\ApiService.cs",
+              "RelativeToolTip": "Services\\ApiService.cs",
+              "ViewState": "AgIAABICAAAAAAAAAAAswCACAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-24T04:46:30.81Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "AdminCategoriesPage.xaml.cs",
+              "DocumentMoniker": "E:\\Rohit_Mundhe\\WOrk\\GroceryApp\\Views\\AdminCategoriesPage.xaml.cs",
+              "RelativeDocumentMoniker": "Views\\AdminCategoriesPage.xaml.cs",
+              "ToolTip": "E:\\Rohit_Mundhe\\WOrk\\GroceryApp\\Views\\AdminCategoriesPage.xaml.cs",
+              "RelativeToolTip": "Views\\AdminCategoriesPage.xaml.cs",
+              "ViewState": "AgIAAA0AAAAAAAAAAADgvxQAAAAEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-24T04:46:30.778Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "AdminAddProductPage.xaml",
+              "DocumentMoniker": "E:\\Rohit_Mundhe\\WOrk\\GroceryApp\\Views\\AdminAddProductPage.xaml",
+              "RelativeDocumentMoniker": "Views\\AdminAddProductPage.xaml",
+              "ToolTip": "E:\\Rohit_Mundhe\\WOrk\\GroceryApp\\Views\\AdminAddProductPage.xaml",
+              "RelativeToolTip": "Views\\AdminAddProductPage.xaml",
+              "ViewState": "AgIAABUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-02-24T10:04:33.112Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "AdminAddProductPage.xaml.cs",
+              "DocumentMoniker": "E:\\Rohit_Mundhe\\WOrk\\GroceryApp\\Views\\AdminAddProductPage.xaml.cs",
+              "RelativeDocumentMoniker": "Views\\AdminAddProductPage.xaml.cs",
+              "ToolTip": "E:\\Rohit_Mundhe\\WOrk\\GroceryApp\\Views\\AdminAddProductPage.xaml.cs",
+              "RelativeToolTip": "Views\\AdminAddProductPage.xaml.cs",
+              "ViewState": "AgIAACoAAAAAAAAAAEAjwDQAAAA+AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-24T04:46:30.715Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "AdminAddCategoryPage.xaml.cs",
+              "DocumentMoniker": "E:\\Rohit_Mundhe\\WOrk\\GroceryApp\\Views\\AdminAddCategoryPage.xaml.cs",
+              "RelativeDocumentMoniker": "Views\\AdminAddCategoryPage.xaml.cs",
+              "ToolTip": "E:\\Rohit_Mundhe\\WOrk\\GroceryApp\\Views\\AdminAddCategoryPage.xaml.cs",
+              "RelativeToolTip": "Views\\AdminAddCategoryPage.xaml.cs",
+              "ViewState": "AgIAADgAAADAy8zMzMwuwAwAAAAXAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-24T04:46:30.778Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "AdminCategoriesPage.xaml",
+              "DocumentMoniker": "E:\\Rohit_Mundhe\\WOrk\\GroceryApp\\Views\\AdminCategoriesPage.xaml",
+              "RelativeDocumentMoniker": "Views\\AdminCategoriesPage.xaml",
+              "ToolTip": "E:\\Rohit_Mundhe\\WOrk\\GroceryApp\\Views\\AdminCategoriesPage.xaml",
+              "RelativeToolTip": "Views\\AdminCategoriesPage.xaml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-02-24T04:46:30.794Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "CustomerViewModels.cs",
+              "DocumentMoniker": "E:\\Rohit_Mundhe\\WOrk\\GroceryApp\\ViewModels\\CustomerViewModels.cs",
+              "RelativeDocumentMoniker": "ViewModels\\CustomerViewModels.cs",
+              "ToolTip": "E:\\Rohit_Mundhe\\WOrk\\GroceryApp\\ViewModels\\CustomerViewModels.cs",
+              "RelativeToolTip": "ViewModels\\CustomerViewModels.cs",
+              "ViewState": "AgIAAEEAAAAANTMzMzMEwCYAAAAtAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-24T04:46:30.794Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

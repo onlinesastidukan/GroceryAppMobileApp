@@ -20,7 +20,9 @@ public partial class AdminProductsPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+        System.Diagnostics.Debug.WriteLine("[ADMIN PRODUCTS PAGE] OnAppearing -> calling InitializeAsyncSafe");
         await _viewModel.InitializeAsyncSafe();
+        System.Diagnostics.Debug.WriteLine($"[ADMIN PRODUCTS PAGE] InitializeAsyncSafe completed. Current UI Products.Count={_viewModel.Products?.Count ?? 0}");
     }
 
     private async void OnAddProductClicked(object sender, EventArgs e)
@@ -33,8 +35,8 @@ public partial class AdminProductsPage : ContentPage
     {
         if (sender is Button button && button.CommandParameter is Product product)
         {
-            // TODO: Implement edit product page
-            await DisplayAlert("Info", $"Edit product: {product.Name}", "OK");
+            var editProductPage = new AdminEditProductPage(_apiService, product);
+            await Navigation.PushAsync(editProductPage);
         }
     }
 }

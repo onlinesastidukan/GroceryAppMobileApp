@@ -8,6 +8,7 @@ public partial class AdminAddProductPage : ContentPage
 {
     private readonly ApiService _apiService;
     private List<Category> _categories = new();
+    private List<Product> _products = new();
 
     public AdminAddProductPage(ApiService apiService)
     {
@@ -19,6 +20,7 @@ public partial class AdminAddProductPage : ContentPage
     {
         base.OnAppearing();
         await LoadCategories();
+        await LoadProducts();
     }
 
     private async Task LoadCategories()
@@ -38,6 +40,41 @@ public partial class AdminAddProductPage : ContentPage
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"[ADD PRODUCT] Error loading categories: {ex.Message}");
+        }
+    }
+
+    private async Task LoadProducts()
+    {
+        try
+        {
+            ProductsLoading.IsRunning = true;
+            ProductsLoading.IsVisible = true;
+
+            var response = await _apiService.GetAllProductsAdminAsync();
+            if (response?.Success == true && response.Data != null)
+            {
+                _products = response.Data.ToList();
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    ProductsCollectionView.ItemsSource = _products;
+                });
+            }
+            else
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    ProductsCollectionView.ItemsSource = new List<Product>();
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[ADD PRODUCT] Error loading products: {ex.Message}");
+        }
+        finally
+        {
+            ProductsLoading.IsRunning = false;
+            ProductsLoading.IsVisible = false;
         }
     }
 
@@ -105,6 +142,38 @@ public partial class AdminAddProductPage : ContentPage
     private async void OnCancelClicked(object sender, EventArgs e)
     {
         await Navigation.PopAsync();
+    }
+
+    private async void OnEditExistingProductClicked(object sender, EventArgs e)
+    {
+        if (sender is Button button && button.CommandParameter is Product product)
+        {
+            var editPage = new AdminEditProductPage(_apiService, product);
+            await Navigation.PushAsync(editPage);
+        }
+    }
+
+    private async void OnDeleteExistingProductClicked(object sender, EventArgs e)
+    {
+        if (sender is Button button && button.CommandParameter is Product product)
+        {
+            var confirm = await DisplayAlert("Confirm", $"Delete {product.Name}?", "Yes", "No");
+            if (!confirm)
+            {
+                return;
+            }
+
+            var response = await _apiService.DeleteProductAsync(product.ProductId);
+            if (response?.Success == true)
+            {
+                await DisplayAlert("Success", "Product deleted", "OK");
+                await LoadProducts();
+            }
+            else
+            {
+                await DisplayAlert("Error", response?.Message ?? "Failed to delete product", "OK");
+            }
+        }
     }
 }
 

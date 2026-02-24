@@ -41,6 +41,7 @@ public static class MauiProgram
 		// Register Views
 		builder.Services.AddSingleton<SplashPage>();
 		builder.Services.AddTransient<LoginPage>();
+		builder.Services.AddTransient<RegisterPage>();
 		builder.Services.AddTransient<AdminDashboardPage>();
 		builder.Services.AddTransient<AdminProductsPage>();
 		builder.Services.AddTransient<AdminCategoriesPage>();

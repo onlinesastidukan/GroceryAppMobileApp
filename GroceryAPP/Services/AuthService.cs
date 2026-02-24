@@ -39,8 +39,7 @@ public class AuthService
                 {
                     UserId = response.Data.UserId,
                     FullName = response.Data.FullName,
-                    Email = response.Data.Email,
-                    PhoneNumber = response.Data.PhoneNumber,
+                    MobileNumber = response.Data.MobileNumber,
                     Address = response.Data.Address,
                     Role = response.Data.Role,
                     Token = response.Data.Token

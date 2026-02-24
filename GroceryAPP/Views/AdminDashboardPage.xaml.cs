@@ -24,7 +24,7 @@ public partial class AdminDashboardPage : ContentPage
     }
 
     // Hamburger Menu Toggle
-    private async void OnMenuClicked(object sender, TappedEventArgs e)
+    private async void OnMenuClicked(object sender, EventArgs e)
     {
         await OpenMenu();
     }
