@@ -10,21 +10,24 @@
             <converters:CategoryToIconConverter x:Key="CategoryIconConverter"/>
         </ResourceDictionary>
     </ContentPage.Resources>
-    <ScrollView>
-        <VerticalStackLayout Padding="16" Spacing="16">
-        <Grid Margin="0,0,0,12">
+
+    <!-- Grid root: fixed header row, CollectionView scrolls in remaining space -->
+    <Grid RowDefinitions="Auto,Auto,Auto,*">
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="16,16,16,4">
             <VerticalStackLayout Spacing="2">
                 <Label Text="Categories" FontSize="28" FontAttributes="Bold" TextColor="#1a1a1a" VerticalOptions="Center"/>
                 <Label Text="Manage product categories" FontSize="13" TextColor="#666666"/>
             </VerticalStackLayout>
-            <Button Text="+ Add" 
-                    Clicked="OnAddCategoryClicked" 
-                    BackgroundColor="#00b366" 
-                    TextColor="White" 
-                    FontSize="13" 
-                    FontAttributes="Bold" 
-                    Padding="14,8" 
-                    CornerRadius="10" 
+            <Button Text="+ Add"
+                    Clicked="OnAddCategoryClicked"
+                    BackgroundColor="#00b366"
+                    TextColor="White"
+                    FontSize="13"
+                    FontAttributes="Bold"
+                    Padding="14,8"
+                    CornerRadius="10"
                     HorizontalOptions="End"
                     VerticalOptions="Center">
                 <Button.Shadow>
@@ -32,27 +35,40 @@
                 </Button.Shadow>
             </Button>
         </Grid>
-        
-        <!-- Loading Indicator -->
-        <ActivityIndicator IsRunning="{Binding IsLoading}" 
-                           IsVisible="{Binding IsLoading}" 
-                           Color="#00b366" 
+
+        <!-- Loading -->
+        <ActivityIndicator Grid.Row="1"
+                           IsRunning="{Binding IsLoading}"
+                           IsVisible="{Binding IsLoading}"
+                           Color="#00b366"
                            Scale="1.5"
                            Margin="0,20"/>
-        
-        <!-- Error Message -->
-        <Label Text="{Binding ErrorMessage}" 
-               IsVisible="{Binding HasError}" 
-               TextColor="#e74c3c" 
+
+        <!-- Error -->
+        <Label Grid.Row="2"
+               Text="{Binding ErrorMessage}"
+               IsVisible="{Binding HasError}"
+               TextColor="#e74c3c"
                FontSize="14"
                FontAttributes="Bold"
-               Margin="0,10"
+               Margin="16,4"
                Padding="12"/>
-        
-        <CollectionView ItemsSource="{Binding Categories}" SelectionMode="None">
+
+        <!-- Categories grid — CollectionView handles its own scrolling -->
+        <CollectionView Grid.Row="3"
+                        ItemsSource="{Binding Categories}"
+                        SelectionMode="None"
+                        Margin="16,8,16,0">
             <CollectionView.ItemsLayout>
                 <GridItemsLayout Orientation="Vertical" Span="2" HorizontalItemSpacing="12" VerticalItemSpacing="12"/>
             </CollectionView.ItemsLayout>
+            <CollectionView.EmptyView>
+                <Label Text="No categories yet"
+                       TextColor="#999999"
+                       HorizontalTextAlignment="Center"
+                       Margin="0,40"
+                       FontSize="14"/>
+            </CollectionView.EmptyView>
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Frame Padding="0" CornerRadius="16" HasShadow="False" BorderColor="#e8e8e8" Margin="0">
@@ -60,44 +76,39 @@
                             <Shadow Brush="#000000" Opacity="0.05" Radius="8" Offset="0,2"/>
                         </Frame.Shadow>
                         <VerticalStackLayout Spacing="12" Padding="14">
-                            <!-- Dynamic Icon Circle -->
-                            <Frame Padding="0" 
-                                   WidthRequest="56" 
-                                   HeightRequest="56" 
-                                   CornerRadius="28" 
-                                   HasShadow="False" 
+                            <Frame Padding="0"
+                                   WidthRequest="56"
+                                   HeightRequest="56"
+                                   CornerRadius="28"
+                                   HasShadow="False"
                                    BackgroundColor="#e8f5e9"
                                    HorizontalOptions="Center">
-                                <Label Text="{Binding Name, Converter={StaticResource CategoryIconConverter}}" 
-                                       FontSize="32" 
-                                       HorizontalOptions="Center" 
+                                <Label Text="{Binding Name, Converter={StaticResource CategoryIconConverter}}"
+                                       FontSize="32"
+                                       HorizontalOptions="Center"
                                        VerticalOptions="Center"
                                        HorizontalTextAlignment="Center"
                                        VerticalTextAlignment="Center"/>
                             </Frame>
-                            
-                            <!-- Category Info -->
                             <VerticalStackLayout Spacing="4" HorizontalOptions="Fill">
                                 <Label Text="{Binding Name}" FontSize="14" FontAttributes="Bold" TextColor="#1a1a1a" HorizontalTextAlignment="Center" MaxLines="2" LineBreakMode="TailTruncation"/>
                                 <Label Text="{Binding Description}" FontSize="11" TextColor="#666666" HorizontalTextAlignment="Center" MaxLines="2" LineBreakMode="TailTruncation"/>
                             </VerticalStackLayout>
-                            
-                            <!-- Action Buttons -->
                             <Grid ColumnDefinitions="*,*" ColumnSpacing="6" Margin="0,2,0,0">
                                 <Button Grid.Column="0"
-                                        Text="Edit" 
+                                        Text="Edit"
                                         Clicked="OnEditCategoryClicked"
-                                        BackgroundColor="#3498db" 
+                                        BackgroundColor="#3498db"
                                         TextColor="White"
                                         FontSize="11"
                                         Padding="8,6"
                                         CornerRadius="8"
                                         CommandParameter="{Binding .}"/>
                                 <Button Grid.Column="1"
-                                        Text="Delete" 
-                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeleteCategoryCommand}" 
+                                        Text="Delete"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeleteCategoryCommand}"
                                         CommandParameter="{Binding .}"
-                                        BackgroundColor="#e74c3c" 
+                                        BackgroundColor="#e74c3c"
                                         TextColor="White"
                                         FontSize="11"
                                         Padding="8,6"
@@ -108,6 +119,6 @@
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
-    </VerticalStackLayout>
-    </ScrollView>
+
+    </Grid>
 </ContentPage>

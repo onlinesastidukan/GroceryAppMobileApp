@@ -4,8 +4,8 @@
              x:Class="GroceryApp.Views.AdminProductsPage"
              Title="सस्ती दुकान - Manage Products"
              BackgroundColor="#ffffff">
-    <VerticalStackLayout Padding="16" Spacing="16">
-        <Grid Margin="0,0,0,12">
+    <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="16" RowSpacing="12">
+        <Grid Grid.Row="0" Margin="0,0,0,6">
             <VerticalStackLayout Spacing="2">
                 <Label Text="Products" FontSize="28" FontAttributes="Bold" TextColor="#1a1a1a" VerticalOptions="Center"/>
                 <Label Text="Manage your inventory" FontSize="13" TextColor="#666666"/>
@@ -25,7 +25,37 @@
                 </Button.Shadow>
             </Button>
         </Grid>
-        <CollectionView ItemsSource="{Binding Products}" SelectionMode="None" VerticalOptions="FillAndExpand">
+
+        <Label Grid.Row="1"
+               Text="{Binding ErrorMessage}"
+               IsVisible="{Binding HasError}"
+               TextColor="White"
+               BackgroundColor="#dc3545"
+               FontSize="13"
+               Padding="10">
+            <Label.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnErrorBannerTapped"/>
+            </Label.GestureRecognizers>
+        </Label>
+
+        <!-- Search Bar -->
+        <Frame Grid.Row="2" Padding="0" CornerRadius="12" HasShadow="False" BorderColor="#e8e8e8">
+            <Frame.Shadow>
+                <Shadow Brush="#000000" Opacity="0.04" Radius="6" Offset="0,2"/>
+            </Frame.Shadow>
+            <SearchBar Placeholder="Search products by name or description..."
+                       Text="{Binding SearchText}"
+                       PlaceholderColor="#aaaaaa"
+                       TextColor="#1a1a1a"
+                       BackgroundColor="Transparent"
+                       FontSize="14"
+                       CancelButtonColor="#00b366"/>
+        </Frame>
+
+        <CollectionView Grid.Row="3"
+                        ItemsSource="{Binding Products}"
+                        SelectionMode="None"
+                        IsVisible="{Binding IsLoading, Converter={StaticResource InvertBoolConverter}}">
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout Orientation="Vertical" ItemSpacing="12"/>
             </CollectionView.ItemsLayout>
@@ -50,8 +80,11 @@
                                    BackgroundColor="#f8f8f8"
                                    WidthRequest="95"
                                    HeightRequest="95">
-                                <Image Source="{Binding ImageUrl}" 
+                                <Image Source="{Binding ImageUrl, Converter={StaticResource Base64ImageSourceConverter}}" 
+                                        BackgroundColor="#f8f8f8"
                                        Aspect="AspectFit"
+                                        WidthRequest="76"
+                                        HeightRequest="76"
                                        HorizontalOptions="Center"
                                        VerticalOptions="Center"/>
                             </Frame>
@@ -61,6 +94,22 @@
                                 <Label Text="{Binding Name}" FontSize="16" FontAttributes="Bold" TextColor="#1a1a1a" MaxLines="2" LineBreakMode="TailTruncation"/>
                                 <Label Text="{Binding Description}" FontSize="12" TextColor="#666666" MaxLines="2" LineBreakMode="TailTruncation"/>
                                 <Label Text="{Binding Price, StringFormat='₹{0:F2}'}" FontSize="18" FontAttributes="Bold" TextColor="#00b366" Margin="0,4,0,0"/>
+                                <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                    <Label Text="{Binding Stock, StringFormat='Stock: {0}'}" FontSize="12" TextColor="#495057"/>
+                                    <Label Text="OUT OF STOCK"
+                                           FontSize="10"
+                                           FontAttributes="Bold"
+                                           TextColor="White"
+                                           BackgroundColor="#d64545"
+                                           Padding="6,2"
+                                           IsVisible="False">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsOutOfStock}" Value="True">
+                                                <Setter Property="IsVisible" Value="True"/>
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </HorizontalStackLayout>
                             </VerticalStackLayout>
                             
                             <!-- Action Buttons -->
@@ -76,6 +125,25 @@
                                         CommandParameter="{Binding .}">
                                     <Button.Shadow>
                                         <Shadow Brush="#3498db" Opacity="0.2" Radius="4" Offset="0,2"/>
+                                    </Button.Shadow>
+                                </Button>
+                                <Button Text="➕ Stock"
+                                        Clicked="OnRestockProductClicked"
+                                        BackgroundColor="#f39c12"
+                                        TextColor="White"
+                                        FontSize="12"
+                                        Padding="14,8"
+                                        CornerRadius="8"
+                                        HorizontalOptions="FillAndExpand"
+                                        CommandParameter="{Binding .}"
+                                        IsVisible="False">
+                                    <Button.Triggers>
+                                        <DataTrigger TargetType="Button" Binding="{Binding IsOutOfStock}" Value="True">
+                                            <Setter Property="IsVisible" Value="True"/>
+                                        </DataTrigger>
+                                    </Button.Triggers>
+                                    <Button.Shadow>
+                                        <Shadow Brush="#f39c12" Opacity="0.2" Radius="4" Offset="0,2"/>
                                     </Button.Shadow>
                                 </Button>
                                 <Button Text="🗑️ Delete" 
@@ -97,5 +165,24 @@
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
-    </VerticalStackLayout>
+
+        <!-- Loading overlay for product list -->
+        <Grid Grid.Row="3"
+              IsVisible="{Binding IsLoading}"
+              InputTransparent="False"
+              BackgroundColor="#F8F9FA">
+            <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="14">
+                <ActivityIndicator IsRunning="True"
+                                   Color="#00b366"
+                                   WidthRequest="48"
+                                   HeightRequest="48"
+                                   HorizontalOptions="Center"/>
+                <Label Text="Loading products..."
+                       FontSize="14"
+                       TextColor="#666666"
+                       HorizontalTextAlignment="Center"
+                       FontAutoScalingEnabled="False"/>
+            </VerticalStackLayout>
+        </Grid>
+    </Grid>
 </ContentPage>

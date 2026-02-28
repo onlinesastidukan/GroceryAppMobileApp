@@ -2,19 +2,113 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GroceryApp.Views.CustomerOrderDetailPage"
-             Title="Sasti Dukan - Order Detail">
-    <VerticalStackLayout Padding="20" Spacing="10">
-        <Label Text="{Binding Order.OrderId, StringFormat='Order #{0}'}" FontSize="18" FontAttributes="Bold"/>
-        <Label Text="{Binding Order.Status}"/>
-        <CollectionView ItemsSource="{Binding OrderItems}">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <StackLayout Padding="10" Spacing="5">
-                        <Label Text="{Binding ProductName}" FontAttributes="Bold"/>
-                        <Label Text="{Binding TotalPrice, StringFormat='Total: ₹{0:F2}'}"/>
-                    </StackLayout>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
-    </VerticalStackLayout>
+             Title="Order Detail"
+             BackgroundColor="#f8f9fa">
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Padding="16" Spacing="14">
+
+                <!-- Order Header Card -->
+                <Frame Padding="18" CornerRadius="16" HasShadow="False" BackgroundColor="#1a1a1a">
+                    <Frame.Shadow>
+                        <Shadow Brush="#000000" Opacity="0.15" Radius="12" Offset="0,4"/>
+                    </Frame.Shadow>
+                    <VerticalStackLayout Spacing="8">
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                            <Label Text="{Binding Order.OrderId, StringFormat='Order #{0}'}"
+                                   FontSize="20" FontAttributes="Bold" TextColor="White"
+                                   FontAutoScalingEnabled="False" VerticalOptions="Center"/>
+                            <!-- Status badge -->
+                            <Frame Grid.Column="1" Padding="10,5" CornerRadius="12" HasShadow="False"
+                                   BackgroundColor="{Binding Order.Status, Converter={StaticResource StatusToBadgeBgConverter}}">
+                                <Label Text="{Binding Order.Status}"
+                                       FontSize="12" FontAttributes="Bold" FontAutoScalingEnabled="False"
+                                       TextColor="{Binding Order.Status, Converter={StaticResource StringToColorConverter}}"
+                                       HorizontalTextAlignment="Center"/>
+                            </Frame>
+                        </Grid>
+                        <Label Text="{Binding Order.OrderDate, StringFormat='{}{0:dd MMM yyyy, hh:mm tt}'}"
+                               FontSize="12" TextColor="#aaaaaa" FontAutoScalingEnabled="False"/>
+                        <Label Text="{Binding Order.TotalAmount, StringFormat='Total: &#8377;{0:F0}'}"
+                               FontSize="16" FontAttributes="Bold" TextColor="#00b366" FontAutoScalingEnabled="False"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Delivery Address -->
+                <Frame Padding="16" CornerRadius="14" HasShadow="False" BackgroundColor="White" BorderColor="#eeeeee">
+                    <Frame.Shadow>
+                        <Shadow Brush="#000000" Opacity="0.05" Radius="8" Offset="0,2"/>
+                    </Frame.Shadow>
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="DELIVERY ADDRESS" FontSize="10" TextColor="#999999" FontAttributes="Bold" FontAutoScalingEnabled="False"/>
+                        <Label Text="{Binding Order.DeliveryAddress}" FontSize="14" TextColor="#333333" FontAutoScalingEnabled="False"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Error -->
+                <Label Text="{Binding ErrorMessage}"
+                       IsVisible="{Binding HasError}"
+                       TextColor="White" BackgroundColor="#dc3545"
+                       Padding="12,8" FontSize="13" FontAutoScalingEnabled="False"/>
+
+                <!-- Order Items -->
+                <Label Text="ORDER ITEMS" FontSize="10" TextColor="#999999" FontAttributes="Bold"
+                       FontAutoScalingEnabled="False" Margin="2,0,0,0"/>
+                <Label Text="No items in this order."
+                       IsVisible="{Binding HasNoItems}"
+                       TextColor="#999999" HorizontalTextAlignment="Center"
+                       FontSize="13" FontAutoScalingEnabled="False"/>
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding OrderItems}" Spacing="0">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <Frame Padding="14" CornerRadius="12" HasShadow="False"
+                                   BackgroundColor="White" BorderColor="#f0f0f0" Margin="0,4">
+                                <Frame.Shadow>
+                                    <Shadow Brush="#000000" Opacity="0.04" Radius="6" Offset="0,2"/>
+                                </Frame.Shadow>
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                    <VerticalStackLayout Grid.Column="0" Spacing="3">
+                                        <Label Text="{Binding DisplayProductName}"
+                                               FontSize="14" FontAttributes="Bold" TextColor="#1a1a1a" FontAutoScalingEnabled="False"/>
+                                        <Label Text="{Binding Quantity, StringFormat='Qty: {0}'}"
+                                               FontSize="12" TextColor="#666666" FontAutoScalingEnabled="False"/>
+                                    </VerticalStackLayout>
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" HorizontalOptions="End" Spacing="2">
+                                        <Label Text="{Binding Price, StringFormat='&#8377;{0:F0}/unit'}"
+                                               FontSize="11" TextColor="#999999" HorizontalTextAlignment="End" FontAutoScalingEnabled="False"/>
+                                        <Label Text="{Binding TotalPrice, StringFormat='&#8377;{0:F0}'}"
+                                               FontSize="15" FontAttributes="Bold" TextColor="#00b366"
+                                               HorizontalTextAlignment="End" FontAutoScalingEnabled="False"/>
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Frame>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
+                <!-- Order Total Footer -->
+                <Frame Padding="16" CornerRadius="14" HasShadow="False" BackgroundColor="#f0faf5" BorderColor="#c8ead8">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Order Total" FontSize="15" FontAttributes="Bold" TextColor="#1a1a1a" FontAutoScalingEnabled="False"/>
+                        <Label Grid.Column="1"
+                               Text="{Binding Order.TotalAmount, StringFormat='&#8377;{0:F0}'}"
+                               FontSize="18" FontAttributes="Bold" TextColor="#00b366" FontAutoScalingEnabled="False"/>
+                    </Grid>
+                </Frame>
+
+                <BoxView HeightRequest="20" Color="Transparent"/>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Full-page loading overlay -->
+        <Grid IsVisible="{Binding IsLoading}" BackgroundColor="#CCFFFFFF" InputTransparent="False">
+            <VerticalStackLayout Spacing="14" HorizontalOptions="Center" VerticalOptions="Center">
+                <ActivityIndicator IsRunning="True" Color="#00b366" WidthRequest="48" HeightRequest="48"/>
+                <Label Text="Loading order..."
+                       FontSize="14" FontAutoScalingEnabled="False"
+                       TextColor="#444444" FontAttributes="Bold"
+                       HorizontalTextAlignment="Center"/>
+            </VerticalStackLayout>
+        </Grid>
+    </Grid>
 </ContentPage>

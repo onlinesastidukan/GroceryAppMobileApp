@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.IO;
 
 namespace GroceryApp.Converters;
 
@@ -123,6 +124,65 @@ public class IsNullOrEmptyConverter : IValueConverter
     {
         throw new NotImplementedException();
     }
+}
+
+/// <summary>
+/// Converts a string image URL (http/https, data:image base64, or local resource name) to an ImageSource.
+/// MAUI's Image control does not natively support data: URIs, so this converter handles all three cases.
+/// </summary>
+public class Base64ImageSourceConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is not string url || string.IsNullOrWhiteSpace(url))
+            return null;
+
+        // data:image/jpeg;base64,... — decode bytes and stream
+        if (url.StartsWith("data:image", StringComparison.OrdinalIgnoreCase))
+        {
+            var commaIndex = url.IndexOf(',');
+            if (commaIndex < 0) return null;
+            try
+            {
+                var base64 = url.Substring(commaIndex + 1);
+                var bytes = System.Convert.FromBase64String(base64);
+                return ImageSource.FromStream(() => new MemoryStream(bytes));
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        // Absolute URI (http/https/etc.)
+        if (Uri.TryCreate(url, UriKind.Absolute, out var uri))
+            return ImageSource.FromUri(uri);
+
+        // Local resource / app-bundle file (e.g. "dotnet_bot.png")
+        return ImageSource.FromFile(url);
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        => throw new NotImplementedException();
+}
+
+/// <summary>Returns a pastel background Color for an order-status badge.</summary>
+public class StatusToBadgeBackgroundConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        return (value as string)?.ToLower() switch
+        {
+            "pending"   => Color.FromArgb("#FFF3CD"),
+            "confirmed" => Color.FromArgb("#D1ECF1"),
+            "shipped"   => Color.FromArgb("#E2D9F3"),
+            "delivered" => Color.FromArgb("#D4EDDA"),
+            "cancelled" => Color.FromArgb("#F8D7DA"),
+            _           => Color.FromArgb("#F5F5F5")
+        };
+    }
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        => throw new NotImplementedException();
 }
 
 public class CategoryToIconConverter : IValueConverter

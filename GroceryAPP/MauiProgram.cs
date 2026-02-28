@@ -36,6 +36,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<CustomerCategoryViewModel>();
 		builder.Services.AddTransient<CustomerProductViewModel>();
 		builder.Services.AddTransient<CustomerOrderHistoryViewModel>();
+		builder.Services.AddTransient<CustomerOrderDetailViewModel>();
 		builder.Services.AddTransient<CartViewModel>();
 
 		// Register Views
@@ -50,6 +51,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<CustomerProductPage>();
 		builder.Services.AddTransient<CustomerCategoryPage>();
 		builder.Services.AddTransient<CustomerOrderHistoryPage>();
+		builder.Services.AddTransient<CustomerOrderDetailPage>();
 		builder.Services.AddTransient<CartPage>();
 
 #if DEBUG

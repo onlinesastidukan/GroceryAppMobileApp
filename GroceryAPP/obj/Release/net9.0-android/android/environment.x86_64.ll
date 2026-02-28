@@ -85,11 +85,13 @@ target triple = "x86_64-unknown-linux-android21"
 @mono_aot_mode_name = dso_local local_unnamed_addr constant ptr @.str.0, align 8
 
 ; Application environment variables array, name:value
-@app_environment_variables = dso_local local_unnamed_addr constant [4 x ptr] [
+@app_environment_variables = dso_local local_unnamed_addr constant [6 x ptr] [
 	ptr @.env.0, ; 0
 	ptr @.env.1, ; 1
 	ptr @.env.2, ; 2
-	ptr @.env.3 ; 3
+	ptr @.env.3, ; 3
+	ptr @.env.4, ; 4
+	ptr @.env.5 ; 5
 ], align 16
 
 ; System properties defined by the application
@@ -108,7 +110,7 @@ target triple = "x86_64-unknown-linux-android21"
 	i1 false, ; bool ignore_split_configs
 	i8 0, ; uint8_t bound_stream_io_exception_type
 	i32 3, ; uint32_t package_naming_policy
-	i32 4, ; uint32_t environment_variable_count
+	i32 6, ; uint32_t environment_variable_count
 	i32 0, ; uint32_t system_property_count
 	i32 128, ; uint32_t number_of_assemblies_in_apk
 	i32 0, ; uint32_t bundled_assembly_name_width
@@ -116,8 +118,8 @@ target triple = "x86_64-unknown-linux-android21"
 	i32 846, ; uint32_t number_of_aot_cache_entries
 	i32 101, ; uint32_t number_of_shared_libraries
 	i32 u0x020002d7, ; uint32_t android_runtime_jnienv_class_token
-	i32 u0x06001bd3, ; uint32_t jnienv_initialize_method_token
-	i32 u0x06001bd2, ; uint32_t jnienv_registerjninatives_method_token
+	i32 u0x06001ba7, ; uint32_t jnienv_initialize_method_token
+	i32 u0x06001ba6, ; uint32_t jnienv_registerjninatives_method_token
 	i32 0, ; uint32_t jni_remapping_replacement_type_count
 	i32 0, ; uint32_t jni_remapping_replacement_method_index_entry_count
 	i32 u0x00000000, ; uint32_t mono_components_mask
@@ -6272,6 +6274,8 @@ target triple = "x86_64-unknown-linux-android21"
 @.env.1 = private unnamed_addr constant [21 x i8] c"major=marksweep-conc\00", align 16
 @.env.2 = private unnamed_addr constant [28 x i8] c"XA_HTTP_CLIENT_HANDLER_TYPE\00", align 16
 @.env.3 = private unnamed_addr constant [42 x i8] c"Xamarin.Android.Net.AndroidMessageHandler\00", align 16
+@.env.4 = private unnamed_addr constant [29 x i8] c"__XA_PACKAGE_NAMING_POLICY__\00", align 16
+@.env.5 = private unnamed_addr constant [15 x i8] c"LowercaseCrc64\00", align 1
 
 ;ApplicationConfig
 @.ApplicationConfig.0_android_package_name = private unnamed_addr constant [22 x i8] c"com.groceryapp.mobile\00", align 16
@@ -6384,7 +6388,7 @@ target triple = "x86_64-unknown-linux-android21"
 !0 = !{i32 1, !"wchar_size", i32 4}
 !1 = !{i32 7, !"PIC Level", i32 2}
 !llvm.ident = !{!2}
-!2 = !{!".NET for Android remotes/origin/release/9.0.1xx @ 9abff7703206541fdb83ffa80fe2c2753ad1997b"}
+!2 = !{!".NET for Android remotes/origin/release/9.0.1xx @ 1dcfb6f8779c33b6f768c996495cb90ecd729329"}
 !3 = !{!4, !4, i64 0}
 !4 = !{!"any pointer", !5, i64 0}
 !5 = !{!"omnipotent char", !6, i64 0}

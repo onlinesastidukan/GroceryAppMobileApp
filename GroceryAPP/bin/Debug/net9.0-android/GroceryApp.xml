@@ -1,0 +1,611 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GroceryApp</name>
+    </assembly>
+    <members>
+        <member name="T:GroceryApp.Converters.Base64ImageSourceConverter">
+            <summary>
+            Converts a string image URL (http/https, data:image base64, or local resource name) to an ImageSource.
+            MAUI's Image control does not natively support data: URIs, so this converter handles all three cases.
+            </summary>
+        </member>
+        <member name="T:GroceryApp.Converters.StatusToBadgeBackgroundConverter">
+            <summary>Returns a pastel background Color for an order-status badge.</summary>
+        </member>
+        <member name="M:GroceryApp.Services.ApiService.CustomConnectAsync(System.Net.Http.SocketsHttpConnectionContext,System.Threading.CancellationToken)">
+            <summary>
+            ConnectCallback for SocketsHttpHandler. Tries system DNS first, then
+            queries 8.8.8.8 and 1.1.1.1 via raw UDP if system DNS fails.
+            </summary>
+        </member>
+        <member name="M:GroceryApp.Services.ApiService.QueryUdpDnsAsync(System.String,System.String,System.Threading.CancellationToken)">
+            <summary>Sends a minimal DNS A-record query to the given DNS server via UDP.</summary>
+        </member>
+        <member name="M:GroceryApp.Services.ApiService.BuildDnsQuery(System.String)">
+            <summary>Builds a minimal DNS query packet for an A (IPv4) record.</summary>
+        </member>
+        <member name="M:GroceryApp.Services.ApiService.ParseDnsARecord(System.Byte[])">
+            <summary>Extracts the first IPv4 address from a raw DNS response packet.</summary>
+        </member>
+        <member name="M:GroceryApp.Services.ApiService.ClassifyNetworkError(System.Exception)">
+            <summary>Returns a user-friendly message for a network exception.</summary>
+        </member>
+        <member name="T:GroceryApp.ViewModels.AdminDashboardViewModel">
+            <inheritdoc/>
+            <inheritdoc/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.AdminDashboardViewModel.TotalOrders">
+            <inheritdoc cref="F:GroceryApp.ViewModels.AdminDashboardViewModel.totalOrders"/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.AdminDashboardViewModel.PendingOrders">
+            <inheritdoc cref="F:GroceryApp.ViewModels.AdminDashboardViewModel.pendingOrders"/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.AdminDashboardViewModel.TotalProducts">
+            <inheritdoc cref="F:GroceryApp.ViewModels.AdminDashboardViewModel.totalProducts"/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.AdminDashboardViewModel.TotalCategories">
+            <inheritdoc cref="F:GroceryApp.ViewModels.AdminDashboardViewModel.totalCategories"/>
+        </member>
+        <member name="F:GroceryApp.ViewModels.AdminDashboardViewModel.initializeCommand">
+            <summary>The backing field for <see cref="P:GroceryApp.ViewModels.AdminDashboardViewModel.InitializeCommand"/>.</summary>
+        </member>
+        <member name="P:GroceryApp.ViewModels.AdminDashboardViewModel.InitializeCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:GroceryApp.ViewModels.AdminDashboardViewModel.InitializeAsync"/>.</summary>
+        </member>
+        <member name="T:GroceryApp.ViewModels.AdminOrdersViewModel">
+            <inheritdoc/>
+            <inheritdoc/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.AdminOrdersViewModel.Orders">
+            <inheritdoc cref="F:GroceryApp.ViewModels.AdminOrdersViewModel.orders"/>
+        </member>
+        <member name="F:GroceryApp.ViewModels.AdminOrdersViewModel.initializeCommand">
+            <summary>The backing field for <see cref="P:GroceryApp.ViewModels.AdminOrdersViewModel.InitializeCommand"/>.</summary>
+        </member>
+        <member name="P:GroceryApp.ViewModels.AdminOrdersViewModel.InitializeCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:GroceryApp.ViewModels.AdminOrdersViewModel.InitializeAsync"/>.</summary>
+        </member>
+        <member name="T:GroceryApp.ViewModels.AdminOrderDetailViewModel">
+            <inheritdoc/>
+            <inheritdoc/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.AdminOrderDetailViewModel.Order">
+            <inheritdoc cref="F:GroceryApp.ViewModels.AdminOrderDetailViewModel.order"/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.AdminOrderDetailViewModel.OrderId">
+            <inheritdoc cref="F:GroceryApp.ViewModels.AdminOrderDetailViewModel.orderId"/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.AdminOrderDetailViewModel.OrderItems">
+            <inheritdoc cref="F:GroceryApp.ViewModels.AdminOrderDetailViewModel.orderItems"/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.AdminOrderDetailViewModel.SelectedStatus">
+            <inheritdoc cref="F:GroceryApp.ViewModels.AdminOrderDetailViewModel.selectedStatus"/>
+        </member>
+        <member name="M:GroceryApp.ViewModels.AdminOrderDetailViewModel.OnSelectedStatusChanged(System.String)">
+            <summary>Executes the logic for when <see cref="P:GroceryApp.ViewModels.AdminOrderDetailViewModel.SelectedStatus"/> just changed.</summary>
+            <param name="value">The new property value that was set.</param>
+            <remarks>This method is invoked right after the value of <see cref="P:GroceryApp.ViewModels.AdminOrderDetailViewModel.SelectedStatus"/> is changed.</remarks>
+        </member>
+        <member name="F:GroceryApp.ViewModels.AdminOrderDetailViewModel.updateOrderStatusCommand">
+            <summary>The backing field for <see cref="P:GroceryApp.ViewModels.AdminOrderDetailViewModel.UpdateOrderStatusCommand"/>.</summary>
+        </member>
+        <member name="P:GroceryApp.ViewModels.AdminOrderDetailViewModel.UpdateOrderStatusCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:GroceryApp.ViewModels.AdminOrderDetailViewModel.UpdateOrderStatusAsync"/>.</summary>
+        </member>
+        <member name="T:GroceryApp.ViewModels.AdminProductsViewModel">
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.AdminProductsViewModel.Products">
+            <inheritdoc cref="F:GroceryApp.ViewModels.AdminProductsViewModel.products"/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.AdminProductsViewModel.SearchText">
+            <inheritdoc cref="F:GroceryApp.ViewModels.AdminProductsViewModel.searchText"/>
+        </member>
+        <member name="M:GroceryApp.ViewModels.AdminProductsViewModel.OnSearchTextChanged(System.String)">
+            <summary>Executes the logic for when <see cref="P:GroceryApp.ViewModels.AdminProductsViewModel.SearchText"/> just changed.</summary>
+            <param name="value">The new property value that was set.</param>
+            <remarks>This method is invoked right after the value of <see cref="P:GroceryApp.ViewModels.AdminProductsViewModel.SearchText"/> is changed.</remarks>
+        </member>
+        <member name="F:GroceryApp.ViewModels.AdminProductsViewModel.initializeCommand">
+            <summary>The backing field for <see cref="P:GroceryApp.ViewModels.AdminProductsViewModel.InitializeCommand"/>.</summary>
+        </member>
+        <member name="P:GroceryApp.ViewModels.AdminProductsViewModel.InitializeCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:GroceryApp.ViewModels.AdminProductsViewModel.InitializeAsync"/>.</summary>
+        </member>
+        <member name="F:GroceryApp.ViewModels.AdminProductsViewModel.deleteProductCommand">
+            <summary>The backing field for <see cref="P:GroceryApp.ViewModels.AdminProductsViewModel.DeleteProductCommand"/>.</summary>
+        </member>
+        <member name="P:GroceryApp.ViewModels.AdminProductsViewModel.DeleteProductCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand`1"/> instance wrapping <see cref="M:GroceryApp.ViewModels.AdminProductsViewModel.DeleteProductAsync(GroceryApp.Models.Product)"/>.</summary>
+        </member>
+        <member name="T:GroceryApp.ViewModels.AdminCategoriesViewModel">
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.AdminCategoriesViewModel.Categories">
+            <inheritdoc cref="F:GroceryApp.ViewModels.AdminCategoriesViewModel.categories"/>
+        </member>
+        <member name="F:GroceryApp.ViewModels.AdminCategoriesViewModel.initializeCommand">
+            <summary>The backing field for <see cref="P:GroceryApp.ViewModels.AdminCategoriesViewModel.InitializeCommand"/>.</summary>
+        </member>
+        <member name="P:GroceryApp.ViewModels.AdminCategoriesViewModel.InitializeCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:GroceryApp.ViewModels.AdminCategoriesViewModel.InitializeAsync"/>.</summary>
+        </member>
+        <member name="F:GroceryApp.ViewModels.AdminCategoriesViewModel.deleteCategoryCommand">
+            <summary>The backing field for <see cref="P:GroceryApp.ViewModels.AdminCategoriesViewModel.DeleteCategoryCommand"/>.</summary>
+        </member>
+        <member name="P:GroceryApp.ViewModels.AdminCategoriesViewModel.DeleteCategoryCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand`1"/> instance wrapping <see cref="M:GroceryApp.ViewModels.AdminCategoriesViewModel.DeleteCategoryAsync(GroceryApp.Models.Category)"/>.</summary>
+        </member>
+        <member name="T:GroceryApp.ViewModels.AdminUsersViewModel">
+            <inheritdoc/>
+        </member>
+        <member name="F:GroceryApp.ViewModels.AdminUsersViewModel.initializeCommand">
+            <summary>The backing field for <see cref="P:GroceryApp.ViewModels.AdminUsersViewModel.InitializeCommand"/>.</summary>
+        </member>
+        <member name="P:GroceryApp.ViewModels.AdminUsersViewModel.InitializeCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:GroceryApp.ViewModels.AdminUsersViewModel.InitializeAsync"/>.</summary>
+        </member>
+        <member name="T:GroceryApp.ViewModels.BaseViewModel">
+            <inheritdoc/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.BaseViewModel.IsLoading">
+            <inheritdoc cref="F:GroceryApp.ViewModels.BaseViewModel.isLoading"/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.BaseViewModel.ErrorMessage">
+            <inheritdoc cref="F:GroceryApp.ViewModels.BaseViewModel.errorMessage"/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.BaseViewModel.HasError">
+            <inheritdoc cref="F:GroceryApp.ViewModels.BaseViewModel.hasError"/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.BaseViewModel.SuccessMessage">
+            <inheritdoc cref="F:GroceryApp.ViewModels.BaseViewModel.successMessage"/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.BaseViewModel.HasSuccess">
+            <inheritdoc cref="F:GroceryApp.ViewModels.BaseViewModel.hasSuccess"/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.BaseViewModel.StatusInfoMessage">
+            <inheritdoc cref="F:GroceryApp.ViewModels.BaseViewModel.statusInfoMessage"/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.BaseViewModel.HasStatusInfo">
+            <inheritdoc cref="F:GroceryApp.ViewModels.BaseViewModel.hasStatusInfo"/>
+        </member>
+        <member name="T:GroceryApp.ViewModels.CustomerCategoryViewModel">
+            <inheritdoc/>
+            <inheritdoc/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.CustomerCategoryViewModel.Categories">
+            <inheritdoc cref="F:GroceryApp.ViewModels.CustomerCategoryViewModel.categories"/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.CustomerCategoryViewModel.SelectedCategoryId">
+            <inheritdoc cref="F:GroceryApp.ViewModels.CustomerCategoryViewModel.selectedCategoryId"/>
+        </member>
+        <member name="F:GroceryApp.ViewModels.CustomerCategoryViewModel.initializeCommand">
+            <summary>The backing field for <see cref="P:GroceryApp.ViewModels.CustomerCategoryViewModel.InitializeCommand"/>.</summary>
+        </member>
+        <member name="P:GroceryApp.ViewModels.CustomerCategoryViewModel.InitializeCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:GroceryApp.ViewModels.CustomerCategoryViewModel.InitializeAsync"/>.</summary>
+        </member>
+        <member name="T:GroceryApp.ViewModels.CustomerProductViewModel">
+            <inheritdoc/>
+            <inheritdoc/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.CustomerProductViewModel.Products">
+            <inheritdoc cref="F:GroceryApp.ViewModels.CustomerProductViewModel.products"/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.CustomerProductViewModel.CategoryId">
+            <inheritdoc cref="F:GroceryApp.ViewModels.CustomerProductViewModel.categoryId"/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.CustomerProductViewModel.CategoryName">
+            <inheritdoc cref="F:GroceryApp.ViewModels.CustomerProductViewModel.categoryName"/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.CustomerProductViewModel.SearchText">
+            <inheritdoc cref="F:GroceryApp.ViewModels.CustomerProductViewModel.searchText"/>
+        </member>
+        <member name="M:GroceryApp.ViewModels.CustomerProductViewModel.OnSearchTextChanged(System.String)">
+            <summary>Executes the logic for when <see cref="P:GroceryApp.ViewModels.CustomerProductViewModel.SearchText"/> just changed.</summary>
+            <param name="value">The new property value that was set.</param>
+            <remarks>This method is invoked right after the value of <see cref="P:GroceryApp.ViewModels.CustomerProductViewModel.SearchText"/> is changed.</remarks>
+        </member>
+        <member name="F:GroceryApp.ViewModels.CustomerProductViewModel.addToCartCommand">
+            <summary>The backing field for <see cref="P:GroceryApp.ViewModels.CustomerProductViewModel.AddToCartCommand"/>.</summary>
+        </member>
+        <member name="P:GroceryApp.ViewModels.CustomerProductViewModel.AddToCartCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand`1"/> instance wrapping <see cref="M:GroceryApp.ViewModels.CustomerProductViewModel.AddToCartAsync(GroceryApp.Models.Product)"/>.</summary>
+        </member>
+        <member name="T:GroceryApp.ViewModels.CartViewModel">
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.CartViewModel.CartItems">
+            <inheritdoc cref="F:GroceryApp.ViewModels.CartViewModel.cartItems"/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.CartViewModel.TotalPrice">
+            <inheritdoc cref="F:GroceryApp.ViewModels.CartViewModel.totalPrice"/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.CartViewModel.DeliveryAddress">
+            <inheritdoc cref="F:GroceryApp.ViewModels.CartViewModel.deliveryAddress"/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.CartViewModel.OrderPlacedSuccessfully">
+            <inheritdoc cref="F:GroceryApp.ViewModels.CartViewModel.orderPlacedSuccessfully"/>
+        </member>
+        <member name="F:GroceryApp.ViewModels.CartViewModel.removeFromCartCommand">
+            <summary>The backing field for <see cref="P:GroceryApp.ViewModels.CartViewModel.RemoveFromCartCommand"/>.</summary>
+        </member>
+        <member name="P:GroceryApp.ViewModels.CartViewModel.RemoveFromCartCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand`1"/> instance wrapping <see cref="M:GroceryApp.ViewModels.CartViewModel.RemoveFromCartAsync(GroceryApp.Models.CartItem)"/>.</summary>
+        </member>
+        <member name="F:GroceryApp.ViewModels.CartViewModel.updateQuantityCommand">
+            <summary>The backing field for <see cref="P:GroceryApp.ViewModels.CartViewModel.UpdateQuantityCommand"/>.</summary>
+        </member>
+        <member name="P:GroceryApp.ViewModels.CartViewModel.UpdateQuantityCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand`1"/> instance wrapping <see cref="M:GroceryApp.ViewModels.CartViewModel.UpdateQuantityAsync(GroceryApp.Models.CartItem)"/>.</summary>
+        </member>
+        <member name="F:GroceryApp.ViewModels.CartViewModel.placeOrderCommand">
+            <summary>The backing field for <see cref="P:GroceryApp.ViewModels.CartViewModel.PlaceOrderCommand"/>.</summary>
+        </member>
+        <member name="P:GroceryApp.ViewModels.CartViewModel.PlaceOrderCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:GroceryApp.ViewModels.CartViewModel.PlaceOrderAsync"/>.</summary>
+        </member>
+        <member name="T:GroceryApp.ViewModels.CustomerOrderHistoryViewModel">
+            <inheritdoc/>
+            <inheritdoc/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.CustomerOrderHistoryViewModel.Orders">
+            <inheritdoc cref="F:GroceryApp.ViewModels.CustomerOrderHistoryViewModel.orders"/>
+        </member>
+        <member name="F:GroceryApp.ViewModels.CustomerOrderHistoryViewModel.initializeCommand">
+            <summary>The backing field for <see cref="P:GroceryApp.ViewModels.CustomerOrderHistoryViewModel.InitializeCommand"/>.</summary>
+        </member>
+        <member name="P:GroceryApp.ViewModels.CustomerOrderHistoryViewModel.InitializeCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:GroceryApp.ViewModels.CustomerOrderHistoryViewModel.InitializeAsync"/>.</summary>
+        </member>
+        <member name="T:GroceryApp.ViewModels.CustomerOrderDetailViewModel">
+            <inheritdoc/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.CustomerOrderDetailViewModel.Order">
+            <inheritdoc cref="F:GroceryApp.ViewModels.CustomerOrderDetailViewModel.order"/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.CustomerOrderDetailViewModel.OrderId">
+            <inheritdoc cref="F:GroceryApp.ViewModels.CustomerOrderDetailViewModel.orderId"/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.CustomerOrderDetailViewModel.OrderItems">
+            <inheritdoc cref="F:GroceryApp.ViewModels.CustomerOrderDetailViewModel.orderItems"/>
+        </member>
+        <member name="T:GroceryApp.ViewModels.LoginViewModel">
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.LoginViewModel.Email">
+            <inheritdoc cref="F:GroceryApp.ViewModels.LoginViewModel.email"/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.LoginViewModel.Password">
+            <inheritdoc cref="F:GroceryApp.ViewModels.LoginViewModel.password"/>
+        </member>
+        <member name="F:GroceryApp.ViewModels.LoginViewModel.loginCommand">
+            <summary>The backing field for <see cref="P:GroceryApp.ViewModels.LoginViewModel.LoginCommand"/>.</summary>
+        </member>
+        <member name="P:GroceryApp.ViewModels.LoginViewModel.LoginCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:GroceryApp.ViewModels.LoginViewModel.LoginAsync"/>.</summary>
+        </member>
+        <member name="F:GroceryApp.ViewModels.LoginViewModel.registerCommand">
+            <summary>The backing field for <see cref="P:GroceryApp.ViewModels.LoginViewModel.RegisterCommand"/>.</summary>
+        </member>
+        <member name="P:GroceryApp.ViewModels.LoginViewModel.RegisterCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:GroceryApp.ViewModels.LoginViewModel.RegisterAsync"/>.</summary>
+        </member>
+        <member name="T:GroceryApp.Resource">
+            <summary>
+            Android Resource Designer class.
+            Exposes the Android Resource designer assembly into the project Namespace.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Maui.Controls.ColorAnimationExtensions_Button.TextColorTo(Microsoft.Maui.Controls.Button,Microsoft.Maui.Graphics.Color,System.UInt32,System.UInt32,Microsoft.Maui.Easing,System.Threading.CancellationToken)">
+            <summary>
+            Animates the TextColor of an <see cref = "T:Microsoft.Maui.ITextStyle"/> to the given color
+            </summary>
+            <param name = "element"></param>
+            <param name = "color">The target color to animate the <see cref = "P:Microsoft.Maui.ITextStyle.TextColor"/> to</param>
+            <param name = "rate">The time, in milliseconds, between the frames of the animation</param>
+            <param name = "length">The duration, in milliseconds, of the animation</param>
+            <param name = "easing">The easing function to be used in the animation</param>
+            <param name = "token"><see cref = "T:System.Threading.CancellationToken"/></param>
+            <returns>Value indicating if the animation completed successfully or not</returns>
+        </member>
+        <member name="M:Microsoft.Maui.Controls.ColorAnimationExtensions_DatePicker.TextColorTo(Microsoft.Maui.Controls.DatePicker,Microsoft.Maui.Graphics.Color,System.UInt32,System.UInt32,Microsoft.Maui.Easing,System.Threading.CancellationToken)">
+            <summary>
+            Animates the TextColor of an <see cref = "T:Microsoft.Maui.ITextStyle"/> to the given color
+            </summary>
+            <param name = "element"></param>
+            <param name = "color">The target color to animate the <see cref = "P:Microsoft.Maui.ITextStyle.TextColor"/> to</param>
+            <param name = "rate">The time, in milliseconds, between the frames of the animation</param>
+            <param name = "length">The duration, in milliseconds, of the animation</param>
+            <param name = "easing">The easing function to be used in the animation</param>
+            <param name = "token"><see cref = "T:System.Threading.CancellationToken"/></param>
+            <returns>Value indicating if the animation completed successfully or not</returns>
+        </member>
+        <member name="M:Microsoft.Maui.Controls.ColorAnimationExtensions_Editor.TextColorTo(Microsoft.Maui.Controls.Editor,Microsoft.Maui.Graphics.Color,System.UInt32,System.UInt32,Microsoft.Maui.Easing,System.Threading.CancellationToken)">
+            <summary>
+            Animates the TextColor of an <see cref = "T:Microsoft.Maui.ITextStyle"/> to the given color
+            </summary>
+            <param name = "element"></param>
+            <param name = "color">The target color to animate the <see cref = "P:Microsoft.Maui.ITextStyle.TextColor"/> to</param>
+            <param name = "rate">The time, in milliseconds, between the frames of the animation</param>
+            <param name = "length">The duration, in milliseconds, of the animation</param>
+            <param name = "easing">The easing function to be used in the animation</param>
+            <param name = "token"><see cref = "T:System.Threading.CancellationToken"/></param>
+            <returns>Value indicating if the animation completed successfully or not</returns>
+        </member>
+        <member name="M:Microsoft.Maui.Controls.ColorAnimationExtensions_Entry.TextColorTo(Microsoft.Maui.Controls.Entry,Microsoft.Maui.Graphics.Color,System.UInt32,System.UInt32,Microsoft.Maui.Easing,System.Threading.CancellationToken)">
+            <summary>
+            Animates the TextColor of an <see cref = "T:Microsoft.Maui.ITextStyle"/> to the given color
+            </summary>
+            <param name = "element"></param>
+            <param name = "color">The target color to animate the <see cref = "P:Microsoft.Maui.ITextStyle.TextColor"/> to</param>
+            <param name = "rate">The time, in milliseconds, between the frames of the animation</param>
+            <param name = "length">The duration, in milliseconds, of the animation</param>
+            <param name = "easing">The easing function to be used in the animation</param>
+            <param name = "token"><see cref = "T:System.Threading.CancellationToken"/></param>
+            <returns>Value indicating if the animation completed successfully or not</returns>
+        </member>
+        <member name="M:Microsoft.Maui.Controls.ColorAnimationExtensions_InputView.TextColorTo(Microsoft.Maui.Controls.InputView,Microsoft.Maui.Graphics.Color,System.UInt32,System.UInt32,Microsoft.Maui.Easing,System.Threading.CancellationToken)">
+            <summary>
+            Animates the TextColor of an <see cref = "T:Microsoft.Maui.ITextStyle"/> to the given color
+            </summary>
+            <param name = "element"></param>
+            <param name = "color">The target color to animate the <see cref = "P:Microsoft.Maui.ITextStyle.TextColor"/> to</param>
+            <param name = "rate">The time, in milliseconds, between the frames of the animation</param>
+            <param name = "length">The duration, in milliseconds, of the animation</param>
+            <param name = "easing">The easing function to be used in the animation</param>
+            <param name = "token"><see cref = "T:System.Threading.CancellationToken"/></param>
+            <returns>Value indicating if the animation completed successfully or not</returns>
+        </member>
+        <member name="M:Microsoft.Maui.Controls.ColorAnimationExtensions_Label.TextColorTo(Microsoft.Maui.Controls.Label,Microsoft.Maui.Graphics.Color,System.UInt32,System.UInt32,Microsoft.Maui.Easing,System.Threading.CancellationToken)">
+            <summary>
+            Animates the TextColor of an <see cref = "T:Microsoft.Maui.ITextStyle"/> to the given color
+            </summary>
+            <param name = "element"></param>
+            <param name = "color">The target color to animate the <see cref = "P:Microsoft.Maui.ITextStyle.TextColor"/> to</param>
+            <param name = "rate">The time, in milliseconds, between the frames of the animation</param>
+            <param name = "length">The duration, in milliseconds, of the animation</param>
+            <param name = "easing">The easing function to be used in the animation</param>
+            <param name = "token"><see cref = "T:System.Threading.CancellationToken"/></param>
+            <returns>Value indicating if the animation completed successfully or not</returns>
+        </member>
+        <member name="M:Microsoft.Maui.Controls.ColorAnimationExtensions_Picker.TextColorTo(Microsoft.Maui.Controls.Picker,Microsoft.Maui.Graphics.Color,System.UInt32,System.UInt32,Microsoft.Maui.Easing,System.Threading.CancellationToken)">
+            <summary>
+            Animates the TextColor of an <see cref = "T:Microsoft.Maui.ITextStyle"/> to the given color
+            </summary>
+            <param name = "element"></param>
+            <param name = "color">The target color to animate the <see cref = "P:Microsoft.Maui.ITextStyle.TextColor"/> to</param>
+            <param name = "rate">The time, in milliseconds, between the frames of the animation</param>
+            <param name = "length">The duration, in milliseconds, of the animation</param>
+            <param name = "easing">The easing function to be used in the animation</param>
+            <param name = "token"><see cref = "T:System.Threading.CancellationToken"/></param>
+            <returns>Value indicating if the animation completed successfully or not</returns>
+        </member>
+        <member name="M:Microsoft.Maui.Controls.ColorAnimationExtensions_RadioButton.TextColorTo(Microsoft.Maui.Controls.RadioButton,Microsoft.Maui.Graphics.Color,System.UInt32,System.UInt32,Microsoft.Maui.Easing,System.Threading.CancellationToken)">
+            <summary>
+            Animates the TextColor of an <see cref = "T:Microsoft.Maui.ITextStyle"/> to the given color
+            </summary>
+            <param name = "element"></param>
+            <param name = "color">The target color to animate the <see cref = "P:Microsoft.Maui.ITextStyle.TextColor"/> to</param>
+            <param name = "rate">The time, in milliseconds, between the frames of the animation</param>
+            <param name = "length">The duration, in milliseconds, of the animation</param>
+            <param name = "easing">The easing function to be used in the animation</param>
+            <param name = "token"><see cref = "T:System.Threading.CancellationToken"/></param>
+            <returns>Value indicating if the animation completed successfully or not</returns>
+        </member>
+        <member name="M:Microsoft.Maui.Controls.ColorAnimationExtensions_SearchBar.TextColorTo(Microsoft.Maui.Controls.SearchBar,Microsoft.Maui.Graphics.Color,System.UInt32,System.UInt32,Microsoft.Maui.Easing,System.Threading.CancellationToken)">
+            <summary>
+            Animates the TextColor of an <see cref = "T:Microsoft.Maui.ITextStyle"/> to the given color
+            </summary>
+            <param name = "element"></param>
+            <param name = "color">The target color to animate the <see cref = "P:Microsoft.Maui.ITextStyle.TextColor"/> to</param>
+            <param name = "rate">The time, in milliseconds, between the frames of the animation</param>
+            <param name = "length">The duration, in milliseconds, of the animation</param>
+            <param name = "easing">The easing function to be used in the animation</param>
+            <param name = "token"><see cref = "T:System.Threading.CancellationToken"/></param>
+            <returns>Value indicating if the animation completed successfully or not</returns>
+        </member>
+        <member name="M:Microsoft.Maui.Controls.ColorAnimationExtensions_TimePicker.TextColorTo(Microsoft.Maui.Controls.TimePicker,Microsoft.Maui.Graphics.Color,System.UInt32,System.UInt32,Microsoft.Maui.Easing,System.Threading.CancellationToken)">
+            <summary>
+            Animates the TextColor of an <see cref = "T:Microsoft.Maui.ITextStyle"/> to the given color
+            </summary>
+            <param name = "element"></param>
+            <param name = "color">The target color to animate the <see cref = "P:Microsoft.Maui.ITextStyle.TextColor"/> to</param>
+            <param name = "rate">The time, in milliseconds, between the frames of the animation</param>
+            <param name = "length">The duration, in milliseconds, of the animation</param>
+            <param name = "easing">The easing function to be used in the animation</param>
+            <param name = "token"><see cref = "T:System.Threading.CancellationToken"/></param>
+            <returns>Value indicating if the animation completed successfully or not</returns>
+        </member>
+        <member name="T:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs">
+            <summary>
+            A helper type providing cached, reusable <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instances
+            for all properties generated with <see cref="T:CommunityToolkit.Mvvm.ComponentModel.ObservablePropertyAttribute"/>.
+            </summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TotalOrders">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TotalOrders" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.PendingOrders">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "PendingOrders" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TotalProducts">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TotalProducts" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TotalCategories">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TotalCategories" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.Orders">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "Orders" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.Order">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "Order" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.OrderId">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "OrderId" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.OrderItems">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "OrderItems" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.SelectedStatus">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "SelectedStatus" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.Products">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "Products" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.SearchText">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "SearchText" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.Categories">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "Categories" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.IsLoading">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "IsLoading" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.ErrorMessage">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "ErrorMessage" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.HasError">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "HasError" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.SuccessMessage">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "SuccessMessage" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.HasSuccess">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "HasSuccess" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.StatusInfoMessage">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "StatusInfoMessage" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.HasStatusInfo">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "HasStatusInfo" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.SelectedCategoryId">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "SelectedCategoryId" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.CategoryId">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "CategoryId" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.CategoryName">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "CategoryName" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.CartItems">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "CartItems" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TotalPrice">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TotalPrice" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.DeliveryAddress">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "DeliveryAddress" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.OrderPlacedSuccessfully">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "OrderPlacedSuccessfully" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.Email">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "Email" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.Password">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "Password" generated properties.</summary>
+        </member>
+        <member name="T:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs">
+            <summary>
+            A helper type providing cached, reusable <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instances
+            for all properties generated with <see cref="T:CommunityToolkit.Mvvm.ComponentModel.ObservablePropertyAttribute"/>.
+            </summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TotalOrders">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TotalOrders" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.PendingOrders">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "PendingOrders" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TotalProducts">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TotalProducts" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TotalCategories">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TotalCategories" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.Orders">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "Orders" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.Order">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "Order" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.OrderId">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "OrderId" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.OrderItems">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "OrderItems" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.SelectedStatus">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "SelectedStatus" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.Products">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "Products" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.SearchText">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "SearchText" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.Categories">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "Categories" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.IsLoading">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "IsLoading" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.ErrorMessage">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "ErrorMessage" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.HasError">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "HasError" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.SuccessMessage">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "SuccessMessage" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.HasSuccess">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "HasSuccess" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.StatusInfoMessage">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "StatusInfoMessage" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.HasStatusInfo">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "HasStatusInfo" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.SelectedCategoryId">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "SelectedCategoryId" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.CategoryId">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "CategoryId" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.CategoryName">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "CategoryName" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.CartItems">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "CartItems" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TotalPrice">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TotalPrice" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.DeliveryAddress">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "DeliveryAddress" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.OrderPlacedSuccessfully">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "OrderPlacedSuccessfully" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.Email">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "Email" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.Password">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "Password" generated properties.</summary>
+        </member>
+    </members>
+</doc>

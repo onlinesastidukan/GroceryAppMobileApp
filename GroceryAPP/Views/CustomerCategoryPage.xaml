@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:converters="clr-namespace:GroceryApp.Converters"
              x:Class="GroceryApp.Views.CustomerCategoryPage"
+             x:Name="CustomerCategoryPageRoot"
              Title="सस्ती दुकान"
              BackgroundColor="#ffffff">
     <ContentPage.Resources>
@@ -10,107 +11,223 @@
             <converters:CategoryToIconConverter x:Key="CategoryIconConverter"/>
         </ResourceDictionary>
     </ContentPage.Resources>
-    <Grid Padding="0">
-        <VerticalStackLayout Padding="16,12,16,0" Spacing="16">
-            <!-- Enhanced Header -->
-            <VerticalStackLayout Spacing="4">
-                <Label Text="सस्ती दुकान" FontSize="32" FontAttributes="Bold" TextColor="#1a1a1a">
+    <Grid Padding="0" RowDefinitions="Auto,*">
+        <VerticalStackLayout Grid.Row="0" Padding="16,12,16,0" Spacing="16">
+            <!-- Header with Hamburger Menu -->
+            <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto" RowSpacing="4">
+                <Button Grid.Column="0"
+                        Grid.Row="0"
+                        Text="☰"
+                        FontSize="22"
+                        Clicked="OnMenuClicked"
+                        BackgroundColor="Transparent"
+                        TextColor="#1a1a1a"
+                        WidthRequest="44"
+                        HeightRequest="44"/>
+
+                <Label Grid.Column="1"
+                       Grid.Row="0"
+                       Text="सस्ती दुकान"
+                       FontSize="22"
+                       FontAttributes="Bold"
+                       FontAutoScalingEnabled="False"
+                       VerticalOptions="Center"
+                       TextColor="#1a1a1a">
                     <Label.Shadow>
                         <Shadow Brush="#000000" Opacity="0.1" Radius="2" Offset="0,2"/>
                     </Label.Shadow>
                 </Label>
-                <HorizontalStackLayout Spacing="6">
+
+                <Grid Grid.Column="2" Grid.Row="0">
+                    <Button Text="🛒"
+                        FontSize="20"
+                        Clicked="OnCartClicked"
+                        BackgroundColor="Transparent"
+                        TextColor="#00b366"
+                        WidthRequest="44"
+                        HeightRequest="44"/>
+
+                    <Border IsVisible="{Binding Source={x:Reference CustomerCategoryPageRoot}, Path=HasCartItems}"
+                        BackgroundColor="#e74c3c"
+                        StrokeThickness="0"
+                        Padding="4,1"
+                        HorizontalOptions="End"
+                        VerticalOptions="Start"
+                        TranslationX="4"
+                        TranslationY="-2"
+                        StrokeShape="RoundRectangle 10">
+                    <Label Text="{Binding Source={x:Reference CustomerCategoryPageRoot}, Path=CartItemCount}"
+                           FontSize="10"
+                           FontAttributes="Bold"
+                           TextColor="White"
+                           HorizontalTextAlignment="Center"
+                           VerticalTextAlignment="Center"/>
+                    </Border>
+                </Grid>
+
+                <HorizontalStackLayout Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" Spacing="6">
                     <Label Text="⚡" FontSize="14"/>
                     <Label Text="Fast Delivery" FontSize="13" TextColor="#00b366" FontAttributes="Bold"/>
                     <Label Text="•" FontSize="13" TextColor="#999999"/>
                     <Label Text="🌿 Fresh Groceries" FontSize="13" TextColor="#666666"/>
                 </HorizontalStackLayout>
-            </VerticalStackLayout>
+            </Grid>
             
             <Label Text="{Binding ErrorMessage}" 
                    IsVisible="{Binding HasError}" 
                    TextColor="#e74c3c" 
                    FontSize="12"/>
             
-            <!-- Categories Grid with Dynamic Icons-->
-            <CollectionView x:Name="CategoriesCollectionView" 
-                            ItemsSource="{Binding Categories}"
-                            SelectionMode="Single"
-                            SelectionChanged="OnCategorySelected">
-                <CollectionView.ItemsLayout>
-                    <GridItemsLayout Orientation="Vertical" Span="2" HorizontalItemSpacing="12" VerticalItemSpacing="12"/>
-                </CollectionView.ItemsLayout>
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <!-- Enhanced Category Card -->
-                        <Frame Padding="0" 
-                               CornerRadius="16" 
-                               HasShadow="False" 
-                               BackgroundColor="#ffffff" 
-                               BorderColor="#e8e8e8">
-                            <Frame.Shadow>
-                                <Shadow Brush="#000000" Opacity="0.06" Radius="8" Offset="0,2"/>
-                            </Frame.Shadow>
-                            <VerticalStackLayout Spacing="10" Padding="14">
-                                <!-- Dynamic Icon Circle -->
-                                <Frame Padding="0" 
-                                       WidthRequest="56" 
-                                       HeightRequest="56" 
-                                       CornerRadius="28" 
-                                       HasShadow="False" 
-                                       BackgroundColor="#e8f5e9"
-                                       HorizontalOptions="Center">
-                                    <Frame.Shadow>
-                                        <Shadow Brush="#00b366" Opacity="0.15" Radius="6" Offset="0,2"/>
-                                    </Frame.Shadow>
-                                    <Label Text="{Binding Name, Converter={StaticResource CategoryIconConverter}}" 
-                                           FontSize="32" 
-                                           HorizontalOptions="Center" 
-                                           VerticalOptions="Center"
-                                           HorizontalTextAlignment="Center"
-                                           VerticalTextAlignment="Center"/>
-                                </Frame>
-                                
-                                <!-- Category Info -->
-                                <VerticalStackLayout Spacing="3" HorizontalOptions="Center">
-                                    <Label Text="{Binding Name}" 
-                                           FontSize="14" 
-                                           FontAttributes="Bold" 
-                                           TextColor="#1a1a1a"
-                                           HorizontalTextAlignment="Center"
-                                           MaxLines="2"
-                                           LineBreakMode="TailTruncation"/>
-                                    <Label Text="{Binding Description}" 
-                                           FontSize="11" 
-                                           TextColor="#666666"
-                                           HorizontalTextAlignment="Center"
-                                           MaxLines="2"
-                                           LineBreakMode="TailTruncation"/>
-                                </VerticalStackLayout>
-                            </VerticalStackLayout>
-                        </Frame>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-            
             <ActivityIndicator IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}" Color="#00b366" Margin="0,20"/>
         </VerticalStackLayout>
+
+        <!-- Categories Grid with Dynamic Icons -->
+        <CollectionView Grid.Row="1"
+                        x:Name="CategoriesCollectionView"
+                        Margin="16,8,16,16"
+                        ItemsSource="{Binding Categories}"
+                        SelectionMode="None">
+            <CollectionView.ItemsLayout>
+                <GridItemsLayout Orientation="Vertical" Span="2" HorizontalItemSpacing="12" VerticalItemSpacing="12"/>
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <!-- Enhanced Category Card -->
+                    <Frame Padding="0"
+                           CornerRadius="16"
+                           HasShadow="False"
+                           BackgroundColor="#ffffff"
+                           BorderColor="#e8e8e8">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnCategoryTapped"/>
+                        </Frame.GestureRecognizers>
+                        <Frame.Shadow>
+                            <Shadow Brush="#000000" Opacity="0.06" Radius="8" Offset="0,2"/>
+                        </Frame.Shadow>
+                        <VerticalStackLayout Spacing="10" Padding="14">
+                            <!-- Dynamic Icon Circle -->
+                            <Frame Padding="0"
+                                   WidthRequest="56"
+                                   HeightRequest="56"
+                                   CornerRadius="28"
+                                   HasShadow="False"
+                                   BackgroundColor="#e8f5e9"
+                                   HorizontalOptions="Center">
+                                <Frame.Shadow>
+                                    <Shadow Brush="#00b366" Opacity="0.15" Radius="6" Offset="0,2"/>
+                                </Frame.Shadow>
+                                <Label Text="{Binding Name, Converter={StaticResource CategoryIconConverter}}"
+                                       FontSize="32"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center"
+                                       HorizontalTextAlignment="Center"
+                                       VerticalTextAlignment="Center"/>
+                            </Frame>
+
+                            <!-- Category Info -->
+                            <VerticalStackLayout Spacing="3" HorizontalOptions="Center">
+                                <Label Text="{Binding Name}"
+                                       FontSize="14"
+                                       FontAttributes="Bold"
+                                       TextColor="#1a1a1a"
+                                       HorizontalTextAlignment="Center"
+                                       MaxLines="2"
+                                       LineBreakMode="TailTruncation"/>
+                                <Label Text="{Binding Description}"
+                                       FontSize="11"
+                                       TextColor="#666666"
+                                       HorizontalTextAlignment="Center"
+                                       MaxLines="2"
+                                       LineBreakMode="TailTruncation"/>
+                            </VerticalStackLayout>
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
         
-        <!-- Floating Cart Button with Shadow -->
-        <Button Text="🛒" 
-                FontSize="24"
-                WidthRequest="64"
-                HeightRequest="64"
-                CornerRadius="32"
-                BackgroundColor="#00b366"
-                TextColor="White"
-                Clicked="OnCartClicked"
-                HorizontalOptions="End"
-                VerticalOptions="End"
-                Margin="20">
-            <Button.Shadow>
-                <Shadow Brush="#00b366" Opacity="0.4" Radius="12" Offset="0,6"/>
-            </Button.Shadow>
-        </Button>
+        <!-- Dimmed overlay shown while menu is open -->
+        <BoxView Grid.RowSpan="2"
+             x:Name="MenuOverlay"
+                 IsVisible="False"
+                 BackgroundColor="#80000000"
+                 Opacity="0"
+                 InputTransparent="False">
+            <BoxView.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnOverlayTapped"/>
+            </BoxView.GestureRecognizers>
+        </BoxView>
+
+        <!-- Customer Side Menu -->
+         <Frame Grid.RowSpan="2"
+             x:Name="SideMenu"
+               IsVisible="False"
+               TranslationX="-300"
+               WidthRequest="280"
+               HorizontalOptions="Start"
+               VerticalOptions="Fill"
+               CornerRadius="0"
+               Padding="0"
+               HasShadow="False"
+               BackgroundColor="White">
+            <VerticalStackLayout Spacing="0">
+                <Grid Padding="20,26,20,18" BackgroundColor="#00b366" ColumnDefinitions="*,Auto">
+                    <Label Text="Customer Menu" FontSize="22" FontAttributes="Bold" TextColor="White" VerticalOptions="Center"/>
+                    <Button Grid.Column="1" Text="✕" Clicked="OnCloseMenuClicked" BackgroundColor="Transparent" TextColor="White" FontSize="18"/>
+                </Grid>
+
+                <VerticalStackLayout Spacing="4" Padding="12,10">
+                    <Border Stroke="#e9e9e9" StrokeThickness="1" StrokeShape="RoundRectangle 10" Padding="12,10">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnMenuCategoriesClicked"/>
+                        </Border.GestureRecognizers>
+                        <Label Text="View Categories" FontSize="15" TextColor="#1a1a1a"/>
+                    </Border>
+
+                    <Border Stroke="#e9e9e9" StrokeThickness="1" StrokeShape="RoundRectangle 10" Padding="12,10">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnMenuCartClicked"/>
+                        </Border.GestureRecognizers>
+                        <Label Text="Cart" FontSize="15" TextColor="#1a1a1a"/>
+                    </Border>
+
+                    <Border Stroke="#e9e9e9" StrokeThickness="1" StrokeShape="RoundRectangle 10" Padding="12,10">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnMenuPastOrdersClicked"/>
+                        </Border.GestureRecognizers>
+                        <Label Text="Past Orders" FontSize="15" TextColor="#1a1a1a"/>
+                    </Border>
+
+                    <Border Stroke="#ffe1e1" StrokeThickness="1" StrokeShape="RoundRectangle 10" Padding="12,10">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnMenuLogoutClicked"/>
+                        </Border.GestureRecognizers>
+                        <Label Text="Logout" FontSize="15" TextColor="#d64545"/>
+                    </Border>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </Frame>
+
+        <!-- Loading overlay shown while navigating to a category -->
+        <Grid Grid.RowSpan="2"
+              x:Name="CategoryLoadingOverlay"
+              IsVisible="False"
+              BackgroundColor="#CCFFFFFF"
+              InputTransparent="False">
+            <VerticalStackLayout Spacing="14"
+                                 HorizontalOptions="Center"
+                                 VerticalOptions="Center">
+                <ActivityIndicator IsRunning="True"
+                                   Color="#00b366"
+                                   WidthRequest="48"
+                                   HeightRequest="48"/>
+                <Label Text="Loading products..."
+                       FontSize="14"
+                       FontAutoScalingEnabled="False"
+                       TextColor="#444444"
+                       FontAttributes="Bold"
+                       HorizontalTextAlignment="Center"/>
+            </VerticalStackLayout>
+        </Grid>
     </Grid>
 </ContentPage>

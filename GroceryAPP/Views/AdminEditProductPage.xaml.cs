@@ -8,6 +8,8 @@ public partial class AdminEditProductPage : ContentPage
     private readonly ApiService _apiService;
     private readonly Product _product;
     private List<Category> _categories = new();
+    private string _selectedImageBase64 = string.Empty;
+    private byte[] _previewImageBytes;
 
     public AdminEditProductPage(ApiService apiService, Product product)
     {
@@ -29,7 +31,39 @@ public partial class AdminEditProductPage : ContentPage
         PriceEntry.Text = _product.Price.ToString("0.##");
         DescriptionEditor.Text = _product.Description;
         StockQuantityEntry.Text = _product.Stock.ToString();
-        PhotoUrlEntry.Text = _product.ImageUrl;
+
+        // Pre-populate image preview if product already has one
+        if (!string.IsNullOrWhiteSpace(_product.ImageUrl))
+        {
+            _selectedImageBase64 = _product.ImageUrl;
+            if (_product.ImageUrl.StartsWith("data:image", StringComparison.OrdinalIgnoreCase))
+            {
+                // base64 stored image
+                var commaIndex = _product.ImageUrl.IndexOf(',');
+                if (commaIndex >= 0)
+                {
+                    try
+                    {
+                        var bytes = Convert.FromBase64String(_product.ImageUrl.Substring(commaIndex + 1));
+                        ProductImagePreview.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
+                        ProductImagePreview.IsVisible = true;
+                        ImagePlaceholder.IsVisible = false;
+                        ImageStatusLabel.Text = "✓ Current image loaded";
+                        ImageStatusLabel.IsVisible = true;
+                    }
+                    catch { /* ignore preview error */ }
+                }
+            }
+            else
+            {
+                // URL-based image
+                ProductImagePreview.Source = ImageSource.FromUri(new Uri(_product.ImageUrl));
+                ProductImagePreview.IsVisible = true;
+                ImagePlaceholder.IsVisible = false;
+                ImageStatusLabel.Text = "✓ Current image loaded";
+                ImageStatusLabel.IsVisible = true;
+            }
+        }
     }
 
     private async Task LoadCategories()
@@ -61,7 +95,7 @@ public partial class AdminEditProductPage : ContentPage
         var priceText = PriceEntry.Text;
         var description = DescriptionEditor.Text;
         var stockText = StockQuantityEntry.Text;
-        var photoUrl = PhotoUrlEntry.Text;
+        var photoUrl = _selectedImageBase64;
         var categoryIndex = CategoryPicker.SelectedIndex;
 
         if (string.IsNullOrWhiteSpace(productName) || string.IsNullOrWhiteSpace(priceText) || string.IsNullOrWhiteSpace(stockText) || categoryIndex < 0)
@@ -130,5 +164,37 @@ public partial class AdminEditProductPage : ContentPage
     private async void OnCancelClicked(object sender, EventArgs e)
     {
         await Navigation.PopAsync();
+    }
+
+    private async void OnPickImageClicked(object sender, EventArgs e)
+    {
+        try
+        {
+            var result = await MediaPicker.Default.PickPhotoAsync(new MediaPickerOptions
+            {
+                Title = "Select Product Image"
+            });
+
+            if (result == null) return;
+
+            using var stream = await result.OpenReadAsync();
+            using var ms = new MemoryStream();
+            await stream.CopyToAsync(ms);
+            _previewImageBytes = ms.ToArray();
+
+            var extension = Path.GetExtension(result.FileName)?.TrimStart('.').ToLowerInvariant() ?? "jpeg";
+            var mimeType = extension == "png" ? "image/png" : "image/jpeg";
+            _selectedImageBase64 = $"data:{mimeType};base64,{Convert.ToBase64String(_previewImageBytes)}";
+
+            ProductImagePreview.Source = ImageSource.FromStream(() => new MemoryStream(_previewImageBytes));
+            ProductImagePreview.IsVisible = true;
+            ImagePlaceholder.IsVisible = false;
+            ImageStatusLabel.Text = $"✓ {result.FileName}";
+            ImageStatusLabel.IsVisible = true;
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", $"Could not pick image: {ex.Message}", "OK");
+        }
     }
 }

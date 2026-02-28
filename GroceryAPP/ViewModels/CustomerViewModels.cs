@@ -70,6 +70,7 @@ public partial class CustomerProductViewModel : BaseViewModel
 {
     private readonly ApiService _apiService;
     private readonly CartService _cartService;
+    private List<Product> _allProducts = new();
 
     [ObservableProperty]
     private ObservableCollection<Product> products;
@@ -79,6 +80,25 @@ public partial class CustomerProductViewModel : BaseViewModel
 
     [ObservableProperty]
     private string categoryName;
+
+    [ObservableProperty]
+    private string searchText = string.Empty;
+
+    partial void OnSearchTextChanged(string value) => FilterProducts();
+
+    private void FilterProducts()
+    {
+        var query = SearchText?.Trim() ?? string.Empty;
+        var filtered = string.IsNullOrEmpty(query)
+            ? _allProducts
+            : _allProducts.Where(p =>
+                p.Name.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                (!string.IsNullOrEmpty(p.Description) && p.Description.Contains(query, StringComparison.OrdinalIgnoreCase)));
+
+        Products.Clear();
+        foreach (var product in filtered)
+            Products.Add(product);
+    }
 
     public CustomerProductViewModel(ApiService apiService, CartService cartService)
     {
@@ -97,11 +117,14 @@ public partial class CustomerProductViewModel : BaseViewModel
             var response = await _apiService.GetProductsAsync(CategoryId);
             if (response?.Success == true && response.Data != null)
             {
-                Products.Clear();
-                foreach (var product in response.Data)
-                {
-                    Products.Add(product);
-                }
+                // Defensive filtering: if backend returns an unfiltered list,
+                // still show only products from the selected category.
+                var sourceProduts = CategoryId > 0
+                    ? response.Data.Where(p => p.CategoryId == CategoryId)
+                    : response.Data;
+
+                _allProducts = new List<Product>(sourceProduts);
+                FilterProducts();
             }
             else
             {
@@ -123,6 +146,12 @@ public partial class CustomerProductViewModel : BaseViewModel
     {
         if (product != null)
         {
+            if (product.Stock <= 0)
+            {
+                await Application.Current.MainPage.DisplayAlert("Out Of Stock", "This product is currently unavailable.", "OK");
+                return;
+            }
+
             _cartService.AddToCart(product, 1);
         }
         await Task.CompletedTask;
@@ -216,7 +245,11 @@ public partial class CartViewModel : BaseViewModel
             var orderRequest = new CreateOrderRequest
             {
                 DeliveryAddress = DeliveryAddress,
-                Items = CartItems.ToList()
+                Items = CartItems.Select(x => new CreateOrderItem
+                {
+                    ProductId = x.ProductId,
+                    Quantity = x.Quantity
+                }).ToList()
             };
 
             var response = await _apiService.CreateOrderAsync(orderRequest);
@@ -262,6 +295,10 @@ public partial class CustomerOrderHistoryViewModel : BaseViewModel
         Orders = new ObservableCollection<Order>();
     }
 
+    public bool HasNoOrders => Orders == null || Orders.Count == 0;
+
+    public void NotifyOrdersChanged() => OnPropertyChanged(nameof(HasNoOrders));
+
     [RelayCommand]
     protected override async Task InitializeAsync()
     {
@@ -278,15 +315,18 @@ public partial class CustomerOrderHistoryViewModel : BaseViewModel
                 {
                     Orders.Add(order);
                 }
+                OnPropertyChanged(nameof(HasNoOrders));
             }
             else
             {
                 SetError(response?.Message ?? "Failed to load orders");
+                OnPropertyChanged(nameof(HasNoOrders));
             }
         }
         catch (Exception ex)
         {
             SetError($"Error: {ex.Message}");
+            OnPropertyChanged(nameof(HasNoOrders));
         }
         finally
         {
@@ -313,6 +353,8 @@ public partial class CustomerOrderDetailViewModel : BaseViewModel
     [ObservableProperty]
     private ObservableCollection<OrderItem> orderItems;
 
+    public bool HasNoItems => OrderItems == null || OrderItems.Count == 0;
+
     public CustomerOrderDetailViewModel(ApiService apiService)
     {
         _apiService = apiService;
@@ -337,6 +379,7 @@ public partial class CustomerOrderDetailViewModel : BaseViewModel
                     {
                         OrderItems.Add(item);
                     }
+                    OnPropertyChanged(nameof(HasNoItems));
                 }
                 else
                 {

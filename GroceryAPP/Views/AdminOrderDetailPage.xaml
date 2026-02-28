@@ -2,10 +2,188 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GroceryApp.Views.AdminOrderDetailPage"
-             Title="Sasti Dukan - Order Detail">
-    <VerticalStackLayout Padding="20" Spacing="10">
-        <Label Text="{Binding Order.OrderId, StringFormat='Order #{0}'}" FontSize="20" FontAttributes="Bold"/>
-        <Picker Title="Status" ItemsSource="{Binding AvailableStatuses}" SelectedItem="{Binding SelectedStatus}"/>
-        <Button Text="Update Status" Command="{Binding UpdateOrderStatusCommand}" BackgroundColor="#007AFF" TextColor="White"/>
-    </VerticalStackLayout>
+             Title="Order Detail"
+             BackgroundColor="#f8f9fa">
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Padding="16" Spacing="14">
+
+                <!-- Order Header Card -->
+                <Frame Padding="18" CornerRadius="16" HasShadow="False" BackgroundColor="#1a1a1a">
+                    <Frame.Shadow>
+                        <Shadow Brush="#000000" Opacity="0.15" Radius="12" Offset="0,4"/>
+                    </Frame.Shadow>
+                    <VerticalStackLayout Spacing="8">
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                            <Label Text="{Binding Order.OrderId, StringFormat='Order #{0}'}"
+                                   FontSize="20" FontAttributes="Bold" TextColor="White"
+                                   FontAutoScalingEnabled="False" VerticalOptions="Center"/>
+                            <!-- Status badge -->
+                            <Frame Grid.Column="1" Padding="10,5" CornerRadius="12" HasShadow="False"
+                                   BackgroundColor="{Binding Order.Status, Converter={StaticResource StatusToBadgeBgConverter}}">
+                                <Label Text="{Binding Order.Status}"
+                                       FontSize="12" FontAttributes="Bold" FontAutoScalingEnabled="False"
+                                       TextColor="{Binding Order.Status, Converter={StaticResource StringToColorConverter}}"
+                                       HorizontalTextAlignment="Center"/>
+                            </Frame>
+                        </Grid>
+                        <Label Text="{Binding Order.OrderDate, StringFormat='{}{0:dd MMM yyyy, hh:mm tt}'}"
+                               FontSize="12" TextColor="#aaaaaa" FontAutoScalingEnabled="False"/>
+                        <Label Text="{Binding Order.TotalAmount, StringFormat='Total: &#8377;{0:F0}'}"
+                               FontSize="16" FontAttributes="Bold" TextColor="#00b366" FontAutoScalingEnabled="False"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Customer Info -->
+                <Frame Padding="16" CornerRadius="14" HasShadow="False" BackgroundColor="White" BorderColor="#eeeeee">
+                    <Frame.Shadow>
+                        <Shadow Brush="#000000" Opacity="0.05" Radius="8" Offset="0,2"/>
+                    </Frame.Shadow>
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="CUSTOMER" FontSize="10" TextColor="#999999" FontAttributes="Bold" FontAutoScalingEnabled="False"/>
+                        <Label Text="{Binding Order.UserFullName}" FontSize="15" FontAttributes="Bold" TextColor="#1a1a1a" FontAutoScalingEnabled="False"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Delivery Address -->
+                <Frame Padding="16" CornerRadius="14" HasShadow="False" BackgroundColor="White" BorderColor="#eeeeee">
+                    <Frame.Shadow>
+                        <Shadow Brush="#000000" Opacity="0.05" Radius="8" Offset="0,2"/>
+                    </Frame.Shadow>
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="DELIVERY ADDRESS" FontSize="10" TextColor="#999999" FontAttributes="Bold" FontAutoScalingEnabled="False"/>
+                        <Label Text="{Binding Order.DeliveryAddress}" FontSize="14" TextColor="#333333" FontAutoScalingEnabled="False"/>
+                        <Label Text="No address on record"
+                               FontSize="13" TextColor="#aaaaaa" FontAutoScalingEnabled="False"
+                               IsVisible="{Binding Order.DeliveryAddress, Converter={StaticResource IsNullOrEmptyConverter}}"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Error Banner -->
+                <Frame x:Name="ErrorBanner"
+                       IsVisible="{Binding HasError}"
+                       Padding="14,10" CornerRadius="12" HasShadow="False"
+                       BackgroundColor="#dc3545" BorderColor="Transparent">
+                    <Grid ColumnDefinitions="Auto,*">
+                        <Label Grid.Column="0" Text="✕" TextColor="White" FontSize="14"
+                               FontAttributes="Bold" VerticalOptions="Center" Margin="0,0,8,0"
+                               FontAutoScalingEnabled="False"/>
+                        <Label Grid.Column="1" Text="{Binding ErrorMessage}"
+                               TextColor="White" FontSize="13" VerticalOptions="Center"
+                               FontAutoScalingEnabled="False"/>
+                    </Grid>
+                </Frame>
+
+                <!-- Status Info Banner (red, auto-dismisses – shown for non-terminal status changes) -->
+                <Frame x:Name="StatusInfoBanner"
+                       IsVisible="{Binding HasStatusInfo}"
+                       Padding="14,10" CornerRadius="12" HasShadow="False"
+                       BackgroundColor="#dc3545" BorderColor="Transparent">
+                    <Grid ColumnDefinitions="Auto,*">
+                        <Label Grid.Column="0" Text="●" TextColor="White" FontSize="12"
+                               FontAttributes="Bold" VerticalOptions="Center" Margin="0,0,8,0"
+                               FontAutoScalingEnabled="False"/>
+                        <Label Grid.Column="1" Text="{Binding StatusInfoMessage}"
+                               TextColor="White" FontSize="13" VerticalOptions="Center"
+                               FontAutoScalingEnabled="False"/>
+                    </Grid>
+                </Frame>
+
+                <!-- Success Banner -->
+                <Frame x:Name="SuccessBanner"
+                       IsVisible="{Binding HasSuccess}"
+                       Padding="14,10" CornerRadius="12" HasShadow="False"
+                       BackgroundColor="#198754" BorderColor="Transparent">
+                    <Grid ColumnDefinitions="Auto,*">
+                        <Label Grid.Column="0" Text="✔" TextColor="White" FontSize="14"
+                               FontAttributes="Bold" VerticalOptions="Center" Margin="0,0,8,0"
+                               FontAutoScalingEnabled="False"/>
+                        <Label Grid.Column="1" Text="{Binding SuccessMessage}"
+                               TextColor="White" FontSize="13" VerticalOptions="Center"
+                               FontAutoScalingEnabled="False"/>
+                    </Grid>
+                </Frame>
+
+                <!-- Status Update Section -->
+                <Frame Padding="16" CornerRadius="14" HasShadow="False" BackgroundColor="White" BorderColor="#eeeeee">
+                    <Frame.Shadow>
+                        <Shadow Brush="#000000" Opacity="0.05" Radius="8" Offset="0,2"/>
+                    </Frame.Shadow>
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="UPDATE STATUS" FontSize="10" TextColor="#999999" FontAttributes="Bold" FontAutoScalingEnabled="False"/>
+                        <Frame Padding="2,0" CornerRadius="10" HasShadow="False" BorderColor="#e0e0e0" BackgroundColor="#f9f9f9">
+                            <Picker Title="Select status"
+                                    ItemsSource="{Binding AvailableStatuses}"
+                                    SelectedItem="{Binding SelectedStatus}"
+                                    FontSize="14" TextColor="#1a1a1a" FontAutoScalingEnabled="False"
+                                    Margin="8,0"/>
+                        </Frame>
+                        <Button Text="✔  Apply Status Change"
+                                Command="{Binding UpdateOrderStatusCommand}"
+                                BackgroundColor="#007AFF" TextColor="White"
+                                CornerRadius="10" FontAttributes="Bold"
+                                FontAutoScalingEnabled="False" HeightRequest="46"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Order Items -->
+                <Label Text="ORDER ITEMS" FontSize="10" TextColor="#999999" FontAttributes="Bold"
+                       FontAutoScalingEnabled="False" Margin="2,0,0,0"/>
+                <Label Text="No items in this order."
+                       IsVisible="{Binding HasNoItems}"
+                       TextColor="#999999" HorizontalTextAlignment="Center"
+                       FontSize="13" FontAutoScalingEnabled="False"/>
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding OrderItems}" Spacing="0">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <Frame Padding="14" CornerRadius="12" HasShadow="False"
+                                   BackgroundColor="White" BorderColor="#f0f0f0" Margin="0,4">
+                                <Frame.Shadow>
+                                    <Shadow Brush="#000000" Opacity="0.04" Radius="6" Offset="0,2"/>
+                                </Frame.Shadow>
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                    <VerticalStackLayout Grid.Column="0" Spacing="3">
+                                        <Label Text="{Binding DisplayProductName}"
+                                               FontSize="14" FontAttributes="Bold" TextColor="#1a1a1a" FontAutoScalingEnabled="False"/>
+                                        <Label Text="{Binding Quantity, StringFormat='Qty: {0}'}"
+                                               FontSize="12" TextColor="#666666" FontAutoScalingEnabled="False"/>
+                                    </VerticalStackLayout>
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" HorizontalOptions="End" Spacing="2">
+                                        <Label Text="{Binding Price, StringFormat='&#8377;{0:F0}/unit'}"
+                                               FontSize="11" TextColor="#999999" HorizontalTextAlignment="End" FontAutoScalingEnabled="False"/>
+                                        <Label Text="{Binding TotalPrice, StringFormat='&#8377;{0:F0}'}"
+                                               FontSize="15" FontAttributes="Bold" TextColor="#00b366"
+                                               HorizontalTextAlignment="End" FontAutoScalingEnabled="False"/>
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Frame>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
+                <!-- Order Total Footer -->
+                <Frame Padding="16" CornerRadius="14" HasShadow="False" BackgroundColor="#f0faf5" BorderColor="#c8ead8">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Order Total" FontSize="15" FontAttributes="Bold" TextColor="#1a1a1a" FontAutoScalingEnabled="False"/>
+                        <Label Grid.Column="1"
+                               Text="{Binding Order.TotalAmount, StringFormat='&#8377;{0:F0}'}"
+                               FontSize="18" FontAttributes="Bold" TextColor="#00b366" FontAutoScalingEnabled="False"/>
+                    </Grid>
+                </Frame>
+
+                <BoxView HeightRequest="20" Color="Transparent"/>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Full-page loading overlay -->
+        <Grid IsVisible="{Binding IsLoading}" BackgroundColor="#CCFFFFFF" InputTransparent="False">
+            <VerticalStackLayout Spacing="14" HorizontalOptions="Center" VerticalOptions="Center">
+                <ActivityIndicator IsRunning="True" Color="#00b366" WidthRequest="48" HeightRequest="48"/>
+                <Label Text="Please wait..."
+                       FontSize="14" FontAutoScalingEnabled="False"
+                       TextColor="#444444" FontAttributes="Bold"
+                       HorizontalTextAlignment="Center"/>
+            </VerticalStackLayout>
+        </Grid>
+    </Grid>
 </ContentPage>

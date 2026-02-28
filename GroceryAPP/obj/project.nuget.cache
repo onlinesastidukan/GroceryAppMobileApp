@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "zd3s8y6P1P8=",
+  "dgSpecHash": "Lka+OZudKl0=",
   "success": true,
   "projectFilePath": "E:\\Rohit_Mundhe\\WOrk\\GroceryApp\\GroceryApp.csproj",
   "expectedPackageFiles": [
@@ -125,13 +125,18 @@
     "C:\\Users\\ROHITMUNDHE2\\.nuget\\packages\\xamarin.kotlinx.coroutines.core.jvm\\1.9.0.3\\xamarin.kotlinx.coroutines.core.jvm.1.9.0.3.nupkg.sha512",
     "C:\\Users\\ROHITMUNDHE2\\.nuget\\packages\\xamarin.kotlinx.serialization.core\\1.7.3.4\\xamarin.kotlinx.serialization.core.1.7.3.4.nupkg.sha512",
     "C:\\Users\\ROHITMUNDHE2\\.nuget\\packages\\xamarin.kotlinx.serialization.core.jvm\\1.7.3.4\\xamarin.kotlinx.serialization.core.jvm.1.7.3.4.nupkg.sha512",
+    "C:\\Users\\ROHITMUNDHE2\\.nuget\\packages\\microsoft.android.ref.35\\35.0.105\\microsoft.android.ref.35.35.0.105.nupkg.sha512",
     "C:\\Users\\ROHITMUNDHE2\\.nuget\\packages\\microsoft.android.runtime.35.android-arm64\\35.0.105\\microsoft.android.runtime.35.android-arm64.35.0.105.nupkg.sha512",
     "C:\\Users\\ROHITMUNDHE2\\.nuget\\packages\\microsoft.android.runtime.35.android-x64\\35.0.105\\microsoft.android.runtime.35.android-x64.35.0.105.nupkg.sha512",
-    "C:\\Users\\ROHITMUNDHE2\\.nuget\\packages\\microsoft.android.ref.35\\35.0.105\\microsoft.android.ref.35.35.0.105.nupkg.sha512",
-    "C:\\Users\\ROHITMUNDHE2\\.nuget\\packages\\microsoft.ios.runtime.iossimulator-x64.net9.0_26.0\\26.0.9783\\microsoft.ios.runtime.iossimulator-x64.net9.0_26.0.26.0.9783.nupkg.sha512",
     "C:\\Users\\ROHITMUNDHE2\\.nuget\\packages\\microsoft.ios.ref.net9.0_26.0\\26.0.9783\\microsoft.ios.ref.net9.0_26.0.26.0.9783.nupkg.sha512",
-    "C:\\Users\\ROHITMUNDHE2\\.nuget\\packages\\microsoft.maccatalyst.runtime.maccatalyst-x64.net9.0_26.0\\26.0.9783\\microsoft.maccatalyst.runtime.maccatalyst-x64.net9.0_26.0.26.0.9783.nupkg.sha512",
+    "C:\\Users\\ROHITMUNDHE2\\.nuget\\packages\\microsoft.ios.runtime.ios-arm64.net9.0_26.0\\26.0.9783\\microsoft.ios.runtime.ios-arm64.net9.0_26.0.26.0.9783.nupkg.sha512",
     "C:\\Users\\ROHITMUNDHE2\\.nuget\\packages\\microsoft.maccatalyst.ref.net9.0_26.0\\26.0.9783\\microsoft.maccatalyst.ref.net9.0_26.0.26.0.9783.nupkg.sha512",
+    "C:\\Users\\ROHITMUNDHE2\\.nuget\\packages\\microsoft.maccatalyst.runtime.maccatalyst-x64.net9.0_26.0\\26.0.9783\\microsoft.maccatalyst.runtime.maccatalyst-x64.net9.0_26.0.26.0.9783.nupkg.sha512",
+    "C:\\Users\\ROHITMUNDHE2\\.nuget\\packages\\microsoft.maccatalyst.runtime.maccatalyst-arm64.net9.0_26.0\\26.0.9783\\microsoft.maccatalyst.runtime.maccatalyst-arm64.net9.0_26.0.26.0.9783.nupkg.sha512",
+    "C:\\Users\\ROHITMUNDHE2\\.nuget\\packages\\microsoft.netcore.app.runtime.win-x64\\9.0.13\\microsoft.netcore.app.runtime.win-x64.9.0.13.nupkg.sha512",
+    "C:\\Users\\ROHITMUNDHE2\\.nuget\\packages\\microsoft.windowsdesktop.app.runtime.win-x64\\9.0.13\\microsoft.windowsdesktop.app.runtime.win-x64.9.0.13.nupkg.sha512",
+    "C:\\Users\\ROHITMUNDHE2\\.nuget\\packages\\microsoft.aspnetcore.app.runtime.win-x64\\9.0.13\\microsoft.aspnetcore.app.runtime.win-x64.9.0.13.nupkg.sha512",
+    "C:\\Users\\ROHITMUNDHE2\\.nuget\\packages\\microsoft.netcore.app.crossgen2.win-x64\\9.0.13\\microsoft.netcore.app.crossgen2.win-x64.9.0.13.nupkg.sha512",
     "C:\\Users\\ROHITMUNDHE2\\.nuget\\packages\\microsoft.windows.sdk.net.ref\\10.0.19041.57\\microsoft.windows.sdk.net.ref.10.0.19041.57.nupkg.sha512"
   ],
   "logs": []

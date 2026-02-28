@@ -52,6 +52,8 @@
                                    Placeholder="Choose a unique user ID"
                                 ReturnType="Next"
                                    BackgroundColor="Transparent"
+                                              TextColor="#1a1a1a"
+                                              PlaceholderColor="#9a9a9a"
                                    FontSize="15"
                                    Margin="16,12"/>
                         </Frame>
@@ -64,6 +66,8 @@
                                    Placeholder="Enter your full name"
                                 ReturnType="Next"
                                    BackgroundColor="Transparent"
+                                              TextColor="#1a1a1a"
+                                              PlaceholderColor="#9a9a9a"
                                    FontSize="15"
                                    Margin="16,12"/>
                         </Frame>
@@ -77,6 +81,8 @@
                                    IsPassword="True"
                                 ReturnType="Next"
                                    BackgroundColor="Transparent"
+                                              TextColor="#1a1a1a"
+                                              PlaceholderColor="#9a9a9a"
                                    FontSize="15"
                                    Margin="16,12"/>
                         </Frame>
@@ -90,6 +96,8 @@
                                    Keyboard="Telephone"
                                 ReturnType="Next"
                                    BackgroundColor="Transparent"
+                                              TextColor="#1a1a1a"
+                                              PlaceholderColor="#9a9a9a"
                                    FontSize="15"
                                    Margin="16,12"/>
                         </Frame>
@@ -102,6 +110,8 @@
                                     Placeholder="Enter delivery address"
                                     AutoSize="TextChanges"
                                     BackgroundColor="Transparent"
+                                    TextColor="#1a1a1a"
+                                    PlaceholderColor="#9a9a9a"
                                     FontSize="15"
                                     HeightRequest="90"
                                     Margin="16,10"/>

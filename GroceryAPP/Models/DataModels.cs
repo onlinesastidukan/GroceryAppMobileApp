@@ -91,11 +91,31 @@ public class Product
     [JsonPropertyName("stockQuantity")]
     public int Stock { get; set; }
 
+    [JsonIgnore]
+    public bool IsOutOfStock => Stock <= 0;
+
+    [JsonIgnore]
+    public string StockStatus => IsOutOfStock ? "Stock unavailable" : $"In stock: {Stock}";
+
     [JsonPropertyName("categoryId")]
     public int CategoryId { get; set; }
 
     [JsonPropertyName("photoUrl")]
     public string ImageUrl { get; set; }
+
+    // Compatibility aliases for backend variants that send image URL under alternate keys.
+    [JsonPropertyName("imageUrl")]
+    public string? ImageUrlAlias
+    {
+        get => ImageUrl;
+        set
+        {
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                ImageUrl = value;
+            }
+        }
+    }
 
     [JsonPropertyName("createdAt")]
     public DateTime CreatedDate { get; set; }
@@ -199,6 +219,20 @@ public class Order
     [JsonPropertyName("orderDate")]
     public DateTime OrderDate { get; set; }
 
+    // Backend compatibility alias when order date comes as createdAt.
+    [JsonPropertyName("createdAt")]
+    public DateTime CreatedAtAlias
+    {
+        get => OrderDate;
+        set
+        {
+            if (value != default)
+            {
+                OrderDate = value;
+            }
+        }
+    }
+
     [JsonPropertyName("totalAmount")]
     public decimal TotalAmount { get; set; }
 
@@ -210,6 +244,20 @@ public class Order
 
     [JsonPropertyName("items")]
     public List<OrderItem> OrderItems { get; set; } = new();
+
+    // Backend compatibility alias when payload uses orderItems instead of items.
+    [JsonPropertyName("orderItems")]
+    public List<OrderItem>? OrderItemsAlias
+    {
+        get => OrderItems;
+        set
+        {
+            if (value != null && value.Count > 0)
+            {
+                OrderItems = value;
+            }
+        }
+    }
 
     public DateTime? EstimatedDelivery { get; set; }
 }
@@ -227,11 +275,43 @@ public class OrderItem
     [JsonPropertyName("productName")]
     public string ProductName { get; set; }
 
+    // Backend compatibility alias when product name comes as "name".
+    [JsonPropertyName("name")]
+    public string? ProductNameAlias
+    {
+        get => ProductName;
+        set
+        {
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                ProductName = value;
+            }
+        }
+    }
+
     [JsonPropertyName("priceAtTime")]
     public decimal Price { get; set; }
 
+    // Backend compatibility alias when price comes as "price".
+    [JsonPropertyName("price")]
+    public decimal PriceAlias
+    {
+        get => Price;
+        set
+        {
+            if (value > 0)
+            {
+                Price = value;
+            }
+        }
+    }
+
     [JsonPropertyName("quantity")]
     public int Quantity { get; set; }
+
+    public string DisplayProductName => string.IsNullOrWhiteSpace(ProductName)
+        ? $"Product #{ProductId}"
+        : ProductName;
 
     public decimal TotalPrice => Price * Quantity;
 }
@@ -240,7 +320,13 @@ public class CreateOrderRequest
 {
     [Required]
     public string DeliveryAddress { get; set; }
-    public List<CartItem> Items { get; set; }
+    public List<CreateOrderItem> Items { get; set; }
+}
+
+public class CreateOrderItem
+{
+    public int ProductId { get; set; }
+    public int Quantity { get; set; }
 }
 
 public class UpdateOrderStatusRequest

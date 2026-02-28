@@ -70,15 +70,37 @@
                         </Frame>
                     </VerticalStackLayout>
 
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="Photo URL" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
-                        <Frame Padding="0" CornerRadius="10" HasShadow="False" BorderColor="#e0e0e0">
-                            <Entry x:Name="PhotoUrlEntry"
-                                   Placeholder="https://example.com/image.jpg"
-                                   BackgroundColor="Transparent"
-                                   FontSize="14"
-                                   Margin="12,8"/>
+                    <!-- Product Image Picker -->
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Product Image" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
+                        <Frame Padding="8" CornerRadius="10" HasShadow="False" BorderColor="#e0e0e0" HeightRequest="140" BackgroundColor="#fafafa">
+                            <Grid>
+                                <VerticalStackLayout x:Name="ImagePlaceholder"
+                                                     HorizontalOptions="Center"
+                                                     VerticalOptions="Center"
+                                                     Spacing="6">
+                                    <Label Text="🖼️" FontSize="40" HorizontalTextAlignment="Center"/>
+                                    <Label Text="No image selected" FontSize="12" TextColor="#999999" HorizontalTextAlignment="Center"/>
+                                </VerticalStackLayout>
+                                <Image x:Name="ProductImagePreview"
+                                       Aspect="AspectFit"
+                                       IsVisible="False"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center"/>
+                            </Grid>
                         </Frame>
+                        <Button Text="📷 Change Image"
+                                Clicked="OnPickImageClicked"
+                                BackgroundColor="#f0f0f0"
+                                TextColor="#333333"
+                                FontSize="13"
+                                Padding="12,8"
+                                CornerRadius="10"/>
+                        <Label x:Name="ImageStatusLabel"
+                               Text=""
+                               FontSize="11"
+                               TextColor="#00b366"
+                               IsVisible="False"/>
                     </VerticalStackLayout>
 
                     <VerticalStackLayout Spacing="6">

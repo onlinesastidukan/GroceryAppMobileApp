@@ -27,16 +27,65 @@ public partial class AdminProductsPage : ContentPage
 
     private async void OnAddProductClicked(object sender, EventArgs e)
     {
-        var addProductPage = new AdminAddProductPage(_apiService);
-        await Navigation.PushAsync(addProductPage);
+        _viewModel.DismissError();
+
+        try
+        {
+            var addProductPage = new AdminAddProductPage(_apiService);
+            await Navigation.PushAsync(addProductPage);
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Navigation Error", $"Unable to open Add Product page. {ex.Message}", "OK");
+        }
     }
 
     private async void OnEditProductClicked(object sender, EventArgs e)
     {
-        if (sender is Button button && button.CommandParameter is Product product)
+        _viewModel.DismissError();
+
+        try
         {
-            var editProductPage = new AdminEditProductPage(_apiService, product);
-            await Navigation.PushAsync(editProductPage);
+            if (sender is Button button && button.CommandParameter is Product product)
+            {
+                var editProductPage = new AdminEditProductPage(_apiService, product);
+                await Navigation.PushAsync(editProductPage);
+            }
+            else
+            {
+                await DisplayAlert("Edit Error", "Unable to determine which product to edit.", "OK");
+            }
         }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Edit Error", $"Unable to open Edit Product page. {ex.Message}", "OK");
+        }
+    }
+
+    private async void OnRestockProductClicked(object sender, EventArgs e)
+    {
+        _viewModel.DismissError();
+
+        try
+        {
+            if (sender is Button button && button.CommandParameter is Product product)
+            {
+                var editProductPage = new AdminEditProductPage(_apiService, product);
+                await Navigation.PushAsync(editProductPage);
+            }
+            else
+            {
+                await DisplayAlert("Restock Error", "Unable to determine product for restock.", "OK");
+            }
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Restock Error", $"Unable to open stock editor. {ex.Message}", "OK");
+        }
+    }
+
+    private void OnErrorBannerTapped(object sender, TappedEventArgs e)
+    {
+        _viewModel.DismissError();
     }
 }

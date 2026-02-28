@@ -24,15 +24,21 @@ public partial class CartPage : ContentPage
 
     private async void OnPlaceOrderClicked(object sender, EventArgs e)
     {
-        await _viewModel.PlaceOrderCommand.ExecuteAsync(null);
+        await _viewModel.PlaceOrderAsync();
+
+        if (_viewModel.HasError && !string.IsNullOrWhiteSpace(_viewModel.ErrorMessage))
+        {
+            await DisplayAlert("Checkout", _viewModel.ErrorMessage, "OK");
+        }
     }
 
     private async void OnViewModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(_viewModel.OrderPlacedSuccessfully) && _viewModel.OrderPlacedSuccessfully)
         {
-            var orderHistoryPage = Application.Current.Handler.MauiContext.Services.GetService<CustomerOrderHistoryPage>();
-            await Navigation.PushAsync(orderHistoryPage);
+            var orderHistoryPage = Application.Current?.Handler?.MauiContext?.Services?.GetService<CustomerOrderHistoryPage>();
+            if (orderHistoryPage != null)
+                await Navigation.PushAsync(orderHistoryPage);
         }
     }
 

@@ -9,6 +9,8 @@ public partial class AdminAddProductPage : ContentPage
     private readonly ApiService _apiService;
     private List<Category> _categories = new();
     private List<Product> _products = new();
+    private string _selectedImageBase64 = string.Empty;
+    private byte[] _previewImageBytes;
 
     public AdminAddProductPage(ApiService apiService)
     {
@@ -84,7 +86,7 @@ public partial class AdminAddProductPage : ContentPage
         var priceText = PriceEntry.Text;
         var description = DescriptionEditor.Text;
         var stockText = StockQuantityEntry.Text;
-        var photoUrl = PhotoUrlEntry.Text;
+        var photoUrl = _selectedImageBase64;
         var categoryIndex = CategoryPicker.SelectedIndex;
 
         if (string.IsNullOrWhiteSpace(productName) || string.IsNullOrWhiteSpace(priceText) || string.IsNullOrWhiteSpace(stockText) || categoryIndex < 0)
@@ -142,6 +144,38 @@ public partial class AdminAddProductPage : ContentPage
     private async void OnCancelClicked(object sender, EventArgs e)
     {
         await Navigation.PopAsync();
+    }
+
+    private async void OnPickImageClicked(object sender, EventArgs e)
+    {
+        try
+        {
+            var result = await MediaPicker.Default.PickPhotoAsync(new MediaPickerOptions
+            {
+                Title = "Select Product Image"
+            });
+
+            if (result == null) return;
+
+            using var stream = await result.OpenReadAsync();
+            using var ms = new MemoryStream();
+            await stream.CopyToAsync(ms);
+            _previewImageBytes = ms.ToArray();
+
+            var extension = Path.GetExtension(result.FileName)?.TrimStart('.').ToLowerInvariant() ?? "jpeg";
+            var mimeType = extension == "png" ? "image/png" : "image/jpeg";
+            _selectedImageBase64 = $"data:{mimeType};base64,{Convert.ToBase64String(_previewImageBytes)}";
+
+            ProductImagePreview.Source = ImageSource.FromStream(() => new MemoryStream(_previewImageBytes));
+            ProductImagePreview.IsVisible = true;
+            ImagePlaceholder.IsVisible = false;
+            ImageStatusLabel.Text = $"✓ {result.FileName}";
+            ImageStatusLabel.IsVisible = true;
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", $"Could not pick image: {ex.Message}", "OK");
+        }
     }
 
     private async void OnEditExistingProductClicked(object sender, EventArgs e)

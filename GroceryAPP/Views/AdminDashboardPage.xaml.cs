@@ -7,13 +7,15 @@ public partial class AdminDashboardPage : ContentPage
 {
     private readonly AdminDashboardViewModel _viewModel;
     private readonly AuthService _authService;
+    private readonly ApiService _apiService;
     private bool _isMenuOpen = false;
 
-    public AdminDashboardPage(AdminDashboardViewModel viewModel, AuthService authService)
+    public AdminDashboardPage(AdminDashboardViewModel viewModel, AuthService authService, ApiService apiService)
     {
         InitializeComponent();
         _viewModel = viewModel;
         _authService = authService;
+        _apiService = apiService;
         BindingContext = _viewModel;
     }
 
@@ -31,17 +33,33 @@ public partial class AdminDashboardPage : ContentPage
 
     private async Task OpenMenu()
     {
-        if (_isMenuOpen) return;
+        if (_isMenuOpen)
+        {
+            return;
+        }
 
-        _isMenuOpen = true;
-        SideMenu.IsVisible = true;
-        Overlay.IsVisible = true;
+        try
+        {
+            _isMenuOpen = true;
+            SideMenu.TranslationX = -300;
+            SideMenu.IsVisible = true;
+            Overlay.Opacity = 0;
+            Overlay.InputTransparent = false;
+            Overlay.IsVisible = true;
 
-        // Animate menu sliding in from left
-        await Task.WhenAll(
-            SideMenu.TranslateTo(0, 0, 250, Easing.CubicOut),
-            Overlay.FadeTo(0.5, 250)
-        );
+            await Task.WhenAll(
+                SideMenu.TranslateTo(0, 0, 250, Easing.CubicOut),
+                Overlay.FadeTo(1, 250, Easing.CubicOut)
+            );
+        }
+        catch (Exception ex)
+        {
+            _isMenuOpen = false;
+            SideMenu.IsVisible = false;
+            Overlay.IsVisible = false;
+            Overlay.InputTransparent = true;
+            await DisplayAlert("Menu Error", $"Unable to open menu. {ex.Message}", "OK");
+        }
     }
 
     private async void OnCloseMenuClicked(object sender, EventArgs e)
@@ -56,39 +74,44 @@ public partial class AdminDashboardPage : ContentPage
 
     private async Task CloseMenu()
     {
-        if (!_isMenuOpen) return;
+        if (!_isMenuOpen)
+        {
+            return;
+        }
 
-        // Animate menu sliding out to left
-        await Task.WhenAll(
-            SideMenu.TranslateTo(-300, 0, 250, Easing.CubicIn),
-            Overlay.FadeTo(0, 250)
-        );
-
-        SideMenu.IsVisible = false;
-        Overlay.IsVisible = false;
-        _isMenuOpen = false;
+        try
+        {
+            await Task.WhenAll(
+                SideMenu.TranslateTo(-300, 0, 250, Easing.CubicIn),
+                Overlay.FadeTo(0, 250, Easing.CubicIn)
+            );
+        }
+        finally
+        {
+            SideMenu.IsVisible = false;
+            Overlay.IsVisible = false;
+            Overlay.InputTransparent = true;
+            _isMenuOpen = false;
+        }
     }
 
     // Menu Navigation Handlers
     private async void OnMenuOrdersClicked(object sender, TappedEventArgs e)
     {
         await CloseMenu();
-        var ordersPage = Application.Current.Handler.MauiContext.Services.GetService<AdminOrdersPage>();
-        await Navigation.PushAsync(ordersPage);
+        await NavigateToPageAsync<AdminOrdersPage>("Orders");
     }
 
     private async void OnMenuProductsClicked(object sender, TappedEventArgs e)
     {
         await CloseMenu();
-        var productsPage = Application.Current.Handler.MauiContext.Services.GetService<AdminProductsPage>();
-        await Navigation.PushAsync(productsPage);
+        await NavigateToPageAsync<AdminProductsPage>("Products");
     }
 
     private async void OnMenuCategoriesClicked(object sender, TappedEventArgs e)
     {
         await CloseMenu();
-        var categoriesPage = Application.Current.Handler.MauiContext.Services.GetService<AdminCategoriesPage>();
-        await Navigation.PushAsync(categoriesPage);
+        await NavigateToPageAsync<AdminCategoriesPage>("Categories");
     }
 
     private async void OnMenuLogoutClicked(object sender, TappedEventArgs e)
@@ -98,11 +121,69 @@ public partial class AdminDashboardPage : ContentPage
         bool confirm = await DisplayAlert("Logout", "Are you sure you want to logout?", "Yes", "No");
         if (confirm)
         {
-            await _authService.LogoutAsync();
+            await _authService.LogoutAsync(_apiService);
             
             // Navigate back to login page and clear navigation stack
-            var loginPage = Application.Current.Handler.MauiContext.Services.GetService<LoginPage>();
+            var loginPage = Application.Current?.Handler?.MauiContext?.Services?.GetService<LoginPage>();
+            if (loginPage == null)
+            {
+                await DisplayAlert("Navigation Error", "Unable to load Login page.", "OK");
+                return;
+            }
+
             Application.Current.MainPage = new NavigationPage(loginPage);
+        }
+    }
+
+    private async void OnOrdersCardTapped(object sender, TappedEventArgs e)
+    {
+        if (_viewModel.TotalOrders <= 0)
+        {
+            await DisplayAlert("No Orders", "There are no orders to manage.", "OK");
+            return;
+        }
+
+        await NavigateToPageAsync<AdminOrdersPage>("Orders");
+    }
+
+    private async void OnProductsCardTapped(object sender, TappedEventArgs e)
+    {
+        if (_viewModel.TotalProducts <= 0)
+        {
+            await DisplayAlert("No Products", "There are no products to manage.", "OK");
+            return;
+        }
+
+        await NavigateToPageAsync<AdminProductsPage>("Products");
+    }
+
+    private async void OnCategoriesCardTapped(object sender, TappedEventArgs e)
+    {
+        if (_viewModel.TotalCategories <= 0)
+        {
+            await DisplayAlert("No Categories", "There are no categories to manage.", "OK");
+            return;
+        }
+
+        await NavigateToPageAsync<AdminCategoriesPage>("Categories");
+    }
+
+    private async Task NavigateToPageAsync<TPage>(string pageName) where TPage : Page
+    {
+        try
+        {
+            var page = Application.Current?.Handler?.MauiContext?.Services.GetService<TPage>();
+            if (page == null)
+            {
+                await DisplayAlert("Navigation Error", $"Unable to open {pageName} page.", "OK");
+                return;
+            }
+
+            await Navigation.PushAsync(page);
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Navigation Error", $"Failed to open {pageName}: {ex.Message}", "OK");
         }
     }
 }

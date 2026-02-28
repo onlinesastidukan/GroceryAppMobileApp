@@ -1,5 +1,6 @@
 using GroceryApp.Services;
 using GroceryApp.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace GroceryApp.Views;
 
@@ -9,14 +10,16 @@ public partial class LoginPage : ContentPage
 	private readonly AuthService _authService;
 	private readonly CartService _cartService;
 	private readonly LoginViewModel _viewModel;
+	private readonly IServiceProvider _serviceProvider;
 
-	public LoginPage(LoginViewModel viewModel, ApiService apiService, AuthService authService, CartService cartService)
+	public LoginPage(LoginViewModel viewModel, ApiService apiService, AuthService authService, CartService cartService, IServiceProvider serviceProvider)
 	{
 		InitializeComponent();
 		_viewModel = viewModel;
 		_apiService = apiService;
 		_authService = authService;
 		_cartService = cartService;
+		_serviceProvider = serviceProvider;
 		BindingContext = _viewModel;
 	}
 
@@ -35,7 +38,7 @@ public partial class LoginPage : ContentPage
 		try
 		{
 			LoadingIndicator.IsRunning = true;
-			LoadingIndicator.IsVisible = true;
+			LoadingOverlay.IsVisible = true;
 			ErrorLabel.IsVisible = false;
 			
 			var success = await _authService.LoginAsync(userId, password, _apiService);
@@ -48,20 +51,22 @@ public partial class LoginPage : ContentPage
 				// Navigate based on role
 				if (_authService.IsAdmin)
 				{
-					var adminDashboard = Application.Current.Handler.MauiContext.Services.GetService<AdminDashboardPage>();
+					var adminDashboard = _serviceProvider.GetService<AdminDashboardPage>();
 					await Navigation.PushAsync(adminDashboard);
 					Navigation.RemovePage(this);
 				}
 				else if (_authService.IsCustomer)
 				{
-					var customerCategory = Application.Current.Handler.MauiContext.Services.GetService<CustomerCategoryPage>();
+					var customerCategory = _serviceProvider.GetService<CustomerCategoryPage>();
 					await Navigation.PushAsync(customerCategory);
 					Navigation.RemovePage(this);
 				}
 			}
 			else
 			{
-				ErrorLabel.Text = "Invalid user ID or password";
+				ErrorLabel.Text = string.IsNullOrWhiteSpace(_authService.LastErrorMessage)
+					? "Invalid user ID or password"
+					: _authService.LastErrorMessage;
 				ErrorLabel.IsVisible = true;
 			}
 		}
@@ -74,13 +79,13 @@ public partial class LoginPage : ContentPage
 		finally
 		{
 			LoadingIndicator.IsRunning = false;
-			LoadingIndicator.IsVisible = false;
+			LoadingOverlay.IsVisible = false;
 		}
 	}
 
 	private async void OnRegisterClicked(object sender, EventArgs e)
 	{
-		var registerPage = Application.Current.Handler.MauiContext.Services.GetService<RegisterPage>();
+		var registerPage = _serviceProvider.GetService<RegisterPage>();
 		await Navigation.PushAsync(registerPage);
 	}
 }

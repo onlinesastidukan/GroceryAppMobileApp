@@ -24,44 +24,48 @@
                                    Color="#00b366"
                                    Margin="0,10"/>
 
-                <CollectionView ItemsSource="{Binding Orders}">
-                    <CollectionView.EmptyView>
-                        <Label Text="No orders yet" TextColor="#999999" HorizontalTextAlignment="Center"/>
-                    </CollectionView.EmptyView>
-                    <CollectionView.ItemTemplate>
+                <Label Text="No orders yet" IsVisible="{Binding HasNoOrders}"
+                       TextColor="#999999" HorizontalTextAlignment="Center" Margin="0,20"
+                       FontAutoScalingEnabled="False"/>
+
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding Orders}" Spacing="0">
+                    <BindableLayout.ItemTemplate>
                         <DataTemplate>
-                            <Frame Padding="0" CornerRadius="16" HasShadow="False" BorderColor="#e8e8e8" Margin="0,6">
-                                <Frame.Shadow>
-                                    <Shadow Brush="#000000" Opacity="0.08" Radius="10" Offset="0,4"/>
-                                </Frame.Shadow>
-                                <VerticalStackLayout Padding="16" Spacing="8">
-                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
-                                        <Label Text="{Binding OrderId, StringFormat='Order #{0}'}"
-                                               FontAttributes="Bold"
-                                               TextColor="#1a1a1a"/>
-                                        <Frame Grid.Column="1" Padding="8,4" CornerRadius="10" BackgroundColor="#f1f3f5" HasShadow="False">
-                                            <Label Text="{Binding Status}" FontSize="12" TextColor="#495057"/>
-                                        </Frame>
-                                    </Grid>
-
-                                    <Label Text="{Binding UserFullName, StringFormat='Customer: {0}'}"
-                                           FontSize="13"
-                                           TextColor="#333333"/>
-
-                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
-                                        <Label Text="{Binding TotalAmount, StringFormat='₹{0:F0}'}"
-                                               FontAttributes="Bold"
-                                               TextColor="#00b366"/>
-                                        <Label Grid.Column="1"
-                                               Text="{Binding OrderDate, StringFormat='{}{0:dd MMM yyyy}'}"
-                                               FontSize="12"
-                                               TextColor="#777777"/>
-                                    </Grid>
-                                </VerticalStackLayout>
-                            </Frame>
+                            <Grid Padding="0,6">
+                                <Frame Padding="0" CornerRadius="16" HasShadow="False" BorderColor="#e8e8e8">
+                                    <Frame.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnOrderTapped"/>
+                                    </Frame.GestureRecognizers>
+                                    <Frame.Shadow>
+                                        <Shadow Brush="#000000" Opacity="0.08" Radius="10" Offset="0,4"/>
+                                    </Frame.Shadow>
+                                    <VerticalStackLayout Padding="16" Spacing="8">
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                            <Label Text="{Binding OrderId, StringFormat='Order #{0}'}"
+                                                   FontAttributes="Bold" TextColor="#1a1a1a"/>
+                                            <Frame Grid.Column="1" Padding="8,4" CornerRadius="10"
+                                                   BackgroundColor="{Binding Status, Converter={StaticResource StatusToBadgeBgConverter}}"
+                                                   HasShadow="False" BorderColor="Transparent">
+                                                <Label Text="{Binding Status}" FontSize="12"
+                                                       TextColor="{Binding Status, Converter={StaticResource StringToColorConverter}}"
+                                                       FontAttributes="Bold"/>
+                                            </Frame>
+                                        </Grid>
+                                        <Label Text="{Binding UserFullName, StringFormat='Customer: {0}'}"
+                                               FontSize="13" TextColor="#333333"/>
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                            <Label Text="{Binding TotalAmount, StringFormat='₹{0:F0}'}"
+                                                   FontAttributes="Bold" TextColor="#00b366"/>
+                                            <Label Grid.Column="1"
+                                                   Text="{Binding OrderDate, StringFormat='{}{0:dd MMM yyyy}'}"
+                                                   FontSize="12" TextColor="#777777"/>
+                                        </Grid>
+                                    </VerticalStackLayout>
+                                </Frame>
+                            </Grid>
                         </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
             </VerticalStackLayout>
         </ScrollView>
     </Grid>

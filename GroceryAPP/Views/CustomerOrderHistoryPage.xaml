@@ -2,22 +2,119 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GroceryApp.Views.CustomerOrderHistoryPage"
-             Title="Sasti Dukan - Orders">
-    <VerticalStackLayout Padding="20">
-        <Label Text="My Orders" FontSize="20" FontAttributes="Bold"/>
-        <CollectionView ItemsSource="{Binding Orders}">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Frame HasShadow="True" Margin="0,5">
-                        <VerticalStackLayout>
-                            <Label Text="{Binding OrderId, StringFormat='Order #{0}'}" FontAttributes="Bold"/>
-                            <Label Text="{Binding OrderDate, StringFormat='Date: {0:yyyy-MM-dd}'}" FontSize="12"/>
-                            <Label Text="{Binding TotalAmount, StringFormat='Total: ₹{0:F2}'}" TextColor="#007AFF" FontAttributes="Bold"/>
-                            <Label Text="{Binding Status}"/>
-                        </VerticalStackLayout>
-                    </Frame>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
-    </VerticalStackLayout>
+             Title="My Orders"
+             BackgroundColor="#f8f9fa">
+
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Padding="16,12" Spacing="0">
+
+                <!-- Header -->
+                <Label Text="Order History"
+                       FontSize="24" FontAttributes="Bold"
+                       TextColor="#1a1a1a" Margin="4,0,0,16"
+                       FontAutoScalingEnabled="False"/>
+
+                <!-- Error Banner -->
+                <Frame IsVisible="{Binding HasError}"
+                       Padding="14,10" CornerRadius="12" HasShadow="False"
+                       BackgroundColor="#dc3545" BorderColor="Transparent" Margin="0,0,0,12">
+                    <Label Text="{Binding ErrorMessage}"
+                           TextColor="White" FontSize="13"
+                           FontAutoScalingEnabled="False"/>
+                </Frame>
+
+                <!-- Empty State -->
+                <VerticalStackLayout IsVisible="{Binding HasNoOrders}"
+                                     Spacing="12" Padding="0,48,0,0"
+                                     HorizontalOptions="Center">
+                    <Label Text="🛍️" FontSize="52" HorizontalTextAlignment="Center"/>
+                    <Label Text="No past orders yet"
+                           FontSize="16" TextColor="#999999" FontAttributes="Bold"
+                           HorizontalTextAlignment="Center" FontAutoScalingEnabled="False"/>
+                    <Label Text="Your order history will appear here"
+                           FontSize="13" TextColor="#bbbbbb"
+                           HorizontalTextAlignment="Center" FontAutoScalingEnabled="False"/>
+                </VerticalStackLayout>
+
+                <!-- Orders List — BindableLayout avoids CollectionView-in-ScrollView crash -->
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding Orders}" Spacing="0">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Padding="0,5">
+                                <Frame Padding="0" CornerRadius="16" HasShadow="False"
+                                       BackgroundColor="White" BorderColor="#eeeeee">
+                                    <Frame.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnOrderTapped"/>
+                                    </Frame.GestureRecognizers>
+                                    <Frame.Shadow>
+                                        <Shadow Brush="#000000" Opacity="0.07" Radius="10" Offset="0,3"/>
+                                    </Frame.Shadow>
+                                    <Grid ColumnDefinitions="Auto,*,Auto">
+
+                                        <!-- Left accent bar -->
+                                        <BoxView Grid.Column="0"
+                                                 WidthRequest="5" CornerRadius="16,0,0,16"
+                                                 VerticalOptions="Fill"
+                                                 Color="{Binding Status, Converter={StaticResource StringToColorConverter}}"/>
+
+                                        <!-- Main content -->
+                                        <VerticalStackLayout Grid.Column="1" Padding="14,14,12,14" Spacing="6">
+                                            <!-- Order ID + Status badge row -->
+                                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                                <Label Text="{Binding OrderId, StringFormat='Order #{0}'}"
+                                                       FontSize="15" FontAttributes="Bold" TextColor="#1a1a1a"
+                                                       VerticalOptions="Center" FontAutoScalingEnabled="False"/>
+                                                <Frame Grid.Column="1" Padding="8,4" CornerRadius="10"
+                                                       HasShadow="False"
+                                                       BackgroundColor="{Binding Status, Converter={StaticResource StatusToBadgeBgConverter}}"
+                                                       BorderColor="Transparent">
+                                                    <Label Text="{Binding Status}"
+                                                           FontSize="11" FontAttributes="Bold"
+                                                           TextColor="{Binding Status, Converter={StaticResource StringToColorConverter}}"
+                                                           HorizontalTextAlignment="Center"
+                                                           FontAutoScalingEnabled="False"/>
+                                                </Frame>
+                                            </Grid>
+
+                                            <!-- Date -->
+                                            <Label Text="{Binding OrderDate, StringFormat='📅 {0:dd MMM yyyy, hh:mm tt}'}"
+                                                   FontSize="12" TextColor="#888888" FontAutoScalingEnabled="False"/>
+
+                                            <!-- Divider -->
+                                            <BoxView HeightRequest="1" Color="#f0f0f0" Margin="0,2"/>
+
+                                            <!-- Total -->
+                                            <Label Text="{Binding TotalAmount, StringFormat='Total  ₹{0:F0}'}"
+                                                   FontSize="16" FontAttributes="Bold" TextColor="#00b366"
+                                                   FontAutoScalingEnabled="False"/>
+                                        </VerticalStackLayout>
+
+                                        <!-- Chevron -->
+                                        <Label Grid.Column="2"
+                                               Text="›" FontSize="28" TextColor="#cccccc"
+                                               VerticalOptions="Center" HorizontalOptions="Center"
+                                               Margin="0,0,14,0" FontAutoScalingEnabled="False"/>
+                                    </Grid>
+                                </Frame>
+                            </Grid>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
+                <BoxView HeightRequest="20" Color="Transparent"/>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Loading overlay -->
+        <Grid IsVisible="{Binding IsLoading}" BackgroundColor="#CCFFFFFF" InputTransparent="False">
+            <VerticalStackLayout Spacing="14" HorizontalOptions="Center" VerticalOptions="Center">
+                <ActivityIndicator IsRunning="True" Color="#00b366" WidthRequest="48" HeightRequest="48"/>
+                <Label Text="Loading orders..."
+                       FontSize="14" FontAutoScalingEnabled="False"
+                       TextColor="#444444" FontAttributes="Bold"
+                       HorizontalTextAlignment="Center"/>
+            </VerticalStackLayout>
+        </Grid>
+    </Grid>
 </ContentPage>

@@ -5,6 +5,7 @@
              Title="सस्ती दुकान"
              NavigationPage.HasNavigationBar="False"
              BackgroundColor="#ffffff">
+    <Grid>
     <ScrollView>
         <VerticalStackLayout Padding="24" Spacing="20" VerticalOptions="Center">
             
@@ -59,6 +60,8 @@
                             <Entry x:Name="UserIdEntry" 
                                    Placeholder="Enter your user ID"
                                    BackgroundColor="Transparent"
+                                TextColor="#1a1a1a"
+                                PlaceholderColor="#9a9a9a"
                                    FontSize="15"
                                    Margin="16,12"/>
                         </Frame>
@@ -72,6 +75,8 @@
                                    Placeholder="Enter your password"
                                    IsPassword="True"
                                    BackgroundColor="Transparent"
+                                TextColor="#1a1a1a"
+                                PlaceholderColor="#9a9a9a"
                                    FontSize="15"
                                    Margin="16,12"/>
                         </Frame>
@@ -115,12 +120,7 @@
                 </VerticalStackLayout>
             </Frame>
             
-            <!-- Loading Indicator -->
-            <ActivityIndicator x:Name="LoadingIndicator" 
-                               IsRunning="False" 
-                               IsVisible="False" 
-                               Color="#00b366"
-                               Margin="0,20"/>
+
             
             <!-- Footer -->
             <VerticalStackLayout Spacing="4" Margin="0,20,0,20" HorizontalOptions="Center">
@@ -138,4 +138,21 @@
             
         </VerticalStackLayout>
     </ScrollView>
+
+    <!-- Full-page loading overlay (always visible regardless of scroll position) -->
+    <Grid x:Name="LoadingOverlay" IsVisible="False" BackgroundColor="#99FFFFFF">
+        <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="14">
+            <ActivityIndicator x:Name="LoadingIndicator"
+                               IsRunning="False"
+                               Color="#00b366"
+                               Scale="1.4"
+                               HorizontalOptions="Center"/>
+            <Label Text="Signing in..."
+                   FontSize="15"
+                   TextColor="#1a1a1a"
+                   HorizontalTextAlignment="Center"/>
+        </VerticalStackLayout>
+    </Grid>
+
+    </Grid>
 </ContentPage>

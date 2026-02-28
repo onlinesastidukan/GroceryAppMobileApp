@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GroceryApp.Views.SplashPage"
-             BackgroundColor="#512BD4"
+             BackgroundColor="#00b366"
              NavigationPage.HasNavigationBar="False">
     <Grid>
         <VerticalStackLayout VerticalOptions="Center" Spacing="30">
@@ -12,13 +12,6 @@
                    FontAttributes="Bold"
                    TextColor="White"
                    HorizontalTextAlignment="Center"/>
-            
-            <Label Text="Sasti Dukan" 
-                   FontSize="32" 
-                   FontAttributes="Bold"
-                   TextColor="White"
-                   HorizontalTextAlignment="Center"
-                   Opacity="0.8"/>
             
             <!-- Loading Indicator -->
             <ActivityIndicator IsRunning="True" 

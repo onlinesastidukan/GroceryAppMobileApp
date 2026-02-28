@@ -4,9 +4,9 @@ namespace GroceryApp;
 
 public partial class App : Application
 {
-	public App()
+	public App(SplashPage splashPage)
 	{
 		InitializeComponent();
-		MainPage = new NavigationPage(new SplashPage());
+		MainPage = new NavigationPage(splashPage);
 	}
 }

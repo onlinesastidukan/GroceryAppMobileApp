@@ -4,6 +4,18 @@
         <name>GroceryApp</name>
     </assembly>
     <members>
+        <member name="T:GroceryApp.Converters.Base64ImageSourceConverter">
+            <summary>
+            Converts a string image URL (http/https, data:image base64, or local resource name) to an ImageSource.
+            MAUI's Image control does not natively support data: URIs, so this converter handles all three cases.
+            </summary>
+        </member>
+        <member name="T:GroceryApp.Converters.StatusToBadgeBackgroundConverter">
+            <summary>Returns a pastel background Color for an order-status badge.</summary>
+        </member>
+        <member name="M:GroceryApp.Services.ApiService.ClassifyNetworkError(System.Exception)">
+            <summary>Returns a user-friendly message for a network exception.</summary>
+        </member>
         <member name="T:GroceryApp.ViewModels.AdminDashboardViewModel">
             <inheritdoc/>
             <inheritdoc/>
@@ -11,8 +23,8 @@
         <member name="P:GroceryApp.ViewModels.AdminDashboardViewModel.TotalOrders">
             <inheritdoc cref="F:GroceryApp.ViewModels.AdminDashboardViewModel.totalOrders"/>
         </member>
-        <member name="P:GroceryApp.ViewModels.AdminDashboardViewModel.TotalRevenue">
-            <inheritdoc cref="F:GroceryApp.ViewModels.AdminDashboardViewModel.totalRevenue"/>
+        <member name="P:GroceryApp.ViewModels.AdminDashboardViewModel.PendingOrders">
+            <inheritdoc cref="F:GroceryApp.ViewModels.AdminDashboardViewModel.pendingOrders"/>
         </member>
         <member name="P:GroceryApp.ViewModels.AdminDashboardViewModel.TotalProducts">
             <inheritdoc cref="F:GroceryApp.ViewModels.AdminDashboardViewModel.totalProducts"/>
@@ -55,6 +67,11 @@
         <member name="P:GroceryApp.ViewModels.AdminOrderDetailViewModel.SelectedStatus">
             <inheritdoc cref="F:GroceryApp.ViewModels.AdminOrderDetailViewModel.selectedStatus"/>
         </member>
+        <member name="M:GroceryApp.ViewModels.AdminOrderDetailViewModel.OnSelectedStatusChanged(System.String)">
+            <summary>Executes the logic for when <see cref="P:GroceryApp.ViewModels.AdminOrderDetailViewModel.SelectedStatus"/> just changed.</summary>
+            <param name="value">The new property value that was set.</param>
+            <remarks>This method is invoked right after the value of <see cref="P:GroceryApp.ViewModels.AdminOrderDetailViewModel.SelectedStatus"/> is changed.</remarks>
+        </member>
         <member name="F:GroceryApp.ViewModels.AdminOrderDetailViewModel.updateOrderStatusCommand">
             <summary>The backing field for <see cref="P:GroceryApp.ViewModels.AdminOrderDetailViewModel.UpdateOrderStatusCommand"/>.</summary>
         </member>
@@ -68,6 +85,14 @@
         </member>
         <member name="P:GroceryApp.ViewModels.AdminProductsViewModel.Products">
             <inheritdoc cref="F:GroceryApp.ViewModels.AdminProductsViewModel.products"/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.AdminProductsViewModel.SearchText">
+            <inheritdoc cref="F:GroceryApp.ViewModels.AdminProductsViewModel.searchText"/>
+        </member>
+        <member name="M:GroceryApp.ViewModels.AdminProductsViewModel.OnSearchTextChanged(System.String)">
+            <summary>Executes the logic for when <see cref="P:GroceryApp.ViewModels.AdminProductsViewModel.SearchText"/> just changed.</summary>
+            <param name="value">The new property value that was set.</param>
+            <remarks>This method is invoked right after the value of <see cref="P:GroceryApp.ViewModels.AdminProductsViewModel.SearchText"/> is changed.</remarks>
         </member>
         <member name="F:GroceryApp.ViewModels.AdminProductsViewModel.initializeCommand">
             <summary>The backing field for <see cref="P:GroceryApp.ViewModels.AdminProductsViewModel.InitializeCommand"/>.</summary>
@@ -122,6 +147,18 @@
         <member name="P:GroceryApp.ViewModels.BaseViewModel.HasError">
             <inheritdoc cref="F:GroceryApp.ViewModels.BaseViewModel.hasError"/>
         </member>
+        <member name="P:GroceryApp.ViewModels.BaseViewModel.SuccessMessage">
+            <inheritdoc cref="F:GroceryApp.ViewModels.BaseViewModel.successMessage"/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.BaseViewModel.HasSuccess">
+            <inheritdoc cref="F:GroceryApp.ViewModels.BaseViewModel.hasSuccess"/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.BaseViewModel.StatusInfoMessage">
+            <inheritdoc cref="F:GroceryApp.ViewModels.BaseViewModel.statusInfoMessage"/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.BaseViewModel.HasStatusInfo">
+            <inheritdoc cref="F:GroceryApp.ViewModels.BaseViewModel.hasStatusInfo"/>
+        </member>
         <member name="T:GroceryApp.ViewModels.CustomerCategoryViewModel">
             <inheritdoc/>
             <inheritdoc/>
@@ -150,6 +187,14 @@
         </member>
         <member name="P:GroceryApp.ViewModels.CustomerProductViewModel.CategoryName">
             <inheritdoc cref="F:GroceryApp.ViewModels.CustomerProductViewModel.categoryName"/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.CustomerProductViewModel.SearchText">
+            <inheritdoc cref="F:GroceryApp.ViewModels.CustomerProductViewModel.searchText"/>
+        </member>
+        <member name="M:GroceryApp.ViewModels.CustomerProductViewModel.OnSearchTextChanged(System.String)">
+            <summary>Executes the logic for when <see cref="P:GroceryApp.ViewModels.CustomerProductViewModel.SearchText"/> just changed.</summary>
+            <param name="value">The new property value that was set.</param>
+            <remarks>This method is invoked right after the value of <see cref="P:GroceryApp.ViewModels.CustomerProductViewModel.SearchText"/> is changed.</remarks>
         </member>
         <member name="F:GroceryApp.ViewModels.CustomerProductViewModel.addToCartCommand">
             <summary>The backing field for <see cref="P:GroceryApp.ViewModels.CustomerProductViewModel.AddToCartCommand"/>.</summary>
@@ -376,8 +421,8 @@
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TotalOrders">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TotalOrders" generated properties.</summary>
         </member>
-        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TotalRevenue">
-            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TotalRevenue" generated properties.</summary>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.PendingOrders">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "PendingOrders" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TotalProducts">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TotalProducts" generated properties.</summary>
@@ -403,6 +448,9 @@
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.Products">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "Products" generated properties.</summary>
         </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.SearchText">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "SearchText" generated properties.</summary>
+        </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.Categories">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "Categories" generated properties.</summary>
         </member>
@@ -414,6 +462,18 @@
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.HasError">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "HasError" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.SuccessMessage">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "SuccessMessage" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.HasSuccess">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "HasSuccess" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.StatusInfoMessage">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "StatusInfoMessage" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.HasStatusInfo">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "HasStatusInfo" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.SelectedCategoryId">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "SelectedCategoryId" generated properties.</summary>
@@ -451,8 +511,8 @@
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TotalOrders">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TotalOrders" generated properties.</summary>
         </member>
-        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TotalRevenue">
-            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TotalRevenue" generated properties.</summary>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.PendingOrders">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "PendingOrders" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TotalProducts">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TotalProducts" generated properties.</summary>
@@ -478,6 +538,9 @@
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.Products">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "Products" generated properties.</summary>
         </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.SearchText">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "SearchText" generated properties.</summary>
+        </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.Categories">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "Categories" generated properties.</summary>
         </member>
@@ -489,6 +552,18 @@
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.HasError">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "HasError" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.SuccessMessage">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "SuccessMessage" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.HasSuccess">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "HasSuccess" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.StatusInfoMessage">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "StatusInfoMessage" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.HasStatusInfo">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "HasStatusInfo" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.SelectedCategoryId">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "SelectedCategoryId" generated properties.</summary>

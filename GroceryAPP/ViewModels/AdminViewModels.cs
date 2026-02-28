@@ -18,7 +18,7 @@ public partial class AdminDashboardViewModel : BaseViewModel
     private int totalOrders;
 
     [ObservableProperty]
-    private decimal totalRevenue;
+    private int pendingOrders;
 
     [ObservableProperty]
     private int totalProducts;
@@ -39,19 +39,68 @@ public partial class AdminDashboardViewModel : BaseViewModel
             IsLoading = true;
             ClearError();
 
+            var loadErrors = new List<string>();
+
             // Load dashboard statistics
             var ordersResponse = await _apiService.GetAllOrdersAdminAsync();
             if (ordersResponse?.Success == true && ordersResponse.Data != null)
             {
                 TotalOrders = ordersResponse.Data.Count;
-                TotalRevenue = ordersResponse.Data.Sum(x => x.TotalAmount);
+                PendingOrders = ordersResponse.Data.Count(x =>
+                    string.Equals(x.Status, "Pending", StringComparison.OrdinalIgnoreCase));
+            }
+            else
+            {
+                TotalOrders = 0;
+                PendingOrders = 0;
+                if (!string.IsNullOrWhiteSpace(ordersResponse?.Message))
+                {
+                    loadErrors.Add($"Orders: {ordersResponse.Message}");
+                }
             }
 
             var productsResponse = await _apiService.GetAllProductsAdminAsync();
-            TotalProducts = productsResponse?.Data?.Count ?? 0;
+            if (productsResponse?.Success != true || productsResponse.Data == null)
+            {
+                productsResponse = await _apiService.GetProductsAsync();
+            }
+
+            if (productsResponse?.Success == true && productsResponse.Data != null)
+            {
+                TotalProducts = productsResponse.Data.Count;
+            }
+            else
+            {
+                TotalProducts = 0;
+                if (!string.IsNullOrWhiteSpace(productsResponse?.Message))
+                {
+                    loadErrors.Add($"Products: {productsResponse.Message}");
+                }
+            }
 
             var categoriesResponse = await _apiService.GetAllCategoriesAdminAsync();
-            TotalCategories = categoriesResponse?.Data?.Count ?? 0;
+            if (categoriesResponse?.Success != true || categoriesResponse.Data == null)
+            {
+                categoriesResponse = await _apiService.GetCategoriesAsync();
+            }
+
+            if (categoriesResponse?.Success == true && categoriesResponse.Data != null)
+            {
+                TotalCategories = categoriesResponse.Data.Count;
+            }
+            else
+            {
+                TotalCategories = 0;
+                if (!string.IsNullOrWhiteSpace(categoriesResponse?.Message))
+                {
+                    loadErrors.Add($"Categories: {categoriesResponse.Message}");
+                }
+            }
+
+            if (loadErrors.Count > 0)
+            {
+                SetError(string.Join(" | ", loadErrors));
+            }
         }
         catch (Exception ex)
         {
@@ -82,6 +131,8 @@ public partial class AdminOrdersViewModel : BaseViewModel
         Orders = new ObservableCollection<Order>();
     }
 
+    public bool HasNoOrders => Orders == null || Orders.Count == 0;
+
     [RelayCommand]
     protected override async Task InitializeAsync()
     {
@@ -98,15 +149,18 @@ public partial class AdminOrdersViewModel : BaseViewModel
                 {
                     Orders.Add(order);
                 }
+                OnPropertyChanged(nameof(HasNoOrders));
             }
             else
             {
                 SetError(response?.Message ?? "Failed to load orders");
+                OnPropertyChanged(nameof(HasNoOrders));
             }
         }
         catch (Exception ex)
         {
             SetError($"Error: {ex.Message}");
+            OnPropertyChanged(nameof(HasNoOrders));
         }
         finally
         {
@@ -137,8 +191,16 @@ public partial class AdminOrderDetailViewModel : BaseViewModel
     private string selectedStatus;
 
     private readonly string[] _statuses = { "Pending", "Confirmed", "Shipped", "Delivered", "Cancelled" };
+    private string _originalStatus;
 
     public string[] AvailableStatuses => _statuses;
+
+    public bool CanApplyStatus => !string.IsNullOrEmpty(SelectedStatus) && SelectedStatus != _originalStatus;
+
+    partial void OnSelectedStatusChanged(string value)
+    {
+        UpdateOrderStatusCommand.NotifyCanExecuteChanged();
+    }
 
     public AdminOrderDetailViewModel(ApiService apiService)
     {
@@ -153,23 +215,51 @@ public partial class AdminOrderDetailViewModel : BaseViewModel
             IsLoading = true;
             ClearError();
 
-            if (OrderId > 0)
+            // Show header immediately from passed order while we fetch full details.
+            if (Order != null)
             {
-                var response = await _apiService.GetOrderByIdAsync(OrderId);
+                SelectedStatus = Order.Status;
+                _originalStatus = Order.Status;
+                UpdateOrderStatusCommand.NotifyCanExecuteChanged();
+            }
+
+            // Always fetch full order from admin endpoint to get address + items.
+            var fetchId = OrderId > 0 ? OrderId : Order?.OrderId ?? 0;
+            if (fetchId > 0)
+            {
+                var response = await _apiService.GetAdminOrderByIdAsync(fetchId);
+                if (response?.Success != true)
+                    response = await _apiService.GetOrderByIdAsync(fetchId);
+
                 if (response?.Success == true && response.Data != null)
                 {
                     Order = response.Data;
                     SelectedStatus = Order.Status;
+                    _originalStatus = Order.Status;
+                    UpdateOrderStatusCommand.NotifyCanExecuteChanged();
+                    OnPropertyChanged(nameof(Order));
                     OrderItems.Clear();
                     foreach (var item in Order.OrderItems)
-                    {
                         OrderItems.Add(item);
-                    }
+                    OnPropertyChanged(nameof(HasNoItems));
+                }
+                else if (Order != null)
+                {
+                    // API failed but we have header from list — render what we can.
+                    OrderItems.Clear();
+                    foreach (var item in Order.OrderItems ?? new())
+                        OrderItems.Add(item);
+                    OnPropertyChanged(nameof(HasNoItems));
                 }
                 else
                 {
                     SetError(response?.Message ?? "Failed to load order");
                 }
+            }
+            else if (Order != null)
+            {
+                _originalStatus = Order.Status;
+                UpdateOrderStatusCommand.NotifyCanExecuteChanged();
             }
         }
         catch (Exception ex)
@@ -182,7 +272,9 @@ public partial class AdminOrderDetailViewModel : BaseViewModel
         }
     }
 
-    [RelayCommand]
+    public bool HasNoItems => OrderItems == null || OrderItems.Count == 0;
+
+    [RelayCommand(CanExecute = nameof(CanApplyStatus))]
     public async Task UpdateOrderStatusAsync()
     {
         if (Order == null || string.IsNullOrEmpty(SelectedStatus))
@@ -200,7 +292,20 @@ public partial class AdminOrderDetailViewModel : BaseViewModel
             if (response?.Success == true)
             {
                 Order.Status = SelectedStatus;
-                await Application.Current.MainPage.DisplayAlert("Success", "Order status updated", "OK");
+                _originalStatus = SelectedStatus;
+                UpdateOrderStatusCommand.NotifyCanExecuteChanged();
+                OnPropertyChanged(nameof(Order));
+
+                if (SelectedStatus == "Delivered")
+                    await ReduceStockOnDeliveryAsync();
+
+                bool isTerminal = SelectedStatus.Equals("Cancelled", StringComparison.OrdinalIgnoreCase)
+                    || SelectedStatus.Equals("Delivered", StringComparison.OrdinalIgnoreCase);
+
+                if (isTerminal)
+                    SetSuccess($"Order marked as {SelectedStatus} ✓");
+                else
+                    SetStatusInfo($"Status updated to '{SelectedStatus}'");
             }
             else
             {
@@ -216,6 +321,33 @@ public partial class AdminOrderDetailViewModel : BaseViewModel
             IsLoading = false;
         }
     }
+
+    private async Task ReduceStockOnDeliveryAsync()
+    {
+        foreach (var item in OrderItems)
+        {
+            try
+            {
+                var productResp = await _apiService.GetProductByIdAsync(item.ProductId);
+                if (productResp?.Success == true && productResp.Data != null)
+                {
+                    var p = productResp.Data;
+                    await _apiService.UpdateProductAsync(new UpdateProductRequest
+                    {
+                        ProductId = p.ProductId,
+                        Name = p.Name,
+                        Description = p.Description ?? "",
+                        Price = p.Price,
+                        StockQuantity = Math.Max(0, p.Stock - item.Quantity),
+                        CategoryId = p.CategoryId,
+                        PhotoUrl = p.ImageUrl ?? "",
+                        IsActive = true
+                    });
+                }
+            }
+            catch { /* best-effort — don't fail the status update */ }
+        }
+    }
 }
 #endregion
 
@@ -223,9 +355,29 @@ public partial class AdminOrderDetailViewModel : BaseViewModel
 public partial class AdminProductsViewModel : BaseViewModel
 {
     private readonly ApiService _apiService;
+    private List<Product> _allProducts = new();
 
     [ObservableProperty]
     private ObservableCollection<Product> products;
+
+    [ObservableProperty]
+    private string searchText = string.Empty;
+
+    partial void OnSearchTextChanged(string value) => FilterProducts();
+
+    private void FilterProducts()
+    {
+        var query = SearchText?.Trim() ?? string.Empty;
+        var filtered = string.IsNullOrEmpty(query)
+            ? _allProducts
+            : _allProducts.Where(p =>
+                p.Name.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                (!string.IsNullOrEmpty(p.Description) && p.Description.Contains(query, StringComparison.OrdinalIgnoreCase)));
+
+        Products.Clear();
+        foreach (var product in filtered)
+            Products.Add(product);
+    }
 
     public AdminProductsViewModel(ApiService apiService)
     {
@@ -246,11 +398,8 @@ public partial class AdminProductsViewModel : BaseViewModel
             System.Diagnostics.Debug.WriteLine($"[ADMIN PRODUCTS VM] API response -> Success={response?.Success}, Message={response?.Message}, DataCount={response?.Data?.Count ?? 0}");
             if (response?.Success == true && response.Data != null)
             {
-                Products.Clear();
-                foreach (var product in response.Data)
-                {
-                    Products.Add(product);
-                }
+                _allProducts = new List<Product>(response.Data);
+                FilterProducts();
                 System.Diagnostics.Debug.WriteLine($"[ADMIN PRODUCTS VM] Products collection populated. Final count={Products.Count}");
             }
             else
@@ -294,6 +443,7 @@ public partial class AdminProductsViewModel : BaseViewModel
                 var response = await _apiService.DeleteProductAsync(product.ProductId);
                 if (response?.Success == true)
                 {
+                    _allProducts.Remove(product);
                     Products.Remove(product);
                     await Application.Current.MainPage.DisplayAlert("Success", "Product deleted", "OK");
                 }
