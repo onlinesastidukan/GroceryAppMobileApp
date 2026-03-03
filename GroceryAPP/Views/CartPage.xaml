@@ -23,7 +23,7 @@
                 <BindableLayout.ItemTemplate>
                     <DataTemplate>
                         <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="#e8e8e8" Margin="0">
-                            <Grid RowDefinitions="*" ColumnDefinitions="70,*,Auto" Padding="12" ColumnSpacing="12">
+                            <Grid RowDefinitions="*" ColumnDefinitions="70,*" Padding="12" ColumnSpacing="12">
                                     <!-- Product Image -->
                                 <Frame Grid.Column="0" 
                                        Padding="8" 
@@ -40,24 +40,63 @@
                                          VerticalOptions="Center"/>
                                 </Frame>
                                 
-                                <!-- Product Info -->
-                                <VerticalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+                                <!-- Product Info + Controls -->
+                                <VerticalStackLayout Grid.Column="1" Spacing="6" VerticalOptions="Center">
                                     <Label Text="{Binding ProductName}" FontSize="14" FontAttributes="Bold" TextColor="#1a1a1a" MaxLines="2" LineBreakMode="TailTruncation"/>
-                                    <Label Text="{Binding TotalPrice, StringFormat='₹{0:F0}'}" FontSize="17" FontAttributes="Bold" TextColor="#00b366"/>
+                                    <Label Text="{Binding TotalPrice, StringFormat='₹{0:F0}'}" FontSize="16" FontAttributes="Bold" TextColor="#00b366"/>
+                                    
+                                    <!-- Quantity +/- Row -->
+                                    <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto" ColumnSpacing="6">
+                                        <!-- Decrease / Remove -->
+                                        <Button Grid.Column="0"
+                                                Text="−"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DecreaseQuantityCommand}"
+                                                CommandParameter="{Binding .}"
+                                                BackgroundColor="#f0f0f0"
+                                                TextColor="#333333"
+                                                FontSize="18"
+                                                FontAttributes="Bold"
+                                                WidthRequest="36"
+                                                HeightRequest="36"
+                                                CornerRadius="8"
+                                                Padding="0"/>
+                                        <!-- Quantity Label -->
+                                        <Label Grid.Column="1"
+                                               Text="{Binding Quantity}"
+                                               FontSize="15"
+                                               FontAttributes="Bold"
+                                               TextColor="#1a1a1a"
+                                               VerticalOptions="Center"
+                                               HorizontalTextAlignment="Center"
+                                               MinimumWidthRequest="28"/>
+                                        <!-- Increase -->
+                                        <Button Grid.Column="2"
+                                                Text="+"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.IncreaseQuantityCommand}"
+                                                CommandParameter="{Binding .}"
+                                                BackgroundColor="#00b366"
+                                                TextColor="White"
+                                                FontSize="18"
+                                                FontAttributes="Bold"
+                                                WidthRequest="36"
+                                                HeightRequest="36"
+                                                CornerRadius="8"
+                                                Padding="0"/>
+                                        <!-- Remove Button -->
+                                        <Button Grid.Column="4"
+                                                Text="🗑"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RemoveFromCartCommand}"
+                                                CommandParameter="{Binding .}"
+                                                BackgroundColor="#ffebee"
+                                                TextColor="#e74c3c"
+                                                FontSize="14"
+                                                WidthRequest="36"
+                                                HeightRequest="36"
+                                                Padding="0"
+                                                CornerRadius="8"
+                                                VerticalOptions="Center"/>
+                                    </Grid>
                                 </VerticalStackLayout>
-                                
-                                <!-- Remove Button -->
-                                <Button Grid.Column="2"
-                                        Text="Remove" 
-                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RemoveFromCartCommand}"
-                                        CommandParameter="{Binding .}"
-                                        BackgroundColor="#ffebee"
-                                        TextColor="#e74c3c"
-                                        FontSize="11"
-                                        FontAttributes="Bold"
-                                        Padding="10,6"
-                                        CornerRadius="6"
-                                        VerticalOptions="Center"/>
                             </Grid>
                         </Frame>
                     </DataTemplate>
@@ -80,10 +119,12 @@
                     <!-- Delivery Address -->
                     <VerticalStackLayout Spacing="6">
                         <Label Text="Delivery Address" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
-                        <Frame Padding="0" CornerRadius="8" HasShadow="False" BorderColor="#e8e8e8">
+                        <Frame Padding="0" CornerRadius="8" HasShadow="False" BorderColor="#cccccc" BackgroundColor="#ffffff">
                             <Entry Text="{Binding DeliveryAddress}" 
                                    Placeholder="Enter your full delivery address"
-                                   BackgroundColor="Transparent"
+                                   BackgroundColor="#ffffff"
+                                   TextColor="#1a1a1a"
+                                   PlaceholderColor="#9a9a9a"
                                    FontSize="13"
                                    Margin="12,8"/>
                         </Frame>

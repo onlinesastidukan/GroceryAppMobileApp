@@ -54,10 +54,10 @@ public partial class AdminEditProductPage : ContentPage
                     catch { /* ignore preview error */ }
                 }
             }
-            else
+            else if (Uri.TryCreate(_product.ImageUrl, UriKind.Absolute, out var imageUri))
             {
                 // URL-based image
-                ProductImagePreview.Source = ImageSource.FromUri(new Uri(_product.ImageUrl));
+                ProductImagePreview.Source = ImageSource.FromUri(imageUri);
                 ProductImagePreview.IsVisible = true;
                 ImagePlaceholder.IsVisible = false;
                 ImageStatusLabel.Text = "✓ Current image loaded";
@@ -73,7 +73,7 @@ public partial class AdminEditProductPage : ContentPage
             var response = await _apiService.GetAllCategoriesAdminAsync();
             if (response?.Success == true && response.Data != null)
             {
-                _categories = response.Data.ToList();
+                _categories = response.Data.Where(c => c.IsActive).ToList();
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
                     CategoryPicker.ItemsSource = _categories.Select(c => c.Name).ToList();

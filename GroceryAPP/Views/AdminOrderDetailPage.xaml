@@ -27,7 +27,7 @@
                                        HorizontalTextAlignment="Center"/>
                             </Frame>
                         </Grid>
-                        <Label Text="{Binding Order.OrderDate, StringFormat='{}{0:dd MMM yyyy, hh:mm tt}'}"
+                        <Label Text="{Binding Order.OrderDateIST, StringFormat='{}{0:dd MMM yyyy, hh:mm tt} IST'}"
                                FontSize="12" TextColor="#aaaaaa" FontAutoScalingEnabled="False"/>
                         <Label Text="{Binding Order.TotalAmount, StringFormat='Total: &#8377;{0:F0}'}"
                                FontSize="16" FontAttributes="Bold" TextColor="#00b366" FontAutoScalingEnabled="False"/>
@@ -42,6 +42,20 @@
                     <VerticalStackLayout Spacing="6">
                         <Label Text="CUSTOMER" FontSize="10" TextColor="#999999" FontAttributes="Bold" FontAutoScalingEnabled="False"/>
                         <Label Text="{Binding Order.UserFullName}" FontSize="15" FontAttributes="Bold" TextColor="#1a1a1a" FontAutoScalingEnabled="False"/>
+                        <!-- Mobile number -->
+                        <HorizontalStackLayout Spacing="6">
+                            <Label Text="📞" FontSize="13"/>
+                            <Label Text="{Binding Order.UserMobileNumber}" FontSize="13" TextColor="#333333" FontAutoScalingEnabled="False"
+                                   IsVisible="{Binding Order.UserMobileNumber, Converter={StaticResource IsNotNullOrEmptyConverter}}"/>
+                            <Label Text="Mobile not available" FontSize="13" TextColor="#aaaaaa" FontAutoScalingEnabled="False"
+                                   IsVisible="{Binding Order.UserMobileNumber, Converter={StaticResource IsNullOrEmptyConverter}}"/>
+                        </HorizontalStackLayout>
+                        <!-- Customer address (if different from delivery address) -->
+                        <HorizontalStackLayout Spacing="6"
+                                              IsVisible="{Binding Order.UserAddress, Converter={StaticResource IsNotNullOrEmptyConverter}}">
+                            <Label Text="🏠" FontSize="13"/>
+                            <Label Text="{Binding Order.UserAddress}" FontSize="13" TextColor="#333333" FontAutoScalingEnabled="False" LineBreakMode="WordWrap"/>
+                        </HorizontalStackLayout>
                     </VerticalStackLayout>
                 </Frame>
 

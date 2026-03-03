@@ -78,7 +78,7 @@
                                             </Grid>
 
                                             <!-- Date -->
-                                            <Label Text="{Binding OrderDate, StringFormat='📅 {0:dd MMM yyyy, hh:mm tt}'}"
+                                            <Label Text="{Binding OrderDateIST, StringFormat='📅 {0:dd MMM yyyy, hh:mm tt} IST'}"
                                                    FontSize="12" TextColor="#888888" FontAutoScalingEnabled="False"/>
 
                                             <!-- Divider -->

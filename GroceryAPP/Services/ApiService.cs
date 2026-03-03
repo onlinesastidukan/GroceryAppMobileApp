@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Http.Json;
 using System.Net.Sockets;
@@ -21,20 +22,34 @@ public class ApiService
     {
         try
         {
-            var handler = new HttpClientHandler();
+            // SocketsHttpHandler gives us fine-grained connection pool control.
+            // PooledConnectionLifetime prevents "socket closed" errors caused by
+            // stale keep-alive connections (Railway/Render recycles them quickly).
+            var socketsHandler = new SocketsHttpHandler
+            {
+                PooledConnectionLifetime = TimeSpan.FromMinutes(2),
+                PooledConnectionIdleTimeout = TimeSpan.FromSeconds(90),
+                ConnectTimeout = TimeSpan.FromSeconds(15),
+                MaxConnectionsPerServer = 10,
+                EnableMultipleHttp2Connections = true,
+            };
 #if DEBUG
             // Allow insecure certificates only for local development endpoints.
-            handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) =>
+            socketsHandler.SslOptions = new System.Net.Security.SslClientAuthenticationOptions
             {
-                if (errors == System.Net.Security.SslPolicyErrors.None)
-                    return true;
-                var host = message?.RequestUri?.Host ?? string.Empty;
-                return host.Equals("localhost", StringComparison.OrdinalIgnoreCase)
-                    || host.Equals("127.0.0.1")
-                    || host.Equals("10.0.2.2");
+                RemoteCertificateValidationCallback = (message, cert, chain, errors) =>
+                {
+                    if (errors == System.Net.Security.SslPolicyErrors.None)
+                        return true;
+                    var host = (message as System.Net.HttpWebRequest)?.RequestUri?.Host
+                              ?? cert?.Subject ?? string.Empty;
+                    return host.Contains("localhost", StringComparison.OrdinalIgnoreCase)
+                        || host.Contains("127.0.0.1")
+                        || host.Contains("10.0.2.2");
+                }
             };
 #endif
-            _httpClient = new HttpClient(handler);
+            _httpClient = new HttpClient(socketsHandler);
             var baseUrl = AppConfig.ApiBaseUrls[_activeBaseUrlIndex].TrimEnd('/') + "/";
             _httpClient.BaseAddress = new Uri(baseUrl);
             // 30s — allows Railway cold-starts
@@ -65,6 +80,14 @@ public class ApiService
     public void ClearAuthToken()
     {
         _authToken = string.Empty;
+        // Reset to primary base URL so the next login attempt starts fresh
+        if (_activeBaseUrlIndex != 0)
+        {
+            _activeBaseUrlIndex = 0;
+            var baseUrl = AppConfig.ApiBaseUrls[0].TrimEnd('/') + "/";
+            _httpClient.BaseAddress = new Uri(baseUrl);
+            Log($"[API] ClearAuthToken: reset BaseAddress to {_httpClient.BaseAddress}");
+        }
         _httpClient.DefaultRequestHeaders.Clear();
         _httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
         _httpClient.DefaultRequestHeaders.Add("User-Agent", UserAgent);
@@ -105,11 +128,19 @@ public class ApiService
 
                 return response;
             }
-            catch (HttpRequestException) when (attempt < MaxRetryAttempts)
+            catch (HttpRequestException ex) when (attempt < MaxRetryAttempts)
             {
-                // On first failure, immediately try the fallback URL (helps Jio/bad routing)
+                // net_http_operation_started or socket closed — switch URL and retry
+                Log($"[API] HttpRequestException attempt {attempt}: {ex.Message}");
                 TrySwitchToNextBaseUrl();
                 await Task.Delay(TimeSpan.FromMilliseconds(400 * attempt));
+            }
+            catch (IOException ex) when (attempt < MaxRetryAttempts)
+            {
+                // Socket closed mid-request (ECONNRESET, broken pipe, etc.)
+                Log($"[API] IOException attempt {attempt}: {ex.Message}");
+                TrySwitchToNextBaseUrl();
+                await Task.Delay(TimeSpan.FromMilliseconds(500 * attempt));
             }
             catch (TaskCanceledException) when (attempt < MaxRetryAttempts)
             {
@@ -336,7 +367,19 @@ public class ApiService
                 _ => $"Network error ({se.SocketErrorCode}). Please check your internet connection."
             };
         }
+        if (inner is IOException ioEx)
+        {
+            var ioMsg = ioEx.Message ?? string.Empty;
+            if (ioMsg.Contains("closed", StringComparison.OrdinalIgnoreCase) ||
+                ioMsg.Contains("reset", StringComparison.OrdinalIgnoreCase) ||
+                ioMsg.Contains("broken pipe", StringComparison.OrdinalIgnoreCase))
+                return "Connection was reset by the server. Please retry.";
+            return "Network I/O error. Please check your internet connection and retry.";
+        }
         var msg = inner.Message ?? string.Empty;
+        if (msg.Contains("net_http_operation_started", StringComparison.OrdinalIgnoreCase) ||
+            msg.Contains("operation has already started", StringComparison.OrdinalIgnoreCase))
+            return "Network request failed. Please retry.";
         if (msg.Contains("SSL", StringComparison.OrdinalIgnoreCase) ||
             msg.Contains("TLS", StringComparison.OrdinalIgnoreCase) ||
             msg.Contains("certificate", StringComparison.OrdinalIgnoreCase))
@@ -376,11 +419,32 @@ public class ApiService
                         };
                     }
                 }
+                catch { }
+
+                // Try 3: Root is an object with a different wrapper — extract first array property
+                try
+                {
+                    using var doc = JsonDocument.Parse(content);
+                    var root = doc.RootElement;
+                    if (root.ValueKind == JsonValueKind.Object)
+                    {
+                        var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                        foreach (var key in new[] { "data", "categories", "items", "result", "results" })
+                        {
+                            if (root.TryGetProperty(key, out var elem) && elem.ValueKind == JsonValueKind.Array)
+                            {
+                                var list = JsonSerializer.Deserialize<List<Category>>(elem.GetRawText(), opts);
+                                if (list != null)
+                                    return new ApiResponse<List<Category>> { Success = true, Message = "Categories loaded", Data = list };
+                            }
+                        }
+                    }
+                }
                 catch (Exception ex)
                 {
                     System.Diagnostics.Debug.WriteLine($"[API] Category parse error: {ex.Message}");
                 }
-                
+
                 return new ApiResponse<List<Category>> { Success = false, Message = "Failed to parse categories" };
             }
             else
@@ -433,11 +497,35 @@ public class ApiService
                         };
                     }
                 }
+                catch { }
+
+                // Try 3: Root is an object with a different wrapper — extract first array property
+                try
+                {
+                    using var doc = JsonDocument.Parse(content);
+                    var root = doc.RootElement;
+                    if (root.ValueKind == JsonValueKind.Object)
+                    {
+                        var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                        foreach (var key in new[] { "data", "products", "items", "result", "results" })
+                        {
+                            if (root.TryGetProperty(key, out var elem) && elem.ValueKind == JsonValueKind.Array)
+                            {
+                                var list = JsonSerializer.Deserialize<List<Product>>(elem.GetRawText(), opts);
+                                if (list != null)
+                                {
+                                    NormalizeProductImageUrls(list);
+                                    return new ApiResponse<List<Product>> { Success = true, Message = "Products loaded", Data = list };
+                                }
+                            }
+                        }
+                    }
+                }
                 catch (Exception ex)
                 {
                     System.Diagnostics.Debug.WriteLine($"[API] Product parse error: {ex.Message}");
                 }
-                
+
                 return new ApiResponse<List<Product>> { Success = false, Message = "Failed to parse products" };
             }
             else
@@ -662,18 +750,49 @@ public class ApiService
         {
             var response = await GetAsyncWithRetry($"{AppConfig.AdminController}/orders/{orderId}");
             var content = await response.Content.ReadAsStringAsync();
+            Log($"[API] GetAdminOrderById/{orderId} → {(int)response.StatusCode}. Body: {Preview(content, 300)}");
+
             if (response.IsSuccessStatusCode)
             {
+                // 1. Wrapped ApiResponse<Order>
                 try
                 {
                     var wrapped = JsonSerializer.Deserialize<ApiResponse<Order>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                     if (wrapped?.Success == true && wrapped.Data != null) return wrapped;
                 }
                 catch { }
-                var order = JsonSerializer.Deserialize<Order>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                if (order != null)
-                    return new ApiResponse<Order> { Success = true, Data = order };
+
+                // 2. Direct Order object
+                try
+                {
+                    var direct = JsonSerializer.Deserialize<Order>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (direct != null && direct.OrderId > 0)
+                        return new ApiResponse<Order> { Success = true, Message = "Order loaded", Data = direct };
+                }
+                catch { }
+
+                // 3. Envelope: { data: {...} }, { order: {...} }, { result: {...} }
+                try
+                {
+                    using var document = JsonDocument.Parse(content);
+                    if (document.RootElement.ValueKind == JsonValueKind.Object)
+                    {
+                        var order = TryReadOrder(document.RootElement, "data")
+                            ?? TryReadOrder(document.RootElement, "order")
+                            ?? TryReadOrder(document.RootElement, "result");
+
+                        if (order != null)
+                            return new ApiResponse<Order> { Success = true, Message = "Order loaded", Data = order };
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log($"[API] GetAdminOrderById envelope parse error: {ex.Message}");
+                }
+
+                return new ApiResponse<Order> { Success = false, Message = "Order not found" };
             }
+
             return new ApiResponse<Order> { Success = false, Message = "Order not found" };
         }
         catch (Exception ex)
@@ -773,11 +892,20 @@ public class ApiService
     {
         try
         {
-            var requestPath = "products";
-            var requestUri = new Uri(_httpClient.BaseAddress!, requestPath);
+            // Try admin endpoint first (returns all products including inactive),
+            // fall back to public endpoint if admin route doesn't exist on this backend.
+            var adminPath = $"{AppConfig.AdminController}/products";
+            var publicPath = "products";
+            var requestPath = adminPath;
             var hasAuthHeader = _httpClient.DefaultRequestHeaders.Authorization != null;
-            System.Diagnostics.Debug.WriteLine($"[API] Fetching all products from GET {requestUri} (AuthHeaderPresent={hasAuthHeader})");
+            System.Diagnostics.Debug.WriteLine($"[API] Fetching all products (admin) from GET {requestPath} (AuthHeaderPresent={hasAuthHeader})");
             var response = await GetAsyncWithRetry(requestPath);
+            if (!response.IsSuccessStatusCode && ((int)response.StatusCode == 404 || (int)response.StatusCode == 405))
+            {
+                Log($"[API] Admin products endpoint returned {(int)response.StatusCode}, falling back to public endpoint");
+                requestPath = publicPath;
+                response = await GetAsyncWithRetry(requestPath);
+            }
             var content = await response.Content.ReadAsStringAsync();
             System.Diagnostics.Debug.WriteLine($"[API] Products response status: {response.StatusCode}");
             System.Diagnostics.Debug.WriteLine($"[API] Products response preview: {Preview(content, 300)}");
@@ -961,71 +1089,74 @@ public class ApiService
 
     public async Task<ApiResponse<List<Category>>> GetAllCategoriesAdminAsync()
     {
-        try
+        // Try admin endpoint first (may return inactive categories too), fall back to public.
+        foreach (var path in new[] { $"{AppConfig.AdminController}/categories", "categories" })
         {
-            System.Diagnostics.Debug.WriteLine("[API] Fetching categories from GET /api/categories");
-            var response = await GetAsyncWithRetry($"categories");
-            var content = await response.Content.ReadAsStringAsync();
-            System.Diagnostics.Debug.WriteLine($"[API] Categories response status: {response.StatusCode}");
-            
-            if (response.IsSuccessStatusCode)
+            try
             {
+                Log($"[API] GetAllCategoriesAdmin: trying GET {path}");
+                var response = await GetAsyncWithRetry(path);
+                var content = await response.Content.ReadAsStringAsync();
+                Log($"[API] GET {path} → {(int)response.StatusCode}");
+
+                if (!response.IsSuccessStatusCode) continue;
+
                 try
                 {
-                    var wrappedResponse = JsonSerializer.Deserialize<ApiResponse<List<Category>>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    if (wrappedResponse != null && wrappedResponse.Success)
-                    {
-                        return wrappedResponse;
-                    }
+                    var wrapped = JsonSerializer.Deserialize<ApiResponse<List<Category>>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (wrapped?.Success == true && wrapped.Data != null)
+                        return wrapped;
                 }
                 catch { }
-                
-                var directList = JsonSerializer.Deserialize<List<Category>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                if (directList != null)
+
+                var list = JsonSerializer.Deserialize<List<Category>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (list != null)
                 {
-                    System.Diagnostics.Debug.WriteLine($"[API] Loaded {directList.Count} categories");
-                    return new ApiResponse<List<Category>> 
-                    { 
-                        Success = true, 
-                        Message = "Categories loaded",
-                        Data = directList 
-                    };
+                    Log($"[API] Loaded {list.Count} categories from {path}");
+                    return new ApiResponse<List<Category>> { Success = true, Message = "Categories loaded", Data = list };
                 }
-                
-                return new ApiResponse<List<Category>> { Success = false, Message = "Failed to parse categories" };
             }
-            else
+            catch (Exception ex)
             {
-                return new ApiResponse<List<Category>> { Success = false, Message = "Failed to load categories" };
+                Log($"[API] GetAllCategoriesAdmin '{path}' error: {ex.Message}");
             }
         }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"[API] GetAllCategoriesAdmin error: {ex.Message}");
-            return new ApiResponse<List<Category>> { Success = false, Message = $"Error: {ex.Message}" };
-        }
+        return new ApiResponse<List<Category>> { Success = false, Message = "Failed to load categories" };
     }
 
     public async Task<ApiResponse<Category>> CreateCategoryAsync(CreateCategoryRequest categoryRequest)
     {
         try
         {
-            var response = await PostAsJsonAsyncWithRetry($"{AppConfig.AdminController}/categories", categoryRequest);
+            var normalizedPhotoUrl = categoryRequest.PhotoUrl?.Trim() ?? string.Empty;
+            var payload = new
+            {
+                name = categoryRequest.Name,
+                description = categoryRequest.Description ?? string.Empty,
+                photoUrl = normalizedPhotoUrl,
+                imageUrl = normalizedPhotoUrl,
+                isActive = true
+            };
+            var response = await PostAsJsonAsyncWithRetry($"{AppConfig.AdminController}/categories", payload);
             var content = await response.Content.ReadAsStringAsync();
+            Log($"[API] CreateCategory response status: {(int)response.StatusCode}. Body: {Preview(content, 200)}");
             
             if (response.IsSuccessStatusCode)
             {
-                var category = JsonSerializer.Deserialize<Category>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                if (category != null)
+                // Try to parse the returned category; if the server just returns success/no body, synthesise one.
+                try
                 {
-                    return new ApiResponse<Category> { Success = true, Message = "Category created", Data = category };
+                    var category = JsonSerializer.Deserialize<Category>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (category != null && (category.CategoryId > 0 || !string.IsNullOrWhiteSpace(category.Name)))
+                        return new ApiResponse<Category> { Success = true, Message = "Category created", Data = category };
                 }
-
-                return new ApiResponse<Category> { Success = false, Message = "Failed to parse category response" };
+                catch { }
+                // Return a synthetic object so callers can rely on Success = true.
+                return new ApiResponse<Category> { Success = true, Message = "Category created", Data = new Category { Name = categoryRequest.Name } };
             }
             else
             {
-                var message = string.IsNullOrWhiteSpace(content) ? "Failed to create category" : content;
+                var message = ExtractApiErrorMessage(content) ?? "Failed to create category";
                 return new ApiResponse<Category> { Success = false, Message = message };
             }
         }
@@ -1039,24 +1170,47 @@ public class ApiService
     {
         try
         {
-            var response = await PutAsJsonAsyncWithRetry($"{AppConfig.AdminController}/categories/{categoryRequest.CategoryId}", categoryRequest);
-            var content = await response.Content.ReadAsStringAsync();
-            
-            if (response.IsSuccessStatusCode)
+            var normalizedPhotoUrl = categoryRequest.PhotoUrl?.Trim() ?? string.Empty;
+            var payload = new
             {
-                var category = JsonSerializer.Deserialize<Category>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                if (category != null)
-                {
-                    return new ApiResponse { Success = true, Message = "Category updated" };
-                }
+                name = categoryRequest.Name,
+                description = categoryRequest.Description ?? string.Empty,
+                photoUrl = normalizedPhotoUrl,
+                isActive = categoryRequest.IsActive
+            };
+            var url = $"{AppConfig.AdminController}/categories/{categoryRequest.CategoryId}";
 
-                return new ApiResponse { Success = true, Message = "Category updated" };
-            }
-            else
+            // Try PATCH first (partial update) — many REST backends use PATCH for field updates.
+            // Fall back to PUT if PATCH returns 404/405.
+            HttpResponseMessage response;
+            string content;
+            response = await PatchAsJsonAsyncWithRetry(url, payload);
+            content = await response.Content.ReadAsStringAsync();
+            Log($"[API] PATCH UpdateCategory → {(int)response.StatusCode}. Body: {Preview(content, 200)}");
+
+            if (!response.IsSuccessStatusCode &&
+                ((int)response.StatusCode == 404 || (int)response.StatusCode == 405 || (int)response.StatusCode == 400))
             {
-                var message = string.IsNullOrWhiteSpace(content) ? "Failed to update category" : content;
-                return new ApiResponse { Success = false, Message = message };
+                Log($"[API] PATCH failed with {(int)response.StatusCode}, retrying with PUT");
+                // PUT typically requires all fields; include categoryId in body for compatibility.
+                var putPayload = new
+                {
+                    categoryId = categoryRequest.CategoryId,
+                    name = categoryRequest.Name,
+                    description = categoryRequest.Description ?? string.Empty,
+                    photoUrl = normalizedPhotoUrl,
+                    isActive = categoryRequest.IsActive
+                };
+                response = await PutAsJsonAsyncWithRetry(url, putPayload);
+                content = await response.Content.ReadAsStringAsync();
+                Log($"[API] PUT UpdateCategory → {(int)response.StatusCode}. Body: {Preview(content, 200)}");
             }
+
+            if (response.IsSuccessStatusCode)
+                return new ApiResponse { Success = true, Message = "Category updated" };
+
+            var message = ExtractApiErrorMessage(content) ?? "Failed to update category";
+            return new ApiResponse { Success = false, Message = message };
         }
         catch (Exception ex)
         {
@@ -1064,26 +1218,95 @@ public class ApiService
         }
     }
 
+    public async Task<ApiResponse<AppUser>> GetAdminUserByIdAsync(int userId)
+    {
+        // Try multiple common endpoint patterns for fetching a single user.
+        var endpoints = new[]
+        {
+            $"{AppConfig.AdminController}/users/{userId}",
+            $"users/{userId}",
+            $"{AppConfig.AdminController}/users",   // list-all fallback
+            "users"
+        };
+
+        foreach (var endpoint in endpoints)
+        {
+            try
+            {
+                Log($"[API] GetAdminUserById: trying GET {endpoint}");
+                var response = await GetAsyncWithRetry(endpoint);
+                if (!response.IsSuccessStatusCode) continue;
+
+                var content = await response.Content.ReadAsStringAsync();
+                Log($"[API] GET {endpoint} → {(int)response.StatusCode}. Body: {Preview(content, 200)}");
+
+                // Single-user wrapped response
+                try
+                {
+                    var wrapped = JsonSerializer.Deserialize<ApiResponse<AppUser>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (wrapped?.Success == true && wrapped.Data != null) return wrapped;
+                }
+                catch { }
+
+                // Single-user direct object
+                try
+                {
+                    var user = JsonSerializer.Deserialize<AppUser>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (user != null && (user.UserId > 0 || !string.IsNullOrWhiteSpace(user.MobileNumber)))
+                        return new ApiResponse<AppUser> { Success = true, Data = user };
+                }
+                catch { }
+
+                // List-all endpoints — find matching user by int id or string userId
+                try
+                {
+                    var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    List<AppUser>? list = null;
+                    try { list = JsonSerializer.Deserialize<List<AppUser>>(content, opts); } catch { }
+                    if (list == null)
+                    {
+                        var wrapped2 = JsonSerializer.Deserialize<ApiResponse<List<AppUser>>>(content, opts);
+                        list = wrapped2?.Data;
+                    }
+                    if (list != null)
+                    {
+                        var match = list.FirstOrDefault(u => u.UserId == userId);
+                        if (match != null)
+                            return new ApiResponse<AppUser> { Success = true, Data = match };
+                    }
+                }
+                catch { }
+            }
+            catch (Exception ex)
+            {
+                Log($"[API] GetAdminUserById '{endpoint}' error: {ex.Message}");
+            }
+        }
+
+        return new ApiResponse<AppUser> { Success = false, Message = "User not found" };
+    }
+
     public async Task<ApiResponse> DeleteCategoryAsync(int categoryId)
     {
         try
         {
-            var response = await DeleteAsyncWithRetry($"{AppConfig.AdminController}/categories/{categoryId}");
+            var endpoint = $"{AppConfig.AdminController}/categories/{categoryId}";
+            System.Diagnostics.Debug.WriteLine($"[API] DELETE {endpoint}");
+            var response = await DeleteAsyncWithRetry(endpoint);
             var content = await response.Content.ReadAsStringAsync();
-            
+            System.Diagnostics.Debug.WriteLine($"[API] DELETE {endpoint} → {(int)response.StatusCode}: {Preview(content, 200)}");
+
             if (response.IsSuccessStatusCode)
-            {
-                var message = string.IsNullOrWhiteSpace(content) ? "Category deleted" : content;
-                return new ApiResponse { Success = true, Message = message };
-            }
-            else
-            {
-                var message = string.IsNullOrWhiteSpace(content) ? "Failed to delete category" : content;
-                return new ApiResponse { Success = false, Message = message };
-            }
+                return new ApiResponse { Success = true, Message = "Category deleted" };
+
+            var msg = ExtractApiErrorMessage(content);
+            if (string.IsNullOrWhiteSpace(msg))
+                msg = $"Server returned {(int)response.StatusCode}";
+            return new ApiResponse { Success = false, Message = msg };
         }
         catch (Exception ex)
         {
+            System.Diagnostics.Debug.WriteLine($"[API] DeleteCategory exception: {ex.Message}");
             return new ApiResponse { Success = false, Message = $"Error: {ex.Message}" };
         }
     }

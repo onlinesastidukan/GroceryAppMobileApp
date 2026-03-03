@@ -32,7 +32,7 @@ public partial class AdminAddProductPage : ContentPage
             var response = await _apiService.GetAllCategoriesAdminAsync();
             if (response?.Success == true && response.Data != null)
             {
-                _categories = response.Data.ToList();
+                _categories = response.Data.Where(c => c.IsActive).ToList();
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
                     CategoryPicker.ItemsSource = _categories.Select(c => c.Name).ToList();

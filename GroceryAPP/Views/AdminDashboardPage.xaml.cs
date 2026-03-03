@@ -168,6 +168,11 @@ public partial class AdminDashboardPage : ContentPage
         await NavigateToPageAsync<AdminCategoriesPage>("Categories");
     }
 
+    private async void OnRevenueCardTapped(object sender, TappedEventArgs e)
+    {
+        await NavigateToPageAsync<AdminOrdersPage>("Orders");
+    }
+
     private async Task NavigateToPageAsync<TPage>(string pageName) where TPage : Page
     {
         try

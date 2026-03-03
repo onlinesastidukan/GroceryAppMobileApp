@@ -46,8 +46,8 @@ public partial class AdminCategoriesPage : ContentPage
     {
         if (sender is Button button && button.CommandParameter is Category category)
         {
-            // TODO: Implement edit category page
-            await DisplayAlert("Info", $"Edit category: {category.Name}", "OK");
+            var editPage = new AdminEditCategoryPage(_apiService, category);
+            await Navigation.PushAsync(editPage);
         }
     }
 }

@@ -24,7 +24,9 @@ public class CartService
         
         if (existingItem != null)
         {
-            existingItem.Quantity += quantity;
+            // Respect stock limit
+            var newQty = existingItem.Quantity + quantity;
+            existingItem.Quantity = product.Stock > 0 ? Math.Min(newQty, product.Stock) : newQty;
         }
         else
         {
@@ -33,7 +35,8 @@ public class CartService
                 ProductId = product.ProductId,
                 ProductName = product.Name,
                 Price = product.Price,
-                Quantity = quantity,
+                Quantity = Math.Min(quantity, product.Stock > 0 ? product.Stock : quantity),
+                Stock = product.Stock > 0 ? product.Stock : int.MaxValue,
                 ImageUrl = product.ImageUrl
             });
         }

@@ -130,6 +130,26 @@
                     </Frame>
                 </Grid>
 
+                <!-- Third Row - Total Revenue (Full Width) -->
+                <Frame Padding="0" CornerRadius="16" HasShadow="False" BorderColor="Transparent" Margin="0">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnRevenueCardTapped"/>
+                    </Frame.GestureRecognizers>
+                    <Frame.Background>
+                        <LinearGradientBrush>
+                            <GradientStop Color="#00b894" Offset="0"/>
+                            <GradientStop Color="#007a5e" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Frame.Background>
+                    <VerticalStackLayout Spacing="8" Padding="16" HorizontalOptions="Center" VerticalOptions="Center" MinimumHeightRequest="72">
+                        <Label Text="{Binding TotalRevenue, StringFormat='₹{0:N0}'}" FontSize="32" FontAttributes="Bold" TextColor="White" HorizontalTextAlignment="Center"/>
+                        <Label Text="Total Revenue" FontSize="13" TextColor="#B2FFEC" HorizontalTextAlignment="Center"/>
+                    </VerticalStackLayout>
+                    <Frame.Shadow>
+                        <Shadow Brush="#00b894" Opacity="0.3" Radius="12" Offset="0,4"/>
+                    </Frame.Shadow>
+                </Frame>
+
                 <BoxView HeightRequest="20" Color="Transparent"/>
             </VerticalStackLayout>
         </ScrollView>

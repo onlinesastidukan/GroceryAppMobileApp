@@ -76,6 +76,10 @@ public partial class CustomerCategoryPage : ContentPage
             productVm.CategoryId = category.CategoryId;
             productVm.CategoryName = category.Name;
 
+            // Pre-fetch products while the loader is still visible on this page,
+            // so the user transitions directly to a page that already has data.
+            await productVm.InitializeAsyncSafe();
+
             await Navigation.PushAsync(productsPage);
         }
         catch (Exception ex)

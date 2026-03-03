@@ -83,12 +83,19 @@
                                    HasShadow="False"
                                    BackgroundColor="#e8f5e9"
                                    HorizontalOptions="Center">
-                                <Label Text="{Binding Name, Converter={StaticResource CategoryIconConverter}}"
-                                       FontSize="32"
-                                       HorizontalOptions="Center"
-                                       VerticalOptions="Center"
-                                       HorizontalTextAlignment="Center"
-                                       VerticalTextAlignment="Center"/>
+                                <Grid HeightRequest="56" WidthRequest="56">
+                                    <Image Source="{Binding PhotoUrl, Converter={StaticResource Base64ImageSourceConverter}}"
+                                           Aspect="AspectFill"
+                                           HeightRequest="56" WidthRequest="56"
+                                           IsVisible="{Binding PhotoUrl, Converter={StaticResource IsNotNullOrEmptyConverter}}"/>
+                                    <Label Text="{Binding Name, Converter={StaticResource CategoryIconConverter}}"
+                                           FontSize="32"
+                                           IsVisible="{Binding PhotoUrl, Converter={StaticResource IsNullOrEmptyConverter}}"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center"
+                                           HorizontalTextAlignment="Center"
+                                           VerticalTextAlignment="Center"/>
+                                </Grid>
                             </Frame>
                             <VerticalStackLayout Spacing="4" HorizontalOptions="Fill">
                                 <Label Text="{Binding Name}" FontSize="14" FontAttributes="Bold" TextColor="#1a1a1a" HorizontalTextAlignment="Center" MaxLines="2" LineBreakMode="TailTruncation"/>

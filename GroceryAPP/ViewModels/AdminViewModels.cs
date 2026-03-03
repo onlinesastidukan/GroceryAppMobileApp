@@ -21,6 +21,9 @@ public partial class AdminDashboardViewModel : BaseViewModel
     private int pendingOrders;
 
     [ObservableProperty]
+    private decimal totalRevenue;
+
+    [ObservableProperty]
     private int totalProducts;
 
     [ObservableProperty]
@@ -48,14 +51,43 @@ public partial class AdminDashboardViewModel : BaseViewModel
                 TotalOrders = ordersResponse.Data.Count;
                 PendingOrders = ordersResponse.Data.Count(x =>
                     string.Equals(x.Status, "Pending", StringComparison.OrdinalIgnoreCase));
+                TotalRevenue = ordersResponse.Data.Sum(x => x.TotalAmount);
             }
             else
             {
                 TotalOrders = 0;
                 PendingOrders = 0;
+                TotalRevenue = 0;
                 if (!string.IsNullOrWhiteSpace(ordersResponse?.Message))
                 {
                     loadErrors.Add($"Orders: {ordersResponse.Message}");
+                }
+            }
+
+            // Use the public categories endpoint — it is server-side filtered to active-only,
+            // so the count is always accurate regardless of isActive deserialization.
+            var categoriesResponse = await _apiService.GetCategoriesAsync();
+
+            bool categoriesLoaded = false;
+            var activeCategoryIds = new HashSet<int>();
+            if (categoriesResponse?.Success == true && categoriesResponse.Data != null)
+            {
+                // Apply client-side filter too as a safety net
+                var activeCategories = categoriesResponse.Data.Where(c => c.IsActive).ToList();
+                // If server already filtered (all returned are active), IsActive may default false —
+                // in that case use the full list since the server guarantees they are all active.
+                if (activeCategories.Count == 0 && categoriesResponse.Data.Count > 0)
+                    activeCategories = categoriesResponse.Data;
+                TotalCategories = activeCategories.Count;
+                activeCategoryIds = activeCategories.Select(c => c.CategoryId).ToHashSet();
+                categoriesLoaded = true;
+            }
+            else
+            {
+                TotalCategories = 0;
+                if (!string.IsNullOrWhiteSpace(categoriesResponse?.Message))
+                {
+                    loadErrors.Add($"Categories: {categoriesResponse.Message}");
                 }
             }
 
@@ -67,7 +99,10 @@ public partial class AdminDashboardViewModel : BaseViewModel
 
             if (productsResponse?.Success == true && productsResponse.Data != null)
             {
-                TotalProducts = productsResponse.Data.Count;
+                // Count only products belonging to active categories (consistent with category view)
+                TotalProducts = categoriesLoaded
+                    ? productsResponse.Data.Count(p => activeCategoryIds.Contains(p.CategoryId))
+                    : productsResponse.Data.Count;
             }
             else
             {
@@ -75,25 +110,6 @@ public partial class AdminDashboardViewModel : BaseViewModel
                 if (!string.IsNullOrWhiteSpace(productsResponse?.Message))
                 {
                     loadErrors.Add($"Products: {productsResponse.Message}");
-                }
-            }
-
-            var categoriesResponse = await _apiService.GetAllCategoriesAdminAsync();
-            if (categoriesResponse?.Success != true || categoriesResponse.Data == null)
-            {
-                categoriesResponse = await _apiService.GetCategoriesAsync();
-            }
-
-            if (categoriesResponse?.Success == true && categoriesResponse.Data != null)
-            {
-                TotalCategories = categoriesResponse.Data.Count;
-            }
-            else
-            {
-                TotalCategories = 0;
-                if (!string.IsNullOrWhiteSpace(categoriesResponse?.Message))
-                {
-                    loadErrors.Add($"Categories: {categoriesResponse.Message}");
                 }
             }
 
@@ -231,12 +247,52 @@ public partial class AdminOrderDetailViewModel : BaseViewModel
                 if (response?.Success != true)
                     response = await _apiService.GetOrderByIdAsync(fetchId);
 
+                // If admin endpoint responded but has no mobile, also try the customer endpoint
+                // which often embeds user contact info directly in the order payload.
+                if (response?.Success == true && response.Data != null
+                    && string.IsNullOrWhiteSpace(response.Data.UserMobileNumber))
+                {
+                    try
+                    {
+                        var customerResponse = await _apiService.GetOrderByIdAsync(fetchId);
+                        if (customerResponse?.Success == true && customerResponse.Data != null
+                            && !string.IsNullOrWhiteSpace(customerResponse.Data.UserMobileNumber))
+                        {
+                            // Patch mobile (and name/address if also missing) from customer endpoint
+                            response.Data.UserMobileNumber = customerResponse.Data.UserMobileNumber;
+                            if (string.IsNullOrWhiteSpace(response.Data.UserFullName) && !string.IsNullOrWhiteSpace(customerResponse.Data.UserFullName))
+                                response.Data.UserFullName = customerResponse.Data.UserFullName;
+                            if (string.IsNullOrWhiteSpace(response.Data.UserAddress) && !string.IsNullOrWhiteSpace(customerResponse.Data.UserAddress))
+                                response.Data.UserAddress = customerResponse.Data.UserAddress;
+                        }
+                    }
+                    catch { /* non-critical */ }
+                }
+
                 if (response?.Success == true && response.Data != null)
                 {
                     Order = response.Data;
                     SelectedStatus = Order.Status;
                     _originalStatus = Order.Status;
                     UpdateOrderStatusCommand.NotifyCanExecuteChanged();
+
+                    // If mobile number is missing from order, fetch it from the user record
+                    if (string.IsNullOrWhiteSpace(Order.UserMobileNumber) && Order.UserId > 0)
+                    {
+                        try
+                        {
+                            var userResponse = await _apiService.GetAdminUserByIdAsync(Order.UserId);
+                            if (userResponse?.Success == true && userResponse.Data != null
+                                && !string.IsNullOrWhiteSpace(userResponse.Data.MobileNumber))
+                            {
+                                Order.UserMobileNumber = userResponse.Data.MobileNumber;
+                                if (string.IsNullOrWhiteSpace(Order.UserFullName) && !string.IsNullOrWhiteSpace(userResponse.Data.FullName))
+                                    Order.UserFullName = userResponse.Data.FullName;
+                            }
+                        }
+                        catch { /* non-critical — silently skip */ }
+                    }
+
                     OnPropertyChanged(nameof(Order));
                     OrderItems.Clear();
                     foreach (var item in Order.OrderItems)
@@ -488,13 +544,21 @@ public partial class AdminCategoriesViewModel : BaseViewModel
             ClearError();
             System.Diagnostics.Debug.WriteLine("[ADMIN CATEGORIES] Starting InitializeAsync...");
 
-            var response = await _apiService.GetAllCategoriesAdminAsync();
+            // Use the same public categories endpoint the customer view uses.
+            // The server filters to active-only, so soft-deleted categories never appear here.
+            var response = await _apiService.GetCategoriesAsync();
             System.Diagnostics.Debug.WriteLine($"[ADMIN CATEGORIES] API Response: Success={response?.Success}, Count={response?.Data?.Count ?? 0}");
-            
+
             if (response?.Success == true && response.Data != null)
             {
                 Categories.Clear();
-                foreach (var category in response.Data)
+                // Apply client-side IsActive filter as a safety net.
+                // If the server didn't include isActive in the payload (all default to false)
+                // fall back to the full list since the public endpoint is already active-only.
+                var activeCategories = response.Data.Where(c => c.IsActive).ToList();
+                var toShow = activeCategories.Count > 0 ? activeCategories : response.Data;
+                System.Diagnostics.Debug.WriteLine($"[ADMIN CATEGORIES] Total from API: {response.Data.Count}, Showing: {toShow.Count}");
+                foreach (var category in toShow)
                 {
                     Categories.Add(category);
                     System.Diagnostics.Debug.WriteLine($"[ADMIN CATEGORIES] Added category: {category.Name}");
@@ -546,12 +610,15 @@ public partial class AdminCategoriesViewModel : BaseViewModel
                 }
                 else
                 {
-                    SetError(response?.Message ?? "Failed to delete category");
+                    var msg = response?.Message ?? "Failed to delete category";
+                    SetError(msg);
+                    await Application.Current.MainPage.DisplayAlert("Delete Failed", msg, "OK");
                 }
             }
             catch (Exception ex)
             {
                 SetError($"Error: {ex.Message}");
+                await Application.Current.MainPage.DisplayAlert("Error", ex.Message, "OK");
             }
             finally
             {

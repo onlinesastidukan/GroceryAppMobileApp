@@ -40,7 +40,7 @@ public partial class CustomerCategoryViewModel : BaseViewModel
             if (response?.Success == true && response.Data != null)
             {
                 Categories.Clear();
-                foreach (var category in response.Data)
+                foreach (var category in response.Data.Where(c => c.IsActive))
                 {
                     Categories.Add(category);
                 }
@@ -71,12 +71,26 @@ public partial class CustomerProductViewModel : BaseViewModel
     private readonly ApiService _apiService;
     private readonly CartService _cartService;
     private List<Product> _allProducts = new();
+    private int _loadedCategoryId = -1; // tracks which category's products are cached
 
     [ObservableProperty]
     private ObservableCollection<Product> products;
 
     [ObservableProperty]
-    private int categoryId;
+    private bool hasNoProducts;
+
+    private int _categoryId;
+    public int CategoryId
+    {
+        get => _categoryId;
+        set
+        {
+            if (_categoryId == value) return;
+            _categoryId = value;
+            _loadedCategoryId = -1; // invalidate cache on category change
+            OnPropertyChanged();
+        }
+    }
 
     [ObservableProperty]
     private string categoryName;
@@ -98,6 +112,8 @@ public partial class CustomerProductViewModel : BaseViewModel
         Products.Clear();
         foreach (var product in filtered)
             Products.Add(product);
+
+        HasNoProducts = Products.Count == 0;
     }
 
     public CustomerProductViewModel(ApiService apiService, CartService cartService)
@@ -114,6 +130,13 @@ public partial class CustomerProductViewModel : BaseViewModel
             IsLoading = true;
             ClearError();
 
+            // Skip re-fetch if we already have data for this category (pre-fetched before navigation)
+            if (_loadedCategoryId == CategoryId && _allProducts.Count > 0)
+            {
+                FilterProducts();
+                return;
+            }
+
             var response = await _apiService.GetProductsAsync(CategoryId);
             if (response?.Success == true && response.Data != null)
             {
@@ -124,15 +147,18 @@ public partial class CustomerProductViewModel : BaseViewModel
                     : response.Data;
 
                 _allProducts = new List<Product>(sourceProduts);
+                _loadedCategoryId = CategoryId;
                 FilterProducts();
             }
             else
             {
+                HasNoProducts = true;
                 SetError(response?.Message ?? "Failed to load products");
             }
         }
         catch (Exception ex)
         {
+            HasNoProducts = true;
             SetError($"Error: {ex.Message}");
         }
         finally
@@ -144,6 +170,11 @@ public partial class CustomerProductViewModel : BaseViewModel
     [RelayCommand]
     public async Task AddToCartAsync(Product product)
     {
+        await AddToCartWithQuantityAsync(product, 1);
+    }
+
+    public async Task AddToCartWithQuantityAsync(Product product, int quantity)
+    {
         if (product != null)
         {
             if (product.Stock <= 0)
@@ -152,7 +183,8 @@ public partial class CustomerProductViewModel : BaseViewModel
                 return;
             }
 
-            _cartService.AddToCart(product, 1);
+            var safeQty = Math.Max(1, Math.Min(quantity, product.Stock));
+            _cartService.AddToCart(product, safeQty);
         }
         await Task.CompletedTask;
     }
@@ -209,6 +241,34 @@ public partial class CartViewModel : BaseViewModel
     public async Task RemoveFromCartAsync(CartItem item)
     {
         if (item != null)
+        {
+            _cartService.RemoveFromCart(item.ProductId);
+            CartItems.Remove(item);
+            UpdateTotalPrice();
+        }
+    }
+
+    [RelayCommand]
+    public void IncreaseQuantity(CartItem item)
+    {
+        if (item == null) return;
+        if (item.Quantity < item.Stock)
+        {
+            item.Quantity++;
+            UpdateTotalPrice();
+        }
+    }
+
+    [RelayCommand]
+    public void DecreaseQuantity(CartItem item)
+    {
+        if (item == null) return;
+        if (item.Quantity > 1)
+        {
+            item.Quantity--;
+            UpdateTotalPrice();
+        }
+        else
         {
             _cartService.RemoveFromCart(item.ProductId);
             CartItems.Remove(item);

@@ -47,11 +47,11 @@
 
                     <VerticalStackLayout Spacing="6">
                         <Label Text="User ID" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
-                        <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="#e0e0e0">
+                        <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="#e0e0e0" BackgroundColor="#ffffff">
                             <Entry x:Name="UserIdEntry"
                                    Placeholder="Choose a unique user ID"
                                 ReturnType="Next"
-                                   BackgroundColor="Transparent"
+                                   BackgroundColor="#ffffff"
                                               TextColor="#1a1a1a"
                                               PlaceholderColor="#9a9a9a"
                                    FontSize="15"
@@ -61,11 +61,11 @@
 
                     <VerticalStackLayout Spacing="6">
                         <Label Text="Full Name" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
-                        <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="#e0e0e0">
+                        <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="#e0e0e0" BackgroundColor="#ffffff">
                             <Entry x:Name="FullNameEntry"
                                    Placeholder="Enter your full name"
                                 ReturnType="Next"
-                                   BackgroundColor="Transparent"
+                                   BackgroundColor="#ffffff"
                                               TextColor="#1a1a1a"
                                               PlaceholderColor="#9a9a9a"
                                    FontSize="15"
@@ -75,12 +75,12 @@
 
                     <VerticalStackLayout Spacing="6">
                         <Label Text="Password" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
-                        <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="#e0e0e0">
+                        <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="#e0e0e0" BackgroundColor="#ffffff">
                             <Entry x:Name="PasswordEntry"
                                    Placeholder="Create a password"
                                    IsPassword="True"
                                 ReturnType="Next"
-                                   BackgroundColor="Transparent"
+                                   BackgroundColor="#ffffff"
                                               TextColor="#1a1a1a"
                                               PlaceholderColor="#9a9a9a"
                                    FontSize="15"
@@ -90,12 +90,12 @@
 
                     <VerticalStackLayout Spacing="6">
                         <Label Text="Mobile Number" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
-                        <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="#e0e0e0">
+                        <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="#e0e0e0" BackgroundColor="#ffffff">
                             <Entry x:Name="MobileEntry"
                                    Placeholder="Enter mobile number"
                                    Keyboard="Telephone"
                                 ReturnType="Next"
-                                   BackgroundColor="Transparent"
+                                   BackgroundColor="#ffffff"
                                               TextColor="#1a1a1a"
                                               PlaceholderColor="#9a9a9a"
                                    FontSize="15"
@@ -105,11 +105,11 @@
 
                     <VerticalStackLayout Spacing="6">
                         <Label Text="Address" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
-                        <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="#e0e0e0">
+                        <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="#e0e0e0" BackgroundColor="#ffffff">
                             <Editor x:Name="AddressEntry"
                                     Placeholder="Enter delivery address"
                                     AutoSize="TextChanges"
-                                    BackgroundColor="Transparent"
+                                    BackgroundColor="#ffffff"
                                     TextColor="#1a1a1a"
                                     PlaceholderColor="#9a9a9a"
                                     FontSize="15"

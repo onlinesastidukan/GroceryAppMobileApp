@@ -78,4 +78,37 @@ public partial class CustomerProductPage : ContentPage
     {
         CartItemCount = _cartService.TotalItems;
     }
+
+    private async void OnReadMoreClicked(object sender, EventArgs e)
+    {
+        if (sender is Button button && button.CommandParameter is Product product)
+        {
+            PopupProductNameLabel.Text = product.Name;
+            PopupDescriptionLabel.Text = string.IsNullOrWhiteSpace(product.Description)
+                ? "No description available."
+                : product.Description;
+            PopupPriceLabel.Text = $"₹{product.Price:F0}";
+            PopupStockLabel.Text = product.StockStatus;
+
+            DescriptionPopupOverlay.Opacity = 0;
+            DescriptionPopupOverlay.IsVisible = true;
+            await DescriptionPopupOverlay.FadeTo(1, 200, Easing.CubicOut);
+        }
+    }
+
+    private async void OnCloseDescriptionPopup(object sender, EventArgs e)
+    {
+        await HideDescriptionPopup();
+    }
+
+    private async void OnPopupBackgroundTapped(object sender, TappedEventArgs e)
+    {
+        await HideDescriptionPopup();
+    }
+
+    private async Task HideDescriptionPopup()
+    {
+        await DescriptionPopupOverlay.FadeTo(0, 180, Easing.CubicIn);
+        DescriptionPopupOverlay.IsVisible = false;
+    }
 }

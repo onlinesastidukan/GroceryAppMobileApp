@@ -126,6 +126,19 @@ public class IsNullOrEmptyConverter : IValueConverter
     }
 }
 
+public class IsNotNullOrEmptyConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        return !string.IsNullOrEmpty(value?.ToString());
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
 /// <summary>
 /// Converts a string image URL (http/https, data:image base64, or local resource name) to an ImageSource.
 /// MAUI's Image control does not natively support data: URIs, so this converter handles all three cases.

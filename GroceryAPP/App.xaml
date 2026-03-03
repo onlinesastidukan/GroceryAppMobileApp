@@ -19,6 +19,7 @@
             <converters:CurrencyConverter x:Key="CurrencyConverter"/>
             <converters:StringToColorConverter x:Key="StringToColorConverter"/>
             <converters:IsNullOrEmptyConverter x:Key="IsNullOrEmptyConverter"/>
+            <converters:IsNotNullOrEmptyConverter x:Key="IsNotNullOrEmptyConverter"/>
             <converters:Base64ImageSourceConverter x:Key="Base64ImageSourceConverter"/>
             <converters:StatusToBadgeBackgroundConverter x:Key="StatusToBadgeBgConverter"/>
         </ResourceDictionary>

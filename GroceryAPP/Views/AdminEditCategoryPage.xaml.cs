@@ -1,18 +1,62 @@
-using GroceryApp.Services;
 using GroceryApp.Models;
+using GroceryApp.Services;
 
 namespace GroceryApp.Views;
 
-public partial class AdminAddCategoryPage : ContentPage
+public partial class AdminEditCategoryPage : ContentPage
 {
     private readonly ApiService _apiService;
+    private readonly Category _category;
     private string _selectedImageBase64 = string.Empty;
     private byte[] _previewImageBytes;
 
-    public AdminAddCategoryPage(ApiService apiService)
+    public AdminEditCategoryPage(ApiService apiService, Category category)
     {
         InitializeComponent();
         _apiService = apiService;
+        _category = category;
+    }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        PopulateFields();
+    }
+
+    private void PopulateFields()
+    {
+        CategoryNameEntry.Text = _category.Name;
+        DescriptionEditor.Text = _category.Description;
+
+        if (!string.IsNullOrWhiteSpace(_category.PhotoUrl))
+        {
+            _selectedImageBase64 = _category.PhotoUrl;
+            if (_category.PhotoUrl.StartsWith("data:image", StringComparison.OrdinalIgnoreCase))
+            {
+                var commaIndex = _category.PhotoUrl.IndexOf(',');
+                if (commaIndex >= 0)
+                {
+                    try
+                    {
+                        var bytes = Convert.FromBase64String(_category.PhotoUrl.Substring(commaIndex + 1));
+                        CategoryImagePreview.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
+                        CategoryImagePreview.IsVisible = true;
+                        ImagePlaceholder.IsVisible = false;
+                        ImageStatusLabel.Text = "✓ Current image loaded";
+                        ImageStatusLabel.IsVisible = true;
+                    }
+                    catch { /* ignore preview error */ }
+                }
+            }
+            else if (Uri.TryCreate(_category.PhotoUrl, UriKind.Absolute, out var uri))
+            {
+                CategoryImagePreview.Source = ImageSource.FromUri(uri);
+                CategoryImagePreview.IsVisible = true;
+                ImagePlaceholder.IsVisible = false;
+                ImageStatusLabel.Text = "✓ Current image loaded";
+                ImageStatusLabel.IsVisible = true;
+            }
+        }
     }
 
     private async void OnSaveClicked(object sender, EventArgs e)
@@ -32,32 +76,30 @@ public partial class AdminAddCategoryPage : ContentPage
             LoadingIndicator.IsRunning = true;
             LoadingIndicator.IsVisible = true;
             ErrorLabel.IsVisible = false;
-            System.Diagnostics.Debug.WriteLine($"[ADD CATEGORY] Creating category: {categoryName}");
 
-            var category = new CreateCategoryRequest
+            var request = new UpdateCategoryRequest
             {
+                CategoryId = _category.CategoryId,
                 Name = categoryName,
                 Description = description ?? string.Empty,
-                PhotoUrl = _selectedImageBase64
+                PhotoUrl = _selectedImageBase64,
+                IsActive = _category.IsActive
             };
 
-            var response = await _apiService.CreateCategoryAsync(category);
-            System.Diagnostics.Debug.WriteLine($"[ADD CATEGORY] Response: Success={response?.Success}, Message={response?.Message}");
-            
+            var response = await _apiService.UpdateCategoryAsync(request);
             if (response?.Success == true)
             {
-                await DisplayAlert("Success", "Category added successfully", "OK");
+                await DisplayAlert("Success", "Category updated successfully", "OK");
                 await Navigation.PopAsync();
             }
             else
             {
-                ErrorLabel.Text = response?.Message ?? "Failed to add category";
+                ErrorLabel.Text = response?.Message ?? "Failed to update category";
                 ErrorLabel.IsVisible = true;
             }
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"[ADD CATEGORY] Exception: {ex.Message}");
             ErrorLabel.Text = $"Error: {ex.Message}";
             ErrorLabel.IsVisible = true;
         }
@@ -105,4 +147,3 @@ public partial class AdminAddCategoryPage : ContentPage
         await Navigation.PopAsync();
     }
 }
-

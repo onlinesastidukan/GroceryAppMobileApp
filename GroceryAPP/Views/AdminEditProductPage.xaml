@@ -25,10 +25,12 @@
 
                     <VerticalStackLayout Spacing="6">
                         <Label Text="Product Name" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
-                        <Frame Padding="0" CornerRadius="10" HasShadow="False" BorderColor="#e0e0e0">
+                        <Frame Padding="0" CornerRadius="10" HasShadow="False" BorderColor="#e0e0e0" BackgroundColor="#ffffff">
                             <Entry x:Name="ProductNameEntry"
                                    Placeholder="e.g., Fresh Tomatoes"
-                                   BackgroundColor="Transparent"
+                                   BackgroundColor="#ffffff"
+                                   TextColor="#1a1a1a"
+                                   PlaceholderColor="#9a9a9a"
                                    FontSize="14"
                                    Margin="12,8"/>
                         </Frame>
@@ -36,11 +38,13 @@
 
                     <VerticalStackLayout Spacing="6">
                         <Label Text="Price (₹)" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
-                        <Frame Padding="0" CornerRadius="10" HasShadow="False" BorderColor="#e0e0e0">
+                        <Frame Padding="0" CornerRadius="10" HasShadow="False" BorderColor="#e0e0e0" BackgroundColor="#ffffff">
                             <Entry x:Name="PriceEntry"
                                    Placeholder="0.00"
                                    Keyboard="Numeric"
-                                   BackgroundColor="Transparent"
+                                   BackgroundColor="#ffffff"
+                                   TextColor="#1a1a1a"
+                                   PlaceholderColor="#9a9a9a"
                                    FontSize="14"
                                    Margin="12,8"/>
                         </Frame>
@@ -48,11 +52,13 @@
 
                     <VerticalStackLayout Spacing="6">
                         <Label Text="Description" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
-                        <Frame Padding="0" CornerRadius="10" HasShadow="False" BorderColor="#e0e0e0">
+                        <Frame Padding="0" CornerRadius="10" HasShadow="False" BorderColor="#e0e0e0" BackgroundColor="#ffffff">
                             <Editor x:Name="DescriptionEditor"
                                     Placeholder="Product details and benefits"
                                     HeightRequest="120"
-                                    BackgroundColor="Transparent"
+                                    BackgroundColor="#ffffff"
+                                    TextColor="#1a1a1a"
+                                    PlaceholderColor="#9a9a9a"
                                     FontSize="14"
                                     Margin="12,8"/>
                         </Frame>
@@ -60,11 +66,13 @@
 
                     <VerticalStackLayout Spacing="6">
                         <Label Text="Stock Quantity" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
-                        <Frame Padding="0" CornerRadius="10" HasShadow="False" BorderColor="#e0e0e0">
+                        <Frame Padding="0" CornerRadius="10" HasShadow="False" BorderColor="#e0e0e0" BackgroundColor="#ffffff">
                             <Entry x:Name="StockQuantityEntry"
                                    Placeholder="0"
                                    Keyboard="Numeric"
-                                   BackgroundColor="Transparent"
+                                   BackgroundColor="#ffffff"
+                                   TextColor="#1a1a1a"
+                                   PlaceholderColor="#9a9a9a"
                                    FontSize="14"
                                    Margin="12,8"/>
                         </Frame>
@@ -109,6 +117,8 @@
                             <Picker x:Name="CategoryPicker"
                                     Title="Select Category"
                                     BackgroundColor="Transparent"
+                                    TitleColor="#9a9a9a"
+                                    TextColor="#1a1a1a"
                                     FontSize="14"
                                     Margin="12,8"/>
                         </Frame>
