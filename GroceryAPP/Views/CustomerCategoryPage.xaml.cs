@@ -69,7 +69,7 @@ public partial class CustomerCategoryPage : ContentPage
             var productsPage = _serviceProvider.GetService<CustomerProductPage>();
             if (productsPage?.BindingContext is not CustomerProductViewModel productVm)
             {
-                await DisplayAlert("Navigation Error", "Unable to open selected category.", "OK");
+                await DisplayAlert("Navigation Error", "Unable to open selected shop.", "OK");
                 return;
             }
 
@@ -84,7 +84,7 @@ public partial class CustomerCategoryPage : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Navigation Error", $"Unable to open category: {ex.Message}", "OK");
+            await DisplayAlert("Navigation Error", $"Unable to open shop: {ex.Message}", "OK");
         }
         finally
         {

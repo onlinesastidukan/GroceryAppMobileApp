@@ -572,6 +572,48 @@ public class CreateOrderRequest
     [JsonPropertyName("deliveryAddress")]
     public string DeliveryAddress { get; set; }
 
+    [JsonPropertyName("mobileNumber")]
+    public string MobileNumber { get; set; }
+
+    [JsonPropertyName("userMobileNumber")]
+    public string UserMobileNumberAlias
+    {
+        get => MobileNumber;
+        set
+        {
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                MobileNumber = value;
+            }
+        }
+    }
+
+    [JsonPropertyName("customerMobile")]
+    public string CustomerMobileAlias
+    {
+        get => MobileNumber;
+        set
+        {
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                MobileNumber = value;
+            }
+        }
+    }
+
+    [JsonPropertyName("customerAddress")]
+    public string CustomerAddressAlias
+    {
+        get => DeliveryAddress;
+        set
+        {
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                DeliveryAddress = value;
+            }
+        }
+    }
+
     [JsonPropertyName("items")]
     public List<CreateOrderItem> Items { get; set; }
 }

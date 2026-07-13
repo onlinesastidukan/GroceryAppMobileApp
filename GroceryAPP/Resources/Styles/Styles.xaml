@@ -438,4 +438,54 @@
         <Setter Property="SelectedTabColor" Value="{AppThemeBinding Light={StaticResource Gray950}, Dark={StaticResource Gray200}}" />
     </Style>
 
+    <!-- Modern ecommerce reusable styles -->
+    <Style x:Key="ModernPage" TargetType="Grid">
+        <Setter Property="BackgroundColor" Value="{StaticResource AppBackground}"/>
+        <Setter Property="Padding" Value="16,12"/>
+        <Setter Property="RowSpacing" Value="12"/>
+    </Style>
+
+    <Style x:Key="ModernCard" TargetType="Frame">
+        <Setter Property="BackgroundColor" Value="{StaticResource Surface}"/>
+        <Setter Property="BorderColor" Value="{StaticResource BorderSubtle}"/>
+        <Setter Property="CornerRadius" Value="16"/>
+        <Setter Property="HasShadow" Value="False"/>
+        <Setter Property="Padding" Value="14"/>
+        <Setter Property="Margin" Value="0"/>
+    </Style>
+
+    <Style x:Key="SectionTitle" TargetType="Label">
+        <Setter Property="FontSize" Value="24"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+        <Setter Property="TextColor" Value="{StaticResource TextPrimary}"/>
+    </Style>
+
+    <Style x:Key="SectionSubtitle" TargetType="Label">
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="TextColor" Value="{StaticResource TextSecondary}"/>
+    </Style>
+
+    <Style x:Key="PrimaryCtaButton" TargetType="Button">
+        <Setter Property="BackgroundColor" Value="{StaticResource BrandPrimary}"/>
+        <Setter Property="TextColor" Value="White"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+        <Setter Property="FontSize" Value="15"/>
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="Padding" Value="16,13"/>
+    </Style>
+
+    <Style x:Key="SecondaryCtaButton" TargetType="Button">
+        <Setter Property="BackgroundColor" Value="{StaticResource SurfaceMuted}"/>
+        <Setter Property="TextColor" Value="{StaticResource BrandPrimaryDark}"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="Padding" Value="16,12"/>
+    </Style>
+
+    <Style x:Key="SkeletonBlock" TargetType="BoxView">
+        <Setter Property="BackgroundColor" Value="#E5E7EB"/>
+        <Setter Property="CornerRadius" Value="8"/>
+        <Setter Property="HeightRequest" Value="12"/>
+    </Style>
 </ResourceDictionary>

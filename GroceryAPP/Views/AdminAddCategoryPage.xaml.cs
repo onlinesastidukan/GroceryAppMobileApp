@@ -22,7 +22,7 @@ public partial class AdminAddCategoryPage : ContentPage
 
         if (string.IsNullOrWhiteSpace(categoryName))
         {
-            ErrorLabel.Text = "Please enter category name";
+            ErrorLabel.Text = "Please enter shop name";
             ErrorLabel.IsVisible = true;
             return;
         }
@@ -32,7 +32,7 @@ public partial class AdminAddCategoryPage : ContentPage
             LoadingIndicator.IsRunning = true;
             LoadingIndicator.IsVisible = true;
             ErrorLabel.IsVisible = false;
-            System.Diagnostics.Debug.WriteLine($"[ADD CATEGORY] Creating category: {categoryName}");
+            System.Diagnostics.Debug.WriteLine($"[ADD SHOP] Creating shop: {categoryName}");
 
             var category = new CreateCategoryRequest
             {
@@ -42,22 +42,22 @@ public partial class AdminAddCategoryPage : ContentPage
             };
 
             var response = await _apiService.CreateCategoryAsync(category);
-            System.Diagnostics.Debug.WriteLine($"[ADD CATEGORY] Response: Success={response?.Success}, Message={response?.Message}");
+            System.Diagnostics.Debug.WriteLine($"[ADD SHOP] Response: Success={response?.Success}, Message={response?.Message}");
             
             if (response?.Success == true)
             {
-                await DisplayAlert("Success", "Category added successfully", "OK");
+                await DisplayAlert("Success", "Shop added successfully", "OK");
                 await Navigation.PopAsync();
             }
             else
             {
-                ErrorLabel.Text = response?.Message ?? "Failed to add category";
+                ErrorLabel.Text = response?.Message ?? "Failed to add shop";
                 ErrorLabel.IsVisible = true;
             }
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"[ADD CATEGORY] Exception: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"[ADD SHOP] Exception: {ex.Message}");
             ErrorLabel.Text = $"Error: {ex.Message}";
             ErrorLabel.IsVisible = true;
         }
@@ -74,7 +74,7 @@ public partial class AdminAddCategoryPage : ContentPage
         {
             var result = await MediaPicker.Default.PickPhotoAsync(new MediaPickerOptions
             {
-                Title = "Select Category Image"
+                Title = "Select Shop Image"
             });
 
             if (result == null) return;

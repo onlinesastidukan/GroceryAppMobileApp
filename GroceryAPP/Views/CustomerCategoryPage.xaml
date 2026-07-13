@@ -5,14 +5,14 @@
              x:Class="GroceryApp.Views.CustomerCategoryPage"
              x:Name="CustomerCategoryPageRoot"
              Title="सस्ती दुकान"
-             BackgroundColor="#ffffff">
+             BackgroundColor="{StaticResource AppBackground}">
     <ContentPage.Resources>
         <ResourceDictionary>
             <converters:CategoryToIconConverter x:Key="CategoryIconConverter"/>
         </ResourceDictionary>
     </ContentPage.Resources>
     <Grid Padding="0" RowDefinitions="Auto,*">
-        <VerticalStackLayout Grid.Row="0" Padding="16,12,16,0" Spacing="16">
+        <VerticalStackLayout Grid.Row="0" Padding="16,12,16,0" Spacing="14">
             <!-- Header with Hamburger Menu -->
             <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto" RowSpacing="4">
                 <Button Grid.Column="0"
@@ -27,12 +27,12 @@
 
                 <Label Grid.Column="1"
                        Grid.Row="0"
-                       Text="सस्ती दुकान"
+                       Text="Explore Local Shops"
                        FontSize="22"
                        FontAttributes="Bold"
                        FontAutoScalingEnabled="False"
                        VerticalOptions="Center"
-                       TextColor="#1a1a1a">
+                       TextColor="{StaticResource TextPrimary}">
                     <Label.Shadow>
                         <Shadow Brush="#000000" Opacity="0.1" Radius="2" Offset="0,2"/>
                     </Label.Shadow>
@@ -67,15 +67,15 @@
 
                 <HorizontalStackLayout Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" Spacing="6">
                     <Label Text="⚡" FontSize="14"/>
-                    <Label Text="Fast Delivery" FontSize="13" TextColor="#00b366" FontAttributes="Bold"/>
-                    <Label Text="•" FontSize="13" TextColor="#999999"/>
-                    <Label Text="🌿 Fresh Groceries" FontSize="13" TextColor="#666666"/>
+                    <Label Text="Fast Delivery" FontSize="13" TextColor="{StaticResource BrandAccent}" FontAttributes="Bold"/>
+                    <Label Text="•" FontSize="13" TextColor="#94A3B8"/>
+                    <Label Text="Curated Grocery Shops" FontSize="13" TextColor="{StaticResource TextSecondary}"/>
                 </HorizontalStackLayout>
             </Grid>
             
             <Label Text="{Binding ErrorMessage}" 
                    IsVisible="{Binding HasError}" 
-                   TextColor="#e74c3c" 
+                   TextColor="{StaticResource Danger}" 
                    FontSize="12"/>
             
             <ActivityIndicator IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}" Color="#00b366" Margin="0,20"/>
@@ -96,8 +96,8 @@
                     <Frame Padding="0"
                            CornerRadius="16"
                            HasShadow="False"
-                           BackgroundColor="#ffffff"
-                           BorderColor="#e8e8e8">
+                           BackgroundColor="{StaticResource Surface}"
+                           BorderColor="{StaticResource BorderSubtle}">
                         <Frame.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnCategoryTapped"/>
                         </Frame.GestureRecognizers>
@@ -131,18 +131,18 @@
                                 </Grid>
                             </Frame>
 
-                            <!-- Category Info -->
+                            <!-- Shop Info -->
                             <VerticalStackLayout Spacing="3" HorizontalOptions="Center">
                                 <Label Text="{Binding Name}"
                                        FontSize="14"
                                        FontAttributes="Bold"
-                                       TextColor="#1a1a1a"
+                                       TextColor="{StaticResource TextPrimary}"
                                        HorizontalTextAlignment="Center"
                                        MaxLines="2"
                                        LineBreakMode="TailTruncation"/>
                                 <Label Text="{Binding Description}"
                                        FontSize="11"
-                                       TextColor="#666666"
+                                       TextColor="{StaticResource TextSecondary}"
                                        HorizontalTextAlignment="Center"
                                        MaxLines="2"
                                        LineBreakMode="TailTruncation"/>
@@ -188,7 +188,7 @@
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnMenuCategoriesClicked"/>
                         </Border.GestureRecognizers>
-                        <Label Text="View Categories" FontSize="15" TextColor="#1a1a1a"/>
+                        <Label Text="View Shops" FontSize="15" TextColor="#1a1a1a"/>
                     </Border>
 
                     <Border Stroke="#e9e9e9" StrokeThickness="1" StrokeShape="RoundRectangle 10" Padding="12,10">
@@ -215,26 +215,33 @@
             </VerticalStackLayout>
         </Frame>
 
-        <!-- Loading overlay shown while navigating to a category -->
+        <!-- Loading overlay shown while navigating to a shop -->
         <Grid Grid.RowSpan="2"
               x:Name="CategoryLoadingOverlay"
               IsVisible="False"
-              BackgroundColor="#CCFFFFFF"
+              BackgroundColor="#DDF8FAFC"
               InputTransparent="False">
-            <VerticalStackLayout Spacing="14"
-                                 HorizontalOptions="Center"
-                                 VerticalOptions="Center">
-                <ActivityIndicator IsRunning="True"
-                                   Color="#00b366"
-                                   WidthRequest="48"
-                                   HeightRequest="48"/>
-                <Label Text="Loading products..."
-                       FontSize="14"
-                       FontAutoScalingEnabled="False"
-                       TextColor="#444444"
-                       FontAttributes="Bold"
-                       HorizontalTextAlignment="Center"/>
-            </VerticalStackLayout>
+            <Frame Style="{StaticResource ModernCard}"
+                   Padding="16"
+                   WidthRequest="240"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center">
+                <VerticalStackLayout Spacing="10">
+                    <BoxView Style="{StaticResource SkeletonBlock}" HeightRequest="14" WidthRequest="180" HorizontalOptions="Center"/>
+                    <BoxView Style="{StaticResource SkeletonBlock}" HeightRequest="12" WidthRequest="150" HorizontalOptions="Center"/>
+                    <ActivityIndicator IsRunning="True"
+                                       Color="{StaticResource BrandPrimary}"
+                                       WidthRequest="42"
+                                       HeightRequest="42"
+                                       HorizontalOptions="Center"/>
+                    <Label Text="Loading products..."
+                           FontSize="13"
+                           FontAutoScalingEnabled="False"
+                           TextColor="{StaticResource TextSecondary}"
+                           FontAttributes="Bold"
+                           HorizontalTextAlignment="Center"/>
+                </VerticalStackLayout>
+            </Frame>
         </Grid>
     </Grid>
 </ContentPage>

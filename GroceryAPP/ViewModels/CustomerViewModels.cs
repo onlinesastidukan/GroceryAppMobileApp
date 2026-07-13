@@ -47,7 +47,7 @@ public partial class CustomerCategoryViewModel : BaseViewModel
             }
             else
             {
-                SetError(response?.Message ?? "Failed to load categories");
+                SetError(response?.Message ?? "Failed to load shops");
             }
         }
         catch (Exception ex)
@@ -210,6 +210,9 @@ public partial class CartViewModel : BaseViewModel
     private string deliveryAddress = "";
 
     [ObservableProperty]
+    private string mobileNumber = "";
+
+    [ObservableProperty]
     private bool orderPlacedSuccessfully;
 
     public CartViewModel(CartService cartService, ApiService apiService)
@@ -297,6 +300,12 @@ public partial class CartViewModel : BaseViewModel
             return;
         }
 
+        if (string.IsNullOrWhiteSpace(MobileNumber))
+        {
+            SetError("Please enter mobile number");
+            return;
+        }
+
         try
         {
             IsLoading = true;
@@ -305,6 +314,7 @@ public partial class CartViewModel : BaseViewModel
             var orderRequest = new CreateOrderRequest
             {
                 DeliveryAddress = DeliveryAddress,
+                MobileNumber = MobileNumber,
                 Items = CartItems.Select(x => new CreateOrderItem
                 {
                     ProductId = x.ProductId,

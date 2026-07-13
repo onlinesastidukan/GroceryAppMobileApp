@@ -32,9 +32,18 @@ public partial class SplashPage : ContentPage
                         if (restored && _authService.CurrentUser?.Token is { Length: > 0 } token)
                         {
                             _apiService.SetAuthToken(token);
-                            nextPage = _authService.IsAdmin
-                                ? services?.GetService<AdminDashboardPage>()
-                                : services?.GetService<CustomerCategoryPage>();
+                            if (_authService.IsAdmin)
+                            {
+                                nextPage = services?.GetService<AdminDashboardPage>();
+                            }
+                            else if (_authService.IsDealer)
+                            {
+                                nextPage = services?.GetService<AdminProductsPage>();
+                            }
+                            else
+                            {
+                                nextPage = services?.GetService<CustomerCategoryPage>();
+                            }
                         }
                         else
                         {

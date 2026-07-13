@@ -30,7 +30,7 @@ public partial class LoginPage : ContentPage
 
 		if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(password))
 		{
-			ErrorLabel.Text = "Please enter user ID and password";
+			ErrorLabel.Text = "Please enter dealer mobile/user ID and password";
 			ErrorLabel.IsVisible = true;
 			return;
 		}
@@ -40,32 +40,35 @@ public partial class LoginPage : ContentPage
 			LoadingIndicator.IsRunning = true;
 			LoadingOverlay.IsVisible = true;
 			ErrorLabel.IsVisible = false;
-			
+
 			var success = await _authService.LoginAsync(userId, password, _apiService);
 
 			if (success)
 			{
-				// Set the auth token in API service
 				_apiService.SetAuthToken(_authService.CurrentUser.Token);
-				
-				// Navigate based on role
+
 				if (_authService.IsAdmin)
 				{
 					var adminDashboard = _serviceProvider.GetService<AdminDashboardPage>();
 					await Navigation.PushAsync(adminDashboard);
 					Navigation.RemovePage(this);
 				}
-				else if (_authService.IsCustomer)
+				else if (_authService.IsDealer)
 				{
-					var customerCategory = _serviceProvider.GetService<CustomerCategoryPage>();
-					await Navigation.PushAsync(customerCategory);
+					var dealerProducts = _serviceProvider.GetService<AdminProductsPage>();
+					await Navigation.PushAsync(dealerProducts);
 					Navigation.RemovePage(this);
+				}
+				else
+				{
+					ErrorLabel.Text = "This account is not allowed for dealer login.";
+					ErrorLabel.IsVisible = true;
 				}
 			}
 			else
 			{
 				ErrorLabel.Text = string.IsNullOrWhiteSpace(_authService.LastErrorMessage)
-					? "Invalid user ID or password"
+					? "Invalid dealer credentials"
 					: _authService.LastErrorMessage;
 				ErrorLabel.IsVisible = true;
 			}
@@ -80,6 +83,29 @@ public partial class LoginPage : ContentPage
 		{
 			LoadingIndicator.IsRunning = false;
 			LoadingOverlay.IsVisible = false;
+		}
+	}
+
+	private async void OnGoToShopCustomerClicked(object sender, EventArgs e)
+	{
+		try
+		{
+			await _authService.LogoutAsync(_apiService);
+			var customerCategory = _serviceProvider.GetService<CustomerCategoryPage>();
+			if (customerCategory == null)
+			{
+				ErrorLabel.Text = "Unable to open customer shop.";
+				ErrorLabel.IsVisible = true;
+				return;
+			}
+
+			await Navigation.PushAsync(customerCategory);
+			Navigation.RemovePage(this);
+		}
+		catch (Exception ex)
+		{
+			ErrorLabel.Text = $"Navigation error: {ex.Message}";
+			ErrorLabel.IsVisible = true;
 		}
 	}
 

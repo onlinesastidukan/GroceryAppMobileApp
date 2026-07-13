@@ -3,13 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GroceryApp.Views.AdminOrdersPage"
              Title="Sasti Dukan - Manage Orders"
-             BackgroundColor="#f8f9fa">
+             BackgroundColor="{StaticResource AppBackground}">
     <Grid>
         <ScrollView>
             <VerticalStackLayout Padding="20" Spacing="16">
                 <VerticalStackLayout Spacing="4">
-                    <Label Text="Orders" FontSize="24" FontAttributes="Bold" TextColor="#1a1a1a"/>
-                    <Label Text="Track and update recent purchases" FontSize="12" TextColor="#666666"/>
+                    <Label Text="Orders" FontSize="24" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+                    <Label Text="Track and update recent purchases" FontSize="12" TextColor="{StaticResource TextSecondary}"/>
                 </VerticalStackLayout>
 
                 <Label Text="{Binding ErrorMessage}"
@@ -32,7 +32,7 @@
                     <BindableLayout.ItemTemplate>
                         <DataTemplate>
                             <Grid Padding="0,6">
-                                <Frame Padding="0" CornerRadius="16" HasShadow="False" BorderColor="#e8e8e8">
+                                <Frame Padding="0" CornerRadius="16" HasShadow="False" BorderColor="{StaticResource BorderSubtle}" BackgroundColor="{StaticResource Surface}">
                                     <Frame.GestureRecognizers>
                                         <TapGestureRecognizer Tapped="OnOrderTapped"/>
                                     </Frame.GestureRecognizers>

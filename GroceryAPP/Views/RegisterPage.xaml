@@ -2,8 +2,8 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GroceryApp.Views.RegisterPage"
-             Title="Create Account"
-             BackgroundColor="#ffffff">
+             Title="Dealer Registration"
+             BackgroundColor="{StaticResource AppBackground}">
     <ScrollView>
         <VerticalStackLayout Padding="24" Spacing="20" VerticalOptions="Center">
 
@@ -27,91 +27,78 @@
                            VerticalTextAlignment="Center"/>
                 </Frame>
 
-                  <Label Text="Create Account"
-                      FontSize="28"
+                  <Label Text="Register Dealer Account"
+                      FontSize="30"
                        FontAttributes="Bold"
                        HorizontalTextAlignment="Center"
-                       TextColor="#1a1a1a"/>
-                  <Label Text="User ID, name, mobile, and address"
-                       FontSize="12"
+                       TextColor="{StaticResource TextPrimary}"/>
+                  <Label Text="Mobile number will be your secure User ID"
+                       FontSize="13"
                        HorizontalTextAlignment="Center"
-                       TextColor="#666666"/>
+                       TextColor="{StaticResource TextSecondary}"/>
             </VerticalStackLayout>
 
             <!-- Form Card -->
-            <Frame Padding="0" CornerRadius="18" HasShadow="False" BorderColor="#e8e8e8">
+            <Frame Padding="0" CornerRadius="20" HasShadow="False" BorderColor="{StaticResource BorderSubtle}" BackgroundColor="{StaticResource Surface}">
                 <Frame.Shadow>
                     <Shadow Brush="#000000" Opacity="0.08" Radius="16" Offset="0,4"/>
                 </Frame.Shadow>
                 <VerticalStackLayout Spacing="16" Padding="22,22">
 
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="User ID" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
-                        <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="#e0e0e0" BackgroundColor="#ffffff">
-                            <Entry x:Name="UserIdEntry"
-                                   Placeholder="Choose a unique user ID"
-                                ReturnType="Next"
-                                   BackgroundColor="#ffffff"
-                                              TextColor="#1a1a1a"
-                                              PlaceholderColor="#9a9a9a"
-                                   FontSize="15"
-                                   Margin="16,12"/>
-                        </Frame>
-                    </VerticalStackLayout>
 
                     <VerticalStackLayout Spacing="6">
-                        <Label Text="Full Name" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
-                        <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="#e0e0e0" BackgroundColor="#ffffff">
+                        <Label Text="Full Name" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+                        <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="{StaticResource BorderSubtle}" BackgroundColor="{StaticResource Surface}">
                             <Entry x:Name="FullNameEntry"
                                    Placeholder="Enter your full name"
-                                ReturnType="Next"
-                                   BackgroundColor="#ffffff"
-                                              TextColor="#1a1a1a"
-                                              PlaceholderColor="#9a9a9a"
+                                   ReturnType="Next"
+                                   BackgroundColor="{StaticResource Surface}"
+                                   TextColor="{StaticResource TextPrimary}"
+                                   PlaceholderColor="#94A3B8"
                                    FontSize="15"
                                    Margin="16,12"/>
                         </Frame>
                     </VerticalStackLayout>
 
                     <VerticalStackLayout Spacing="6">
-                        <Label Text="Password" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
-                        <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="#e0e0e0" BackgroundColor="#ffffff">
+                        <Label Text="Password" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+                        <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="{StaticResource BorderSubtle}" BackgroundColor="{StaticResource Surface}">
                             <Entry x:Name="PasswordEntry"
                                    Placeholder="Create a password"
                                    IsPassword="True"
-                                ReturnType="Next"
-                                   BackgroundColor="#ffffff"
-                                              TextColor="#1a1a1a"
-                                              PlaceholderColor="#9a9a9a"
+                                   ReturnType="Next"
+                                   BackgroundColor="{StaticResource Surface}"
+                                   TextColor="{StaticResource TextPrimary}"
+                                   PlaceholderColor="#94A3B8"
                                    FontSize="15"
                                    Margin="16,12"/>
                         </Frame>
                     </VerticalStackLayout>
 
                     <VerticalStackLayout Spacing="6">
-                        <Label Text="Mobile Number" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
-                        <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="#e0e0e0" BackgroundColor="#ffffff">
+                        <Label Text="Mobile Number" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+                        <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="{StaticResource BorderSubtle}" BackgroundColor="{StaticResource Surface}">
                             <Entry x:Name="MobileEntry"
                                    Placeholder="Enter mobile number"
                                    Keyboard="Telephone"
-                                ReturnType="Next"
-                                   BackgroundColor="#ffffff"
-                                              TextColor="#1a1a1a"
-                                              PlaceholderColor="#9a9a9a"
+                                   ReturnType="Next"
+                                   BackgroundColor="{StaticResource Surface}"
+                                   TextColor="{StaticResource TextPrimary}"
+                                   PlaceholderColor="#94A3B8"
                                    FontSize="15"
                                    Margin="16,12"/>
                         </Frame>
                     </VerticalStackLayout>
 
                     <VerticalStackLayout Spacing="6">
-                        <Label Text="Address" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
-                        <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="#e0e0e0" BackgroundColor="#ffffff">
+                        <Label Text="Address" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+                        <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="{StaticResource BorderSubtle}" BackgroundColor="{StaticResource Surface}">
                             <Editor x:Name="AddressEntry"
                                     Placeholder="Enter delivery address"
                                     AutoSize="TextChanges"
-                                    BackgroundColor="#ffffff"
-                                    TextColor="#1a1a1a"
-                                    PlaceholderColor="#9a9a9a"
+                                    BackgroundColor="{StaticResource Surface}"
+                                    TextColor="{StaticResource TextPrimary}"
+                                    PlaceholderColor="#94A3B8"
                                     FontSize="15"
                                     HeightRequest="90"
                                     Margin="16,10"/>
@@ -126,13 +113,8 @@
                            HorizontalTextAlignment="Center"/>
 
                     <Button x:Name="CreateAccountButton"
-                            Text="✅ Create Account"
-                            BackgroundColor="#00b366"
-                            TextColor="White"
-                            FontSize="16"
-                            FontAttributes="Bold"
-                            Padding="16,14"
-                            CornerRadius="12"
+                            Text="✅ Register Dealer"
+                            Style="{StaticResource PrimaryCtaButton}"
                             Clicked="OnCreateAccountClicked">
                         <Button.Shadow>
                             <Shadow Brush="#00b366" Opacity="0.4" Radius="10" Offset="0,5"/>
@@ -141,12 +123,7 @@
 
                     <Button x:Name="BackToLoginButton"
                             Text="Back to Login"
-                            BackgroundColor="#f5f5f5"
-                            TextColor="#00b366"
-                            FontSize="14"
-                            FontAttributes="Bold"
-                            Padding="16,12"
-                            CornerRadius="12"
+                            Style="{StaticResource SecondaryCtaButton}"
                             Clicked="OnBackToLoginClicked"/>
                 </VerticalStackLayout>
             </Frame>

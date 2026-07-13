@@ -3,13 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GroceryApp.Views.CustomerOrderDetailPage"
              Title="Order Detail"
-             BackgroundColor="#f8f9fa">
+             BackgroundColor="{StaticResource AppBackground}">
     <Grid>
         <ScrollView>
             <VerticalStackLayout Padding="16" Spacing="14">
 
                 <!-- Order Header Card -->
-                <Frame Padding="18" CornerRadius="16" HasShadow="False" BackgroundColor="#1a1a1a">
+                <Frame Padding="18" CornerRadius="16" HasShadow="False" BackgroundColor="{StaticResource TextPrimary}">
                     <Frame.Shadow>
                         <Shadow Brush="#000000" Opacity="0.15" Radius="12" Offset="0,4"/>
                     </Frame.Shadow>
@@ -30,32 +30,32 @@
                         <Label Text="{Binding Order.OrderDateIST, StringFormat='{}{0:dd MMM yyyy, hh:mm tt} IST'}"
                                FontSize="12" TextColor="#aaaaaa" FontAutoScalingEnabled="False"/>
                         <Label Text="{Binding Order.TotalAmount, StringFormat='Total: &#8377;{0:F0}'}"
-                               FontSize="16" FontAttributes="Bold" TextColor="#00b366" FontAutoScalingEnabled="False"/>
+                               FontSize="16" FontAttributes="Bold" TextColor="{StaticResource BrandAccent}" FontAutoScalingEnabled="False"/>
                     </VerticalStackLayout>
                 </Frame>
 
                 <!-- Customer Info Card -->
-                <Frame Padding="16" CornerRadius="14" HasShadow="False" BackgroundColor="White" BorderColor="#eeeeee">
+                <Frame Padding="16" CornerRadius="14" HasShadow="False" BackgroundColor="{StaticResource Surface}" BorderColor="{StaticResource BorderSubtle}">
                     <Frame.Shadow>
                         <Shadow Brush="#000000" Opacity="0.05" Radius="8" Offset="0,2"/>
                     </Frame.Shadow>
                     <VerticalStackLayout Spacing="6">
                         <Label Text="CUSTOMER INFO" FontSize="10" TextColor="#999999" FontAttributes="Bold" FontAutoScalingEnabled="False"/>
-                        <Label Text="{Binding Order.UserFullName}" FontSize="14" FontAttributes="Bold" TextColor="#1a1a1a" FontAutoScalingEnabled="False"/>
+                        <Label Text="{Binding Order.UserFullName}" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" FontAutoScalingEnabled="False"/>
                         <Label Text="{Binding Order.UserMobileNumber, StringFormat='📞 {0}'}"
-                               FontSize="13" TextColor="#444444" FontAutoScalingEnabled="False"
+                               FontSize="13" TextColor="{StaticResource TextSecondary}" FontAutoScalingEnabled="False"
                                IsVisible="{Binding Order.UserMobileNumber, Converter={StaticResource IsNotNullOrEmptyConverter}}"/>
                     </VerticalStackLayout>
                 </Frame>
 
                 <!-- Delivery Address -->
-                <Frame Padding="16" CornerRadius="14" HasShadow="False" BackgroundColor="White" BorderColor="#eeeeee">
+                <Frame Padding="16" CornerRadius="14" HasShadow="False" BackgroundColor="{StaticResource Surface}" BorderColor="{StaticResource BorderSubtle}">
                     <Frame.Shadow>
                         <Shadow Brush="#000000" Opacity="0.05" Radius="8" Offset="0,2"/>
                     </Frame.Shadow>
                     <VerticalStackLayout Spacing="6">
                         <Label Text="DELIVERY ADDRESS" FontSize="10" TextColor="#999999" FontAttributes="Bold" FontAutoScalingEnabled="False"/>
-                        <Label Text="{Binding Order.DeliveryAddress}" FontSize="14" TextColor="#333333" FontAutoScalingEnabled="False"/>
+                        <Label Text="{Binding Order.DeliveryAddress}" FontSize="14" TextColor="{StaticResource TextPrimary}" FontAutoScalingEnabled="False"/>
                     </VerticalStackLayout>
                 </Frame>
 
@@ -76,7 +76,7 @@
                     <BindableLayout.ItemTemplate>
                         <DataTemplate>
                             <Frame Padding="14" CornerRadius="12" HasShadow="False"
-                                   BackgroundColor="White" BorderColor="#f0f0f0" Margin="0,4">
+                                   BackgroundColor="{StaticResource Surface}" BorderColor="{StaticResource BorderSubtle}" Margin="0,4">
                                 <Frame.Shadow>
                                     <Shadow Brush="#000000" Opacity="0.04" Radius="6" Offset="0,2"/>
                                 </Frame.Shadow>
@@ -91,7 +91,7 @@
                                         <Label Text="{Binding Price, StringFormat='&#8377;{0:F0}/unit'}"
                                                FontSize="11" TextColor="#999999" HorizontalTextAlignment="End" FontAutoScalingEnabled="False"/>
                                         <Label Text="{Binding TotalPrice, StringFormat='&#8377;{0:F0}'}"
-                                               FontSize="15" FontAttributes="Bold" TextColor="#00b366"
+                                               FontSize="15" FontAttributes="Bold" TextColor="{StaticResource BrandAccent}"
                                                HorizontalTextAlignment="End" FontAutoScalingEnabled="False"/>
                                     </VerticalStackLayout>
                                 </Grid>
@@ -101,12 +101,12 @@
                 </VerticalStackLayout>
 
                 <!-- Order Total Footer -->
-                <Frame Padding="16" CornerRadius="14" HasShadow="False" BackgroundColor="#f0faf5" BorderColor="#c8ead8">
+                <Frame Padding="16" CornerRadius="14" HasShadow="False" BackgroundColor="#ECFDF5" BorderColor="#BBF7D0">
                     <Grid ColumnDefinitions="*,Auto">
                         <Label Text="Order Total" FontSize="15" FontAttributes="Bold" TextColor="#1a1a1a" FontAutoScalingEnabled="False"/>
                         <Label Grid.Column="1"
                                Text="{Binding Order.TotalAmount, StringFormat='&#8377;{0:F0}'}"
-                               FontSize="18" FontAttributes="Bold" TextColor="#00b366" FontAutoScalingEnabled="False"/>
+                               FontSize="18" FontAttributes="Bold" TextColor="{StaticResource BrandAccent}" FontAutoScalingEnabled="False"/>
                     </Grid>
                 </Frame>
 

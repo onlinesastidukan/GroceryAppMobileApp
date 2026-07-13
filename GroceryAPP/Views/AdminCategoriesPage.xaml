@@ -3,8 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:converters="clr-namespace:GroceryApp.Converters"
              x:Class="GroceryApp.Views.AdminCategoriesPage"
-             Title="सस्ती दुकान - Manage Categories"
-             BackgroundColor="#ffffff">
+             Title="सस्ती दुकान - Manage Shops"
+             BackgroundColor="{StaticResource AppBackground}">
     <ContentPage.Resources>
         <ResourceDictionary>
             <converters:CategoryToIconConverter x:Key="CategoryIconConverter"/>
@@ -17,12 +17,12 @@
         <!-- Header -->
         <Grid Grid.Row="0" Margin="16,16,16,4">
             <VerticalStackLayout Spacing="2">
-                <Label Text="Categories" FontSize="28" FontAttributes="Bold" TextColor="#1a1a1a" VerticalOptions="Center"/>
-                <Label Text="Manage product categories" FontSize="13" TextColor="#666666"/>
+                <Label Text="Shops" FontSize="28" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" VerticalOptions="Center"/>
+                <Label Text="Manage dealer shops" FontSize="13" TextColor="{StaticResource TextSecondary}"/>
             </VerticalStackLayout>
             <Button Text="+ Add"
-                    Clicked="OnAddCategoryClicked"
-                    BackgroundColor="#00b366"
+                    Clicked="OnAddShopClicked"
+                    BackgroundColor="{StaticResource BrandPrimary}"
                     TextColor="White"
                     FontSize="13"
                     FontAttributes="Bold"
@@ -63,7 +63,7 @@
                 <GridItemsLayout Orientation="Vertical" Span="2" HorizontalItemSpacing="12" VerticalItemSpacing="12"/>
             </CollectionView.ItemsLayout>
             <CollectionView.EmptyView>
-                <Label Text="No categories yet"
+                <Label Text="No shops yet"
                        TextColor="#999999"
                        HorizontalTextAlignment="Center"
                        Margin="0,40"
@@ -71,7 +71,7 @@
             </CollectionView.EmptyView>
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Frame Padding="0" CornerRadius="16" HasShadow="False" BorderColor="#e8e8e8" Margin="0">
+                    <Frame Padding="0" CornerRadius="16" HasShadow="False" BorderColor="{StaticResource BorderSubtle}" BackgroundColor="{StaticResource Surface}" Margin="0">
                         <Frame.Shadow>
                             <Shadow Brush="#000000" Opacity="0.05" Radius="8" Offset="0,2"/>
                         </Frame.Shadow>
@@ -104,7 +104,7 @@
                             <Grid ColumnDefinitions="*,*" ColumnSpacing="6" Margin="0,2,0,0">
                                 <Button Grid.Column="0"
                                         Text="Edit"
-                                        Clicked="OnEditCategoryClicked"
+                                        Clicked="OnEditShopClicked"
                                         BackgroundColor="#3498db"
                                         TextColor="White"
                                         FontSize="11"

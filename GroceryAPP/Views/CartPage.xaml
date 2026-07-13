@@ -3,18 +3,18 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GroceryApp.Views.CartPage"
              Title="Sasti Dukan - Cart"
-             BackgroundColor="#ffffff">
+             BackgroundColor="{StaticResource AppBackground}">
     <ScrollView>
         <VerticalStackLayout Spacing="16" Padding="16,12,16,80">
             <!-- Header -->
             <VerticalStackLayout Spacing="2">
-                <Label Text="Your Cart" FontSize="28" FontAttributes="Bold" TextColor="#1a1a1a"/>
-                <Label Text="Review your items" FontSize="12" TextColor="#666666"/>
+                <Label Text="Checkout" FontSize="28" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+                <Label Text="Review items and place your order securely" FontSize="12" TextColor="{StaticResource TextSecondary}"/>
             </VerticalStackLayout>
             
             <Label Text="{Binding ErrorMessage}" 
                    IsVisible="{Binding HasError}" 
-                   TextColor="#e74c3c" 
+                   TextColor="{StaticResource Danger}" 
                    FontSize="12"
                    Margin="0,0,0,8"/>
             
@@ -22,7 +22,7 @@
             <VerticalStackLayout BindableLayout.ItemsSource="{Binding CartItems}" Spacing="10">
                 <BindableLayout.ItemTemplate>
                     <DataTemplate>
-                        <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="#e8e8e8" Margin="0">
+                        <Frame Padding="0" CornerRadius="14" HasShadow="False" BorderColor="{StaticResource BorderSubtle}" BackgroundColor="{StaticResource Surface}" Margin="0">
                             <Grid RowDefinitions="*" ColumnDefinitions="70,*" Padding="12" ColumnSpacing="12">
                                     <!-- Product Image -->
                                 <Frame Grid.Column="0" 
@@ -106,7 +106,7 @@
             <ActivityIndicator IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}" Color="#00b366" Margin="0,12"/>
             
             <!-- Order Summary Card -->
-            <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="#e8e8e8" Margin="0,8,0,0">
+            <Frame Padding="0" CornerRadius="14" HasShadow="False" BorderColor="{StaticResource BorderSubtle}" BackgroundColor="{StaticResource Surface}" Margin="0,8,0,0">
                 <VerticalStackLayout Spacing="12" Padding="16">
                     <!-- Total -->
                     <Grid ColumnDefinitions="*,Auto">
@@ -116,6 +116,21 @@
                     
                     <BoxView HeightRequest="1" BackgroundColor="#f0f0f0" Margin="0,4"/>
                     
+                    <!-- Contact Number -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Mobile Number" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
+                        <Frame Padding="0" CornerRadius="8" HasShadow="False" BorderColor="#cccccc" BackgroundColor="#ffffff">
+                            <Entry Text="{Binding MobileNumber}"
+                                   Placeholder="Enter your mobile number"
+                                   Keyboard="Telephone"
+                                   BackgroundColor="#ffffff"
+                                   TextColor="#1a1a1a"
+                                   PlaceholderColor="#9a9a9a"
+                                   FontSize="13"
+                                   Margin="12,8"/>
+                        </Frame>
+                    </VerticalStackLayout>
+
                     <!-- Delivery Address -->
                     <VerticalStackLayout Spacing="6">
                         <Label Text="Delivery Address" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
@@ -139,13 +154,8 @@
                     
                     <!-- Place Order Button -->
                     <Button Text="Place Order" 
-                            Clicked="OnPlaceOrderClicked" 
-                            BackgroundColor="#00b366" 
-                            TextColor="White"
-                            FontSize="15"
-                            FontAttributes="Bold"
-                            Padding="16,12"
-                            CornerRadius="10"
+                            Clicked="OnPlaceOrderClicked"
+                            Style="{StaticResource PrimaryCtaButton}"
                             Margin="0,4,0,0"/>
                 </VerticalStackLayout>
             </Frame>

@@ -2,15 +2,15 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GroceryApp.Views.AdminEditCategoryPage"
-             Title="सस्ती दुकान - Edit Category"
+             Title="सस्ती दुकान - Edit Shop"
              BackgroundColor="#ffffff">
     <ScrollView>
         <VerticalStackLayout Padding="16" Spacing="20">
 
             <!-- Header -->
             <VerticalStackLayout Spacing="4">
-                <Label Text="Edit Category" FontSize="28" FontAttributes="Bold" TextColor="#1a1a1a"/>
-                <Label Text="Update category details" FontSize="13" TextColor="#666666"/>
+                <Label Text="Edit Shop" FontSize="28" FontAttributes="Bold" TextColor="#1a1a1a"/>
+                <Label Text="Update shop details" FontSize="13" TextColor="#666666"/>
             </VerticalStackLayout>
 
             <Label x:Name="ErrorLabel"
@@ -24,10 +24,10 @@
                 <VerticalStackLayout Spacing="16" Padding="16">
 
                     <VerticalStackLayout Spacing="6">
-                        <Label Text="Category Name" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
+                        <Label Text="Shop Name" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
                         <Frame Padding="0" CornerRadius="10" HasShadow="False" BorderColor="#e0e0e0" BackgroundColor="#ffffff">
                             <Entry x:Name="CategoryNameEntry"
-                                   Placeholder="e.g., Sabji ki Dukan"
+                                   Placeholder="e.g., Ravi Vegetable Shop"
                                    BackgroundColor="#ffffff"
                                    TextColor="#1a1a1a"
                                    PlaceholderColor="#9a9a9a"
@@ -50,9 +50,9 @@
                         </Frame>
                     </VerticalStackLayout>
 
-                    <!-- Category Image Picker -->
+                    <!-- Shop Image Picker -->
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="Category Image" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
+                        <Label Text="Shop Image" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
                         <Frame Padding="8" CornerRadius="10" HasShadow="False" BorderColor="#e0e0e0" HeightRequest="140" BackgroundColor="#fafafa">
                             <Grid>
                                 <VerticalStackLayout x:Name="ImagePlaceholder"
@@ -69,7 +69,7 @@
                                        VerticalOptions="Center"/>
                             </Grid>
                         </Frame>
-                        <Button Text="📷 Change Image"
+                        <Button Text="📷 Change Shop Image"
                                 Clicked="OnPickImageClicked"
                                 BackgroundColor="#f0f0f0"
                                 TextColor="#333333"
@@ -94,7 +94,7 @@
 
             <!-- Action Buttons -->
             <VerticalStackLayout Spacing="10">
-                <Button Text="✅ Update Category"
+                <Button Text="✅ Update Shop"
                         Clicked="OnSaveClicked"
                         BackgroundColor="#00b366"
                         TextColor="White"

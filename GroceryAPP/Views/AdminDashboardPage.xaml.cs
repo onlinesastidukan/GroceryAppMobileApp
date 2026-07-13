@@ -111,7 +111,7 @@ public partial class AdminDashboardPage : ContentPage
     private async void OnMenuCategoriesClicked(object sender, TappedEventArgs e)
     {
         await CloseMenu();
-        await NavigateToPageAsync<AdminCategoriesPage>("Categories");
+        await NavigateToPageAsync<AdminCategoriesPage>("Shops");
     }
 
     private async void OnMenuLogoutClicked(object sender, TappedEventArgs e)
@@ -161,11 +161,11 @@ public partial class AdminDashboardPage : ContentPage
     {
         if (_viewModel.TotalCategories <= 0)
         {
-            await DisplayAlert("No Categories", "There are no categories to manage.", "OK");
+            await DisplayAlert("No Shops", "There are no shops to manage.", "OK");
             return;
         }
 
-        await NavigateToPageAsync<AdminCategoriesPage>("Categories");
+        await NavigateToPageAsync<AdminCategoriesPage>("Shops");
     }
 
     private async void OnRevenueCardTapped(object sender, TappedEventArgs e)

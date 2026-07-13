@@ -567,7 +567,7 @@ public partial class AdminCategoriesViewModel : BaseViewModel
             }
             else
             {
-                SetError(response?.Message ?? "Failed to load categories");
+                SetError(response?.Message ?? "Failed to load shops");
                 System.Diagnostics.Debug.WriteLine($"[ADMIN CATEGORIES] Failed to load categories: {response?.Message}");
             }
         }
@@ -592,7 +592,7 @@ public partial class AdminCategoriesViewModel : BaseViewModel
 
         var confirm = await Application.Current.MainPage.DisplayAlert(
             "Confirm",
-            $"Delete {category.Name}?",
+            $"Delete shop {category.Name}?",
             "Yes",
             "No"
         );
@@ -606,11 +606,11 @@ public partial class AdminCategoriesViewModel : BaseViewModel
                 if (response?.Success == true)
                 {
                     Categories.Remove(category);
-                    await Application.Current.MainPage.DisplayAlert("Success", "Category deleted", "OK");
+                    await Application.Current.MainPage.DisplayAlert("Success", "Shop deleted", "OK");
                 }
                 else
                 {
-                    var msg = response?.Message ?? "Failed to delete category";
+                    var msg = response?.Message ?? "Failed to delete shop";
                     SetError(msg);
                     await Application.Current.MainPage.DisplayAlert("Delete Failed", msg, "OK");
                 }

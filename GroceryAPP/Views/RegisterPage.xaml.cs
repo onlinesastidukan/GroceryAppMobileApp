@@ -15,14 +15,12 @@ public partial class RegisterPage : ContentPage
 
     private async void OnCreateAccountClicked(object sender, EventArgs e)
     {
-        var userId = UserIdEntry.Text?.Trim();
         var fullName = FullNameEntry.Text?.Trim();
         var password = PasswordEntry.Text;
         var mobileNumber = MobileEntry.Text?.Trim();
         var address = AddressEntry.Text?.Trim();
 
-        if (string.IsNullOrWhiteSpace(userId) ||
-            string.IsNullOrWhiteSpace(fullName) ||
+        if (string.IsNullOrWhiteSpace(fullName) ||
             string.IsNullOrWhiteSpace(password) ||
             string.IsNullOrWhiteSpace(mobileNumber) ||
             string.IsNullOrWhiteSpace(address))
@@ -31,6 +29,8 @@ public partial class RegisterPage : ContentPage
             ErrorLabel.IsVisible = true;
             return;
         }
+
+        var userId = mobileNumber;
 
         try
         {
@@ -50,7 +50,7 @@ public partial class RegisterPage : ContentPage
             var response = await _apiService.RegisterAsync(request);
             if (response?.Success == true)
             {
-                await DisplayAlert("Success", "Account created successfully. Please log in.", "OK");
+                await DisplayAlert("Success", "Dealer account created successfully. Please log in.", "OK");
                 await Navigation.PopAsync();
             }
             else

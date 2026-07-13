@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GroceryApp.Views.AdminAddProductPage"
              Title="सस्ती दुकान - Add Product"
-             BackgroundColor="#ffffff">
+             BackgroundColor="{StaticResource AppBackground}">
     <Grid RowDefinitions="0.55*,0.45*" Padding="16" RowSpacing="12">
         <ScrollView Grid.Row="0">
             <VerticalStackLayout Spacing="20">
@@ -137,13 +137,8 @@
             <!-- Action Buttons -->
             <VerticalStackLayout Spacing="10">
                 <Button Text="💾 Save Product" 
-                        Clicked="OnSaveClicked" 
-                        BackgroundColor="#00b366" 
-                        TextColor="White" 
-                        FontSize="15"
-                        FontAttributes="Bold"
-                        Padding="16,12"
-                        CornerRadius="12">
+                        Clicked="OnSaveClicked"
+                        Style="{StaticResource PrimaryCtaButton}">
                     <Button.Shadow>
                         <Shadow Brush="#00b366" Opacity="0.3" Radius="8" Offset="0,4"/>
                     </Button.Shadow>

@@ -36,13 +36,13 @@ public partial class AdminCategoriesPage : ContentPage
         }
     }
 
-    private async void OnAddCategoryClicked(object sender, EventArgs e)
+    private async void OnAddShopClicked(object sender, EventArgs e)
     {
         var addCategoryPage = new AdminAddCategoryPage(_apiService);
         await Navigation.PushAsync(addCategoryPage);
     }
 
-    private async void OnEditCategoryClicked(object sender, EventArgs e)
+    private async void OnEditShopClicked(object sender, EventArgs e)
     {
         if (sender is Button button && button.CommandParameter is Category category)
         {

@@ -179,6 +179,9 @@ public class AuthService
     }
 
     public bool IsAdmin => _currentUser?.Role?.Equals("Admin", StringComparison.OrdinalIgnoreCase) ?? false;
-    
+
+    public bool IsDealer => _currentUser?.Role?.Equals("Dealer", StringComparison.OrdinalIgnoreCase) == true
+        || _currentUser?.Role?.Equals("Vendor", StringComparison.OrdinalIgnoreCase) == true;
+
     public bool IsCustomer => _currentUser?.Role?.Equals("Customer", StringComparison.OrdinalIgnoreCase) ?? false;
 }

@@ -66,7 +66,7 @@ public partial class AdminEditCategoryPage : ContentPage
 
         if (string.IsNullOrWhiteSpace(categoryName))
         {
-            ErrorLabel.Text = "Please enter category name";
+            ErrorLabel.Text = "Please enter shop name";
             ErrorLabel.IsVisible = true;
             return;
         }
@@ -89,12 +89,12 @@ public partial class AdminEditCategoryPage : ContentPage
             var response = await _apiService.UpdateCategoryAsync(request);
             if (response?.Success == true)
             {
-                await DisplayAlert("Success", "Category updated successfully", "OK");
+                await DisplayAlert("Success", "Shop updated successfully", "OK");
                 await Navigation.PopAsync();
             }
             else
             {
-                ErrorLabel.Text = response?.Message ?? "Failed to update category";
+                ErrorLabel.Text = response?.Message ?? "Failed to update shop";
                 ErrorLabel.IsVisible = true;
             }
         }
@@ -116,7 +116,7 @@ public partial class AdminEditCategoryPage : ContentPage
         {
             var result = await MediaPicker.Default.PickPhotoAsync(new MediaPickerOptions
             {
-                Title = "Select Category Image"
+                Title = "Select Shop Image"
             });
 
             if (result == null) return;

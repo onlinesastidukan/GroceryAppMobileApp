@@ -3,16 +3,16 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GroceryApp.Views.AdminProductsPage"
              Title="सस्ती दुकान - Manage Products"
-             BackgroundColor="#ffffff">
+             BackgroundColor="{StaticResource AppBackground}">
     <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="16" RowSpacing="12">
         <Grid Grid.Row="0" Margin="0,0,0,6">
             <VerticalStackLayout Spacing="2">
-                <Label Text="Products" FontSize="28" FontAttributes="Bold" TextColor="#1a1a1a" VerticalOptions="Center"/>
-                <Label Text="Manage your inventory" FontSize="13" TextColor="#666666"/>
+                <Label Text="Products" FontSize="28" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" VerticalOptions="Center"/>
+                <Label Text="Manage your inventory" FontSize="13" TextColor="{StaticResource TextSecondary}"/>
             </VerticalStackLayout>
             <Button Text="+ Add" 
                     Clicked="OnAddProductClicked" 
-                    BackgroundColor="#00b366" 
+                    BackgroundColor="{StaticResource BrandPrimary}" 
                     TextColor="White" 
                     FontSize="13" 
                     FontAttributes="Bold" 
@@ -39,7 +39,7 @@
         </Label>
 
         <!-- Search Bar -->
-        <Frame Grid.Row="2" Padding="0" CornerRadius="12" HasShadow="False" BorderColor="#e8e8e8">
+        <Frame Grid.Row="2" Padding="0" CornerRadius="12" HasShadow="False" BorderColor="{StaticResource BorderSubtle}" BackgroundColor="{StaticResource Surface}">
             <Frame.Shadow>
                 <Shadow Brush="#000000" Opacity="0.04" Radius="6" Offset="0,2"/>
             </Frame.Shadow>
@@ -67,7 +67,7 @@
             </CollectionView.EmptyView>
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Frame Padding="0" CornerRadius="14" HasShadow="False" BorderColor="#e8e8e8" Margin="0">
+                    <Frame Padding="0" CornerRadius="14" HasShadow="False" BorderColor="{StaticResource BorderSubtle}" BackgroundColor="{StaticResource Surface}" Margin="0">
                         <Frame.Shadow>
                             <Shadow Brush="#000000" Opacity="0.05" Radius="8" Offset="0,2"/>
                         </Frame.Shadow>
