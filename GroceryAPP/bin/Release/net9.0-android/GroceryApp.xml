@@ -13,6 +13,15 @@
         <member name="T:GroceryApp.Converters.StatusToBadgeBackgroundConverter">
             <summary>Returns a pastel background Color for an order-status badge.</summary>
         </member>
+        <member name="P:GroceryApp.Models.CartItem.Stock">
+            <summary>Max available stock so +/- can be capped.</summary>
+        </member>
+        <member name="P:GroceryApp.Models.Order.OrderDateIST">
+            <summary>OrderDate converted to Indian Standard Time (IST = UTC+5:30) for display.</summary>
+        </member>
+        <member name="T:GroceryApp.Models.OrderUser">
+            <summary>Nested user/customer object that some backend order endpoints embed in the order response.</summary>
+        </member>
         <member name="M:GroceryApp.Services.ApiService.ClassifyNetworkError(System.Exception)">
             <summary>Returns a user-friendly message for a network exception.</summary>
         </member>
@@ -25,6 +34,9 @@
         </member>
         <member name="P:GroceryApp.ViewModels.AdminDashboardViewModel.PendingOrders">
             <inheritdoc cref="F:GroceryApp.ViewModels.AdminDashboardViewModel.pendingOrders"/>
+        </member>
+        <member name="P:GroceryApp.ViewModels.AdminDashboardViewModel.TotalRevenue">
+            <inheritdoc cref="F:GroceryApp.ViewModels.AdminDashboardViewModel.totalRevenue"/>
         </member>
         <member name="P:GroceryApp.ViewModels.AdminDashboardViewModel.TotalProducts">
             <inheritdoc cref="F:GroceryApp.ViewModels.AdminDashboardViewModel.totalProducts"/>
@@ -182,8 +194,8 @@
         <member name="P:GroceryApp.ViewModels.CustomerProductViewModel.Products">
             <inheritdoc cref="F:GroceryApp.ViewModels.CustomerProductViewModel.products"/>
         </member>
-        <member name="P:GroceryApp.ViewModels.CustomerProductViewModel.CategoryId">
-            <inheritdoc cref="F:GroceryApp.ViewModels.CustomerProductViewModel.categoryId"/>
+        <member name="P:GroceryApp.ViewModels.CustomerProductViewModel.HasNoProducts">
+            <inheritdoc cref="F:GroceryApp.ViewModels.CustomerProductViewModel.hasNoProducts"/>
         </member>
         <member name="P:GroceryApp.ViewModels.CustomerProductViewModel.CategoryName">
             <inheritdoc cref="F:GroceryApp.ViewModels.CustomerProductViewModel.categoryName"/>
@@ -207,6 +219,8 @@
             <inheritdoc/>
             <inheritdoc/>
             <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
         </member>
         <member name="P:GroceryApp.ViewModels.CartViewModel.CartItems">
             <inheritdoc cref="F:GroceryApp.ViewModels.CartViewModel.cartItems"/>
@@ -217,6 +231,9 @@
         <member name="P:GroceryApp.ViewModels.CartViewModel.DeliveryAddress">
             <inheritdoc cref="F:GroceryApp.ViewModels.CartViewModel.deliveryAddress"/>
         </member>
+        <member name="P:GroceryApp.ViewModels.CartViewModel.MobileNumber">
+            <inheritdoc cref="F:GroceryApp.ViewModels.CartViewModel.mobileNumber"/>
+        </member>
         <member name="P:GroceryApp.ViewModels.CartViewModel.OrderPlacedSuccessfully">
             <inheritdoc cref="F:GroceryApp.ViewModels.CartViewModel.orderPlacedSuccessfully"/>
         </member>
@@ -225,6 +242,18 @@
         </member>
         <member name="P:GroceryApp.ViewModels.CartViewModel.RemoveFromCartCommand">
             <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand`1"/> instance wrapping <see cref="M:GroceryApp.ViewModels.CartViewModel.RemoveFromCartAsync(GroceryApp.Models.CartItem)"/>.</summary>
+        </member>
+        <member name="F:GroceryApp.ViewModels.CartViewModel.increaseQuantityCommand">
+            <summary>The backing field for <see cref="P:GroceryApp.ViewModels.CartViewModel.IncreaseQuantityCommand"/>.</summary>
+        </member>
+        <member name="P:GroceryApp.ViewModels.CartViewModel.IncreaseQuantityCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand`1"/> instance wrapping <see cref="M:GroceryApp.ViewModels.CartViewModel.IncreaseQuantity(GroceryApp.Models.CartItem)"/>.</summary>
+        </member>
+        <member name="F:GroceryApp.ViewModels.CartViewModel.decreaseQuantityCommand">
+            <summary>The backing field for <see cref="P:GroceryApp.ViewModels.CartViewModel.DecreaseQuantityCommand"/>.</summary>
+        </member>
+        <member name="P:GroceryApp.ViewModels.CartViewModel.DecreaseQuantityCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand`1"/> instance wrapping <see cref="M:GroceryApp.ViewModels.CartViewModel.DecreaseQuantity(GroceryApp.Models.CartItem)"/>.</summary>
         </member>
         <member name="F:GroceryApp.ViewModels.CartViewModel.updateQuantityCommand">
             <summary>The backing field for <see cref="P:GroceryApp.ViewModels.CartViewModel.UpdateQuantityCommand"/>.</summary>
@@ -424,6 +453,9 @@
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.PendingOrders">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "PendingOrders" generated properties.</summary>
         </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TotalRevenue">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TotalRevenue" generated properties.</summary>
+        </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TotalProducts">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TotalProducts" generated properties.</summary>
         </member>
@@ -478,8 +510,8 @@
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.SelectedCategoryId">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "SelectedCategoryId" generated properties.</summary>
         </member>
-        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.CategoryId">
-            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "CategoryId" generated properties.</summary>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.HasNoProducts">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "HasNoProducts" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.CategoryName">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "CategoryName" generated properties.</summary>
@@ -492,6 +524,9 @@
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.DeliveryAddress">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "DeliveryAddress" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.MobileNumber">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "MobileNumber" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.OrderPlacedSuccessfully">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "OrderPlacedSuccessfully" generated properties.</summary>
@@ -513,6 +548,9 @@
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.PendingOrders">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "PendingOrders" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TotalRevenue">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TotalRevenue" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TotalProducts">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TotalProducts" generated properties.</summary>
@@ -568,8 +606,8 @@
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.SelectedCategoryId">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "SelectedCategoryId" generated properties.</summary>
         </member>
-        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.CategoryId">
-            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "CategoryId" generated properties.</summary>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.HasNoProducts">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "HasNoProducts" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.CategoryName">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "CategoryName" generated properties.</summary>
@@ -582,6 +620,9 @@
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.DeliveryAddress">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "DeliveryAddress" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.MobileNumber">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "MobileNumber" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.OrderPlacedSuccessfully">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "OrderPlacedSuccessfully" generated properties.</summary>

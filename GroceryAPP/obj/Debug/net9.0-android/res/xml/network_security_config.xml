@@ -1,1 +1,0 @@
-<network-security-config><base-config cleartextTrafficPermitted="false"><trust-anchors><certificates src="system" /></trust-anchors></base-config><domain-config cleartextTrafficPermitted="false"><domain includeSubdomains="true">groceryappapi-production.up.railway.app</domain></domain-config></network-security-config>
