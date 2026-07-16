@@ -27,12 +27,12 @@
                            VerticalTextAlignment="Center"/>
                 </Frame>
 
-                  <Label Text="Register Dealer Account"
+                  <Label Text="दुकान जोड़ें"
                       FontSize="30"
                        FontAttributes="Bold"
                        HorizontalTextAlignment="Center"
                        TextColor="{StaticResource TextPrimary}"/>
-                  <Label Text="Mobile number will be your secure User ID"
+                  <Label Text="Register your shop. Mobile number will be your secure User ID"
                        FontSize="13"
                        HorizontalTextAlignment="Center"
                        TextColor="{StaticResource TextSecondary}"/>
@@ -113,7 +113,7 @@
                            HorizontalTextAlignment="Center"/>
 
                     <Button x:Name="CreateAccountButton"
-                            Text="✅ Register Dealer"
+                            Text="✅ दुकान जोड़ें"
                             Style="{StaticResource PrimaryCtaButton}"
                             Clicked="OnCreateAccountClicked">
                         <Button.Shadow>

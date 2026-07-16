@@ -674,6 +674,83 @@ public class ApiService
         }
     }
 
+    public async Task<ApiResponse<List<Order>>> GetOrdersByMobileAsync(string mobileNumber)
+    {
+        if (string.IsNullOrWhiteSpace(mobileNumber))
+        {
+            return new ApiResponse<List<Order>> { Success = false, Message = "Mobile number is required" };
+        }
+
+        try
+        {
+            var normalizedMobile = NormalizeMobileForCompare(mobileNumber);
+            var encodedMobile = Uri.EscapeDataString(mobileNumber.Trim());
+
+            var endpoints = new[]
+            {
+                $"{AppConfig.OrderController}/mobile/{encodedMobile}",
+                $"{AppConfig.OrderController}/by-mobile/{encodedMobile}",
+                $"{AppConfig.OrderController}/search?mobileNumber={encodedMobile}",
+                $"{AppConfig.OrderController}?mobileNumber={encodedMobile}",
+                $"{AppConfig.OrderController}?mobile={encodedMobile}",
+                $"{AppConfig.OrderController}"
+            };
+
+            foreach (var endpoint in endpoints)
+            {
+                HttpResponseMessage response;
+                string content;
+
+                try
+                {
+                    response = await GetAsyncWithRetry(endpoint);
+                    content = await response.Content.ReadAsStringAsync();
+                }
+                catch (Exception ex)
+                {
+                    Log($"[API] GetOrdersByMobile '{endpoint}' exception: {ex.Message}");
+                    continue;
+                }
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    continue;
+                }
+
+                var orders = TryParseOrderList(content);
+                if (orders == null)
+                {
+                    continue;
+                }
+
+                var filteredOrders = orders
+                    .Where(order => IsOrderForMobile(order, normalizedMobile)
+                        && !string.Equals(order.Status, "Delivered", StringComparison.OrdinalIgnoreCase))
+                    .OrderByDescending(order => order.OrderDate)
+                    .ToList();
+
+                return new ApiResponse<List<Order>>
+                {
+                    Success = true,
+                    Message = "Orders loaded",
+                    Data = filteredOrders
+                };
+            }
+
+            return new ApiResponse<List<Order>>
+            {
+                Success = true,
+                Message = "Orders loaded",
+                Data = new List<Order>()
+            };
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[API] GetOrdersByMobile error: {ex.Message}");
+            return new ApiResponse<List<Order>> { Success = false, Message = $"Error: {ex.Message}" };
+        }
+    }
+
     public async Task<ApiResponse<Order>> GetOrderByIdAsync(int orderId)
     {
         try
@@ -839,6 +916,67 @@ public class ApiService
             System.Diagnostics.Debug.WriteLine($"[API] CreateOrder error: {ex.Message}");
             return new ApiResponse<Order> { Success = false, Message = $"Error: {ex.Message}" };
         }
+    }
+
+    public async Task<ApiResponse> TriggerOrderPlacedNotificationAsync(int orderId, string customerMobileNumber)
+    {
+        if (orderId <= 0)
+        {
+            return new ApiResponse { Success = false, Message = "Order ID is required" };
+        }
+
+        var payload = new
+        {
+            orderId,
+            customerMobileNumber = customerMobileNumber?.Trim() ?? string.Empty,
+            eventType = "OrderPlaced"
+        };
+
+        var endpoints = new[]
+        {
+            $"notifications/order-placed",
+            $"notifications/orders/{orderId}",
+            $"notifications/trigger/order-placed",
+            $"admin/orders/{orderId}/notify"
+        };
+
+        foreach (var endpoint in endpoints)
+        {
+            try
+            {
+                var response = await PostAsJsonAsyncWithRetry(endpoint, payload);
+                var content = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    Log($"[API] TriggerOrderPlacedNotification '{endpoint}' failed: {(int)response.StatusCode}. Body: {Preview(content, 200)}");
+                    continue;
+                }
+
+                try
+                {
+                    var parsed = JsonSerializer.Deserialize<ApiResponse>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (parsed != null)
+                    {
+                        parsed.Success = true;
+                        return parsed;
+                    }
+                }
+                catch { }
+
+                return new ApiResponse { Success = true, Message = "Notification triggered" };
+            }
+            catch (Exception ex)
+            {
+                Log($"[API] TriggerOrderPlacedNotification '{endpoint}' exception: {ex.Message}");
+            }
+        }
+
+        return new ApiResponse
+        {
+            Success = false,
+            Message = "Order placed, but notification endpoint is not available on this backend yet."
+        };
     }
 
     public async Task<ApiResponse> UpdateOrderStatusAsync(int orderId, string status)
@@ -1353,6 +1491,75 @@ public class ApiService
             System.Diagnostics.Debug.WriteLine($"[API] GetAllOrdersAdmin error: {ex.Message}");
             return new ApiResponse<List<Order>> { Success = false, Message = $"Error: {ex.Message}" };
         }
+    }
+
+    private static List<Order>? TryParseOrderList(string content)
+    {
+        try
+        {
+            var wrappedResponse = JsonSerializer.Deserialize<ApiResponse<List<Order>>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            if (wrappedResponse?.Data != null)
+            {
+                return wrappedResponse.Data;
+            }
+        }
+        catch { }
+
+        try
+        {
+            var directList = JsonSerializer.Deserialize<List<Order>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            if (directList != null)
+            {
+                return directList;
+            }
+        }
+        catch { }
+
+        try
+        {
+            using var document = JsonDocument.Parse(content);
+            if (document.RootElement.ValueKind == JsonValueKind.Object)
+            {
+                var list = TryReadOrderArray(document.RootElement, "data")
+                    ?? TryReadOrderArray(document.RootElement, "items")
+                    ?? TryReadOrderArray(document.RootElement, "orders")
+                    ?? TryReadOrderArray(document.RootElement, "result");
+
+                if (list == null && document.RootElement.TryGetProperty("data", out var dataNode) && dataNode.ValueKind == JsonValueKind.Object)
+                {
+                    list = TryReadOrderArray(dataNode, "items")
+                        ?? TryReadOrderArray(dataNode, "orders")
+                        ?? TryReadOrderArray(dataNode, "result");
+                }
+
+                return list;
+            }
+        }
+        catch { }
+
+        return null;
+    }
+
+    private static bool IsOrderForMobile(Order? order, string normalizedMobile)
+    {
+        if (order == null)
+        {
+            return false;
+        }
+
+        var orderMobile = NormalizeMobileForCompare(order.UserMobileNumber);
+        return !string.IsNullOrWhiteSpace(orderMobile) && string.Equals(orderMobile, normalizedMobile, StringComparison.Ordinal);
+    }
+
+    private static string NormalizeMobileForCompare(string? mobile)
+    {
+        if (string.IsNullOrWhiteSpace(mobile))
+        {
+            return string.Empty;
+        }
+
+        var chars = mobile.Where(char.IsDigit).ToArray();
+        return new string(chars);
     }
 
     private static List<Product>? TryReadProductArray(JsonElement root, string propertyName)

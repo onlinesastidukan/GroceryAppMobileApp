@@ -10,10 +10,34 @@
             <VerticalStackLayout Padding="16,12" Spacing="0">
 
                 <!-- Header -->
-                <Label Text="Order History"
+                <Label Text="Past Orders"
                        FontSize="24" FontAttributes="Bold"
-                       TextColor="{StaticResource TextPrimary}" Margin="4,0,0,16"
+                       TextColor="{StaticResource TextPrimary}" Margin="4,0,0,12"
                        FontAutoScalingEnabled="False"/>
+
+                <Frame Padding="14" CornerRadius="14" HasShadow="False"
+                       BackgroundColor="{StaticResource Surface}"
+                       BorderColor="{StaticResource BorderSubtle}"
+                       Margin="0,0,0,12">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Enter mobile number"
+                               FontSize="13"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}"/>
+                        <Entry x:Name="MobileEntry"
+                               Placeholder="Mobile number used during checkout"
+                               Keyboard="Telephone"
+                               TextColor="{StaticResource TextPrimary}"
+                               PlaceholderColor="#94A3B8"
+                               FontSize="14"/>
+                        <Label Text="Only active and non-delivered orders will be shown"
+                               FontSize="12"
+                               TextColor="{StaticResource TextSecondary}"/>
+                        <Button Text="Check Past Orders"
+                                Style="{StaticResource PrimaryCtaButton}"
+                                Clicked="OnCheckPastOrdersClicked"/>
+                    </VerticalStackLayout>
+                </Frame>
 
                 <!-- Error Banner -->
                 <Frame IsVisible="{Binding HasError}"

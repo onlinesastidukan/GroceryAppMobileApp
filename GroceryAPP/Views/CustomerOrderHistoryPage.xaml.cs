@@ -9,7 +9,9 @@ public partial class CustomerOrderHistoryPage : ContentPage
     private readonly CustomerOrderHistoryViewModel _viewModel;
     private readonly ApiService _apiService;
 
-    public CustomerOrderHistoryPage(CustomerOrderHistoryViewModel viewModel, ApiService apiService)
+    public CustomerOrderHistoryPage(
+        CustomerOrderHistoryViewModel viewModel,
+        ApiService apiService)
     {
         InitializeComponent();
         _viewModel = viewModel;
@@ -17,13 +19,12 @@ public partial class CustomerOrderHistoryPage : ContentPage
         BindingContext = _viewModel;
     }
 
-    protected override async void OnAppearing()
+    protected override void OnAppearing()
     {
         base.OnAppearing();
-        await LoadOrdersFromApiAsync();
     }
 
-    private async Task LoadOrdersFromApiAsync()
+    private async Task LoadOrdersFromApiAsync(string mobileNumber)
     {
         try
         {
@@ -31,11 +32,25 @@ public partial class CustomerOrderHistoryPage : ContentPage
             _viewModel.HasError = false;
             _viewModel.ErrorMessage = string.Empty;
 
-            var response = await _apiService.GetOrdersAsync();
+            if (string.IsNullOrWhiteSpace(mobileNumber))
+            {
+                _viewModel.HasError = true;
+                _viewModel.ErrorMessage = "Mobile number is required to load past orders.";
+                _viewModel.Orders.Clear();
+                _viewModel.NotifyOrdersChanged();
+                return;
+            }
+
+            var response = await _apiService.GetOrdersByMobileAsync(mobileNumber);
             if (response?.Success == true && response.Data != null)
             {
+                var nonDeliveredOrders = response.Data
+                    .Where(x => !string.Equals(x.Status, "Delivered", StringComparison.OrdinalIgnoreCase))
+                    .OrderByDescending(x => x.OrderDate)
+                    .ToList();
+
                 _viewModel.Orders.Clear();
-                foreach (var order in response.Data.OrderByDescending(x => x.OrderDate))
+                foreach (var order in nonDeliveredOrders)
                 {
                     _viewModel.Orders.Add(order);
                 }
@@ -58,6 +73,19 @@ public partial class CustomerOrderHistoryPage : ContentPage
         {
             _viewModel.IsLoading = false;
         }
+    }
+
+    private async void OnCheckPastOrdersClicked(object sender, EventArgs e)
+    {
+        var mobileNumber = MobileEntry.Text?.Trim() ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(mobileNumber))
+        {
+            _viewModel.HasError = true;
+            _viewModel.ErrorMessage = "Please enter mobile number.";
+            return;
+        }
+
+        await LoadOrdersFromApiAsync(mobileNumber);
     }
 
     private async void OnOrderTapped(object sender, TappedEventArgs e)

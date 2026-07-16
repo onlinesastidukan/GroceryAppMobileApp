@@ -23,68 +23,6 @@ public partial class LoginPage : ContentPage
 		BindingContext = _viewModel;
 	}
 
-	private async void OnLoginClicked(object sender, EventArgs e)
-	{
-		string userId = UserIdEntry.Text;
-		string password = PasswordEntry.Text;
-
-		if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(password))
-		{
-			ErrorLabel.Text = "Please enter dealer mobile/user ID and password";
-			ErrorLabel.IsVisible = true;
-			return;
-		}
-
-		try
-		{
-			LoadingIndicator.IsRunning = true;
-			LoadingOverlay.IsVisible = true;
-			ErrorLabel.IsVisible = false;
-
-			var success = await _authService.LoginAsync(userId, password, _apiService);
-
-			if (success)
-			{
-				_apiService.SetAuthToken(_authService.CurrentUser.Token);
-
-				if (_authService.IsAdmin)
-				{
-					var adminDashboard = _serviceProvider.GetService<AdminDashboardPage>();
-					await Navigation.PushAsync(adminDashboard);
-					Navigation.RemovePage(this);
-				}
-				else if (_authService.IsDealer)
-				{
-					var dealerProducts = _serviceProvider.GetService<AdminProductsPage>();
-					await Navigation.PushAsync(dealerProducts);
-					Navigation.RemovePage(this);
-				}
-				else
-				{
-					ErrorLabel.Text = "This account is not allowed for dealer login.";
-					ErrorLabel.IsVisible = true;
-				}
-			}
-			else
-			{
-				ErrorLabel.Text = string.IsNullOrWhiteSpace(_authService.LastErrorMessage)
-					? "Invalid dealer credentials"
-					: _authService.LastErrorMessage;
-				ErrorLabel.IsVisible = true;
-			}
-		}
-		catch (Exception ex)
-		{
-			System.Diagnostics.Debug.WriteLine($"[LOGIN] Error: {ex.Message}");
-			ErrorLabel.Text = $"Login error: {ex.Message}";
-			ErrorLabel.IsVisible = true;
-		}
-		finally
-		{
-			LoadingIndicator.IsRunning = false;
-			LoadingOverlay.IsVisible = false;
-		}
-	}
 
 	private async void OnGoToShopCustomerClicked(object sender, EventArgs e)
 	{
@@ -109,9 +47,34 @@ public partial class LoginPage : ContentPage
 		}
 	}
 
-	private async void OnRegisterClicked(object sender, EventArgs e)
+	private async void OnGoToDealerClicked(object sender, EventArgs e)
 	{
-		var registerPage = _serviceProvider.GetService<RegisterPage>();
-		await Navigation.PushAsync(registerPage);
+		try
+		{
+			LoadingIndicator.IsRunning = true;
+			LoadingOverlay.IsVisible = true;
+			ErrorLabel.IsVisible = false;
+
+			var dealerLogin = _serviceProvider.GetService<DealerLoginPage>();
+			if (dealerLogin == null)
+			{
+				ErrorLabel.Text = "Unable to open dealer login.";
+				ErrorLabel.IsVisible = true;
+				return;
+			}
+
+			await Navigation.PushAsync(dealerLogin);
+			Navigation.RemovePage(this);
+		}
+		catch (Exception ex)
+		{
+			ErrorLabel.Text = $"Navigation error: {ex.Message}";
+			ErrorLabel.IsVisible = true;
+		}
+		finally
+		{
+			LoadingIndicator.IsRunning = false;
+			LoadingOverlay.IsVisible = false;
+		}
 	}
 }

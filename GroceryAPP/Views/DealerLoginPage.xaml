@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GroceryApp.Views.DealerLoginPage"
+             Title="Dealer Login"
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="{StaticResource AppBackground}">
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Padding="24" Spacing="20" VerticalOptions="Center">
+
+                <VerticalStackLayout Spacing="10" Margin="0,36,0,18" HorizontalOptions="Center">
+                    <Frame Padding="0"
+                           WidthRequest="90"
+                           HeightRequest="90"
+                           CornerRadius="45"
+                           HasShadow="False"
+                           BackgroundColor="#e8f5e9"
+                           HorizontalOptions="Center">
+                        <Frame.Shadow>
+                            <Shadow Brush="#00b366" Opacity="0.2" Radius="12" Offset="0,4"/>
+                        </Frame.Shadow>
+                        <Label Text="🏪"
+                               FontSize="48"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               HorizontalTextAlignment="Center"
+                               VerticalTextAlignment="Center"/>
+                    </Frame>
+
+                    <Label Text="Dealer Login"
+                           FontSize="32"
+                           FontAttributes="Bold"
+                           HorizontalTextAlignment="Center"
+                           TextColor="{StaticResource TextPrimary}"/>
+                    <Label Text="यूज़र आईडी में मोबाइल नंबर डालें"
+                           FontSize="13"
+                           HorizontalTextAlignment="Center"
+                           TextColor="{StaticResource TextSecondary}"/>
+                </VerticalStackLayout>
+
+                <Frame Padding="0" CornerRadius="22" HasShadow="False" BorderColor="{StaticResource BorderSubtle}" BackgroundColor="{StaticResource Surface}" Margin="0,8,0,0">
+                    <Frame.Shadow>
+                        <Shadow Brush="#000000" Opacity="0.08" Radius="16" Offset="0,4"/>
+                    </Frame.Shadow>
+                    <VerticalStackLayout Spacing="16" Padding="24,26">
+
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Mobile Number (User ID)" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+                            <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="{StaticResource BorderSubtle}" BackgroundColor="{StaticResource Surface}">
+                                <Entry x:Name="UserIdEntry"
+                                       Placeholder="Enter dealer mobile number"
+                                       Keyboard="Telephone"
+                                       BackgroundColor="{StaticResource Surface}"
+                                       TextColor="{StaticResource TextPrimary}"
+                                       PlaceholderColor="#94A3B8"
+                                       FontSize="15"
+                                       Margin="16,12"/>
+                            </Frame>
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Password" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+                            <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="{StaticResource BorderSubtle}" BackgroundColor="{StaticResource Surface}">
+                                <Entry x:Name="PasswordEntry"
+                                       Placeholder="Enter your password"
+                                       IsPassword="True"
+                                       BackgroundColor="{StaticResource Surface}"
+                                       TextColor="{StaticResource TextPrimary}"
+                                       PlaceholderColor="#94A3B8"
+                                       FontSize="15"
+                                       Margin="16,12"/>
+                            </Frame>
+                        </VerticalStackLayout>
+
+                        <Label x:Name="ErrorLabel"
+                               Text=""
+                               TextColor="#e74c3c"
+                               FontSize="13"
+                               IsVisible="False"
+                               HorizontalTextAlignment="Center"/>
+
+                        <Button x:Name="LoginButton"
+                                Text="🔐 Login as Dealer"
+                                Style="{StaticResource PrimaryCtaButton}"
+                                Margin="0,8,0,0"
+                                Clicked="OnLoginClicked"/>
+
+                        <Button x:Name="RegisterButton"
+                                Text="दुकान जोड़ें (Register your shop)"
+                                Style="{StaticResource SecondaryCtaButton}"
+                                Clicked="OnRegisterClicked"/>
+
+                        <Button x:Name="BackButton"
+                                Text="Back"
+                                Style="{StaticResource SecondaryCtaButton}"
+                                Clicked="OnBackClicked"/>
+                    </VerticalStackLayout>
+                </Frame>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Grid x:Name="LoadingOverlay" IsVisible="False" BackgroundColor="#99FFFFFF">
+            <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="14">
+                <ActivityIndicator x:Name="LoadingIndicator"
+                                   IsRunning="False"
+                                   Color="#00b366"
+                                   Scale="1.4"
+                                   HorizontalOptions="Center"/>
+                <Label Text="Signing in..."
+                       FontSize="15"
+                       TextColor="#1a1a1a"
+                       HorizontalTextAlignment="Center"/>
+            </VerticalStackLayout>
+        </Grid>
+    </Grid>
+</ContentPage>

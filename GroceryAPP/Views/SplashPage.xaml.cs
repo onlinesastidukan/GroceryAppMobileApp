@@ -29,20 +29,16 @@ public partial class SplashPage : ContentPage
                     try
                     {
                         var restored = await _authService.LoadUserFromLocalStorageAsync();
-                        if (restored && _authService.CurrentUser?.Token is { Length: > 0 } token)
+                        if (restored && _authService.CurrentUser?.Token is { Length: > 0 } token && (_authService.IsAdmin || _authService.IsDealer))
                         {
                             _apiService.SetAuthToken(token);
                             if (_authService.IsAdmin)
                             {
                                 nextPage = services?.GetService<AdminDashboardPage>();
                             }
-                            else if (_authService.IsDealer)
-                            {
-                                nextPage = services?.GetService<AdminProductsPage>();
-                            }
                             else
                             {
-                                nextPage = services?.GetService<CustomerCategoryPage>();
+                                nextPage = services?.GetService<AdminProductsPage>();
                             }
                         }
                         else

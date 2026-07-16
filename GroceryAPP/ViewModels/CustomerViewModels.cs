@@ -199,6 +199,7 @@ public partial class CartViewModel : BaseViewModel
 {
     private readonly CartService _cartService;
     private readonly ApiService _apiService;
+    private readonly GuestSessionService _guestSessionService;
 
     [ObservableProperty]
     private ObservableCollection<CartItem> cartItems;
@@ -215,10 +216,11 @@ public partial class CartViewModel : BaseViewModel
     [ObservableProperty]
     private bool orderPlacedSuccessfully;
 
-    public CartViewModel(CartService cartService, ApiService apiService)
+    public CartViewModel(CartService cartService, ApiService apiService, GuestSessionService guestSessionService)
     {
         _cartService = cartService;
         _apiService = apiService;
+        _guestSessionService = guestSessionService;
         CartItems = new ObservableCollection<CartItem>();
     }
 
@@ -232,6 +234,12 @@ public partial class CartViewModel : BaseViewModel
                 CartItems.Add(item);
             }
             UpdateTotalPrice();
+
+            if (string.IsNullOrWhiteSpace(MobileNumber))
+            {
+                MobileNumber = await _guestSessionService.GetGuestMobileAsync();
+            }
+
             await base.InitializeAsync();
         }
         catch (Exception ex)
@@ -325,6 +333,14 @@ public partial class CartViewModel : BaseViewModel
             var response = await _apiService.CreateOrderAsync(orderRequest);
             if (response?.Success == true)
             {
+                await _guestSessionService.SaveGuestMobileAsync(MobileNumber);
+
+                var placedOrderId = response.Data?.OrderId ?? 0;
+                if (placedOrderId > 0)
+                {
+                    _ = _apiService.TriggerOrderPlacedNotificationAsync(placedOrderId, MobileNumber);
+                }
+
                 _cartService.ClearCart();
                 CartItems.Clear();
                 OrderPlacedSuccessfully = true;
