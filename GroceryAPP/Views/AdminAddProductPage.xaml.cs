@@ -7,15 +7,17 @@ namespace GroceryApp.Views;
 public partial class AdminAddProductPage : ContentPage
 {
     private readonly ApiService _apiService;
+    private readonly AuthService _authService;
     private List<Category> _categories = new();
     private List<Product> _products = new();
     private string _selectedImageBase64 = string.Empty;
     private byte[] _previewImageBytes;
 
-    public AdminAddProductPage(ApiService apiService)
+    public AdminAddProductPage(ApiService apiService, AuthService authService)
     {
         InitializeComponent();
         _apiService = apiService;
+        _authService = authService;
     }
 
     protected override async void OnAppearing()
@@ -29,13 +31,21 @@ public partial class AdminAddProductPage : ContentPage
     {
         try
         {
-            var response = await _apiService.GetAllCategoriesAdminAsync();
+            var response = _authService.IsDealer
+                ? await _apiService.GetDealerShopsAsync()
+                : await _apiService.GetAllCategoriesAdminAsync();
+
             if (response?.Success == true && response.Data != null)
             {
                 _categories = response.Data.Where(c => c.IsActive).ToList();
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
                     CategoryPicker.ItemsSource = _categories.Select(c => c.Name).ToList();
+                    if (_authService.IsDealer && _categories.Count > 0)
+                    {
+                        CategoryPicker.SelectedIndex = 0;
+                        CategoryPicker.IsEnabled = false;
+                    }
                 });
             }
         }
@@ -52,7 +62,9 @@ public partial class AdminAddProductPage : ContentPage
             ProductsLoading.IsRunning = true;
             ProductsLoading.IsVisible = true;
 
-            var response = await _apiService.GetAllProductsAdminAsync();
+            var response = _authService.IsDealer
+                ? await _apiService.GetDealerProductsAsync()
+                : await _apiService.GetAllProductsAdminAsync();
             if (response?.Success == true && response.Data != null)
             {
                 _products = response.Data.ToList();
@@ -121,7 +133,9 @@ public partial class AdminAddProductPage : ContentPage
                 CategoryId = _categories[categoryIndex].CategoryId
             };
 
-            var response = await _apiService.CreateProductAsync(product);
+            var response = _authService.IsDealer
+                ? await _apiService.CreateDealerProductAsync(product)
+                : await _apiService.CreateProductAsync(product);
             System.Diagnostics.Debug.WriteLine($"[ADD PRODUCT] Response: Success={response?.Success}, Message={response?.Message}");
             
             if (response?.Success == true)
@@ -182,7 +196,7 @@ public partial class AdminAddProductPage : ContentPage
     {
         if (sender is Button button && button.CommandParameter is Product product)
         {
-            var editPage = new AdminEditProductPage(_apiService, product);
+            var editPage = new AdminEditProductPage(_apiService, _authService, product);
             await Navigation.PushAsync(editPage);
         }
     }
@@ -197,7 +211,9 @@ public partial class AdminAddProductPage : ContentPage
                 return;
             }
 
-            var response = await _apiService.DeleteProductAsync(product.ProductId);
+            var response = _authService.IsDealer
+                ? await _apiService.DeleteDealerProductAsync(product.ProductId)
+                : await _apiService.DeleteProductAsync(product.ProductId);
             if (response?.Success == true)
             {
                 await DisplayAlert("Success", "Product deleted", "OK");

@@ -44,10 +44,16 @@ public partial class CustomerCategoryViewModel : BaseViewModel
                 {
                     Categories.Add(category);
                 }
+
+                if (Categories.Count == 0)
+                {
+                    // Empty list is a valid state; page shows empty-state UI.
+                    ClearError();
+                }
             }
             else
             {
-                SetError(response?.Message ?? "Failed to load shops");
+                SetError(response?.Message ?? "Unable to load shops right now. Please try again.");
             }
         }
         catch (Exception ex)

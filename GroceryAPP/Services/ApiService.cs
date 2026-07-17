@@ -883,38 +883,83 @@ public class ApiService
     {
         try
         {
-            var response = await PostAsJsonAsyncWithRetry($"{AppConfig.OrderController}", orderRequest);
-            var content = await response.Content.ReadAsStringAsync();
-            
-            if (response.IsSuccessStatusCode)
+            var payloadCandidates = new object[]
             {
-                try
+                orderRequest,
+                new
                 {
-                    var wrappedResponse = JsonSerializer.Deserialize<ApiResponse<Order>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    if (wrappedResponse != null && wrappedResponse.Success)
+                    customerMobileNumber = orderRequest.MobileNumber,
+                    customerMobile = orderRequest.MobileNumber,
+                    mobileNumber = orderRequest.MobileNumber,
+                    deliveryAddress = orderRequest.DeliveryAddress,
+                    customerAddress = orderRequest.DeliveryAddress,
+                    address = orderRequest.DeliveryAddress,
+                    items = orderRequest.Items
+                }
+            };
+
+            foreach (var payload in payloadCandidates)
+            {
+                var response = await PostAsJsonAsyncWithRetry($"{AppConfig.OrderController}", payload);
+                var content = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    try
                     {
-                        return wrappedResponse;
+                        var wrappedResponse = JsonSerializer.Deserialize<ApiResponse<Order>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        if (wrappedResponse != null && (wrappedResponse.Success || wrappedResponse.Data != null))
+                        {
+                            wrappedResponse.Success = true;
+                            return wrappedResponse;
+                        }
                     }
+                    catch { }
+
+                    try
+                    {
+                        var directObj = JsonSerializer.Deserialize<Order>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        if (directObj != null)
+                        {
+                            return new ApiResponse<Order> { Success = true, Message = "Order created", Data = directObj };
+                        }
+                    }
+                    catch { }
+
+                    try
+                    {
+                        using var document = JsonDocument.Parse(content);
+                        if (document.RootElement.ValueKind == JsonValueKind.Object)
+                        {
+                            var order = TryReadOrder(document.RootElement, "data")
+                                ?? TryReadOrder(document.RootElement, "order")
+                                ?? TryReadOrder(document.RootElement, "result");
+
+                            if (order != null)
+                            {
+                                return new ApiResponse<Order> { Success = true, Message = "Order created", Data = order };
+                            }
+                        }
+                    }
+                    catch { }
+
+                    return new ApiResponse<Order> { Success = true, Message = "Order created" };
                 }
-                catch { }
-                
-                var directObj = JsonSerializer.Deserialize<Order>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                if (directObj != null)
+
+                var message = ExtractApiErrorMessage(content);
+                if (!string.IsNullOrWhiteSpace(message) &&
+                    !message.Contains("required", StringComparison.OrdinalIgnoreCase))
                 {
-                    return new ApiResponse<Order> { Success = true, Message = "Order created", Data = directObj };
+                    return new ApiResponse<Order> { Success = false, Message = message };
                 }
-                
-                return new ApiResponse<Order> { Success = false, Message = "Failed to parse response" };
             }
-            else
-            {
-                return new ApiResponse<Order> { Success = false, Message = "Failed to create order" };
-            }
+
+            return new ApiResponse<Order> { Success = false, Message = "Failed to create order" };
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"[API] CreateOrder error: {ex.Message}");
-            return new ApiResponse<Order> { Success = false, Message = $"Error: {ex.Message}" };
+            return new ApiResponse<Order> { Success = false, Message = ClassifyNetworkError(ex) };
         }
     }
 
@@ -977,6 +1022,177 @@ public class ApiService
             Success = false,
             Message = "Order placed, but notification endpoint is not available on this backend yet."
         };
+    }
+
+    public async Task<ApiResponse<List<Category>>> GetDealerShopsAsync()
+    {
+        try
+        {
+            var response = await GetAsyncWithRetry("dealer/shops");
+            var content = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return new ApiResponse<List<Category>> { Success = false, Message = "Failed to load your shops" };
+            }
+
+            try
+            {
+                var wrapped = JsonSerializer.Deserialize<ApiResponse<List<Category>>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (wrapped?.Data != null)
+                {
+                    wrapped.Success = true;
+                    return wrapped;
+                }
+            }
+            catch { }
+
+            try
+            {
+                var list = JsonSerializer.Deserialize<List<Category>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (list != null)
+                {
+                    return new ApiResponse<List<Category>> { Success = true, Data = list, Message = "Shops loaded" };
+                }
+            }
+            catch { }
+
+            return new ApiResponse<List<Category>> { Success = false, Message = "Failed to parse shops" };
+        }
+        catch (Exception ex)
+        {
+            return new ApiResponse<List<Category>> { Success = false, Message = $"Error: {ex.Message}" };
+        }
+    }
+
+    public async Task<ApiResponse<List<Product>>> GetDealerProductsAsync()
+    {
+        try
+        {
+            var response = await GetAsyncWithRetry("dealer/products");
+            var content = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return new ApiResponse<List<Product>> { Success = false, Message = "Failed to load your products" };
+            }
+
+            try
+            {
+                var wrapped = JsonSerializer.Deserialize<ApiResponse<List<Product>>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (wrapped?.Data != null)
+                {
+                    NormalizeProductImageUrls(wrapped.Data);
+                    wrapped.Success = true;
+                    return wrapped;
+                }
+            }
+            catch { }
+
+            try
+            {
+                var list = JsonSerializer.Deserialize<List<Product>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (list != null)
+                {
+                    NormalizeProductImageUrls(list);
+                    return new ApiResponse<List<Product>> { Success = true, Data = list, Message = "Products loaded" };
+                }
+            }
+            catch { }
+
+            return new ApiResponse<List<Product>> { Success = false, Message = "Failed to parse products" };
+        }
+        catch (Exception ex)
+        {
+            return new ApiResponse<List<Product>> { Success = false, Message = $"Error: {ex.Message}" };
+        }
+    }
+
+    public async Task<ApiResponse<Product>> CreateDealerProductAsync(CreateProductRequest productRequest)
+    {
+        try
+        {
+            var payload = new
+            {
+                name = productRequest.Name,
+                description = productRequest.Description,
+                price = productRequest.Price,
+                stockQuantity = productRequest.StockQuantity,
+                categoryId = productRequest.CategoryId,
+                shopId = productRequest.CategoryId,
+                photoUrl = productRequest.PhotoUrl?.Trim() ?? string.Empty
+            };
+
+            var response = await PostAsJsonAsyncWithRetry("dealer/products", payload);
+            var content = await response.Content.ReadAsStringAsync();
+            if (!response.IsSuccessStatusCode)
+            {
+                return new ApiResponse<Product> { Success = false, Message = ExtractApiErrorMessage(content) ?? "Failed to create product" };
+            }
+
+            var product = JsonSerializer.Deserialize<Product>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            if (product != null)
+            {
+                NormalizeProductImageUrl(product);
+                return new ApiResponse<Product> { Success = true, Data = product, Message = "Product created" };
+            }
+
+            return new ApiResponse<Product> { Success = true, Message = "Product created" };
+        }
+        catch (Exception ex)
+        {
+            return new ApiResponse<Product> { Success = false, Message = $"Error: {ex.Message}" };
+        }
+    }
+
+    public async Task<ApiResponse> UpdateDealerProductAsync(UpdateProductRequest productRequest)
+    {
+        try
+        {
+            var payload = new
+            {
+                name = productRequest.Name,
+                description = productRequest.Description,
+                price = productRequest.Price,
+                stockQuantity = productRequest.StockQuantity,
+                categoryId = productRequest.CategoryId,
+                shopId = productRequest.CategoryId,
+                photoUrl = productRequest.PhotoUrl?.Trim() ?? string.Empty,
+                isActive = productRequest.IsActive
+            };
+
+            var response = await PutAsJsonAsyncWithRetry($"dealer/products/{productRequest.ProductId}", payload);
+            var content = await response.Content.ReadAsStringAsync();
+            if (!response.IsSuccessStatusCode)
+            {
+                return new ApiResponse { Success = false, Message = ExtractApiErrorMessage(content) ?? "Failed to update product" };
+            }
+
+            return new ApiResponse { Success = true, Message = "Product updated" };
+        }
+        catch (Exception ex)
+        {
+            return new ApiResponse { Success = false, Message = $"Error: {ex.Message}" };
+        }
+    }
+
+    public async Task<ApiResponse> DeleteDealerProductAsync(int productId)
+    {
+        try
+        {
+            var response = await DeleteAsyncWithRetry($"dealer/products/{productId}");
+            var content = await response.Content.ReadAsStringAsync();
+            if (!response.IsSuccessStatusCode)
+            {
+                return new ApiResponse { Success = false, Message = ExtractApiErrorMessage(content) ?? "Failed to delete product" };
+            }
+
+            return new ApiResponse { Success = true, Message = "Product deleted" };
+        }
+        catch (Exception ex)
+        {
+            return new ApiResponse { Success = false, Message = $"Error: {ex.Message}" };
+        }
     }
 
     public async Task<ApiResponse> UpdateOrderStatusAsync(int orderId, string status)

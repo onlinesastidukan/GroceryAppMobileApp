@@ -411,6 +411,7 @@ public partial class AdminOrderDetailViewModel : BaseViewModel
 public partial class AdminProductsViewModel : BaseViewModel
 {
     private readonly ApiService _apiService;
+    private readonly AuthService _authService;
     private List<Product> _allProducts = new();
 
     [ObservableProperty]
@@ -435,9 +436,10 @@ public partial class AdminProductsViewModel : BaseViewModel
             Products.Add(product);
     }
 
-    public AdminProductsViewModel(ApiService apiService)
+    public AdminProductsViewModel(ApiService apiService, AuthService authService)
     {
         _apiService = apiService;
+        _authService = authService;
         Products = new ObservableCollection<Product>();
     }
 
@@ -450,8 +452,10 @@ public partial class AdminProductsViewModel : BaseViewModel
             ClearError();
             System.Diagnostics.Debug.WriteLine("[ADMIN PRODUCTS VM] InitializeAsync started");
 
-            var response = await _apiService.GetAllProductsAdminAsync();
-            System.Diagnostics.Debug.WriteLine($"[ADMIN PRODUCTS VM] API response -> Success={response?.Success}, Message={response?.Message}, DataCount={response?.Data?.Count ?? 0}");
+            var response = _authService.IsDealer
+                ? await _apiService.GetDealerProductsAsync()
+                : await _apiService.GetAllProductsAdminAsync();
+            System.Diagnostics.Debug.WriteLine($"[ADMIN PRODUCTS VM] API response -> Success={response?.Success}, Message={response?.Message}, DataCount={response?.Data?.Count ?? 0}, IsDealer={_authService.IsDealer}");
             if (response?.Success == true && response.Data != null)
             {
                 _allProducts = new List<Product>(response.Data);
@@ -496,7 +500,9 @@ public partial class AdminProductsViewModel : BaseViewModel
             try
             {
                 IsLoading = true;
-                var response = await _apiService.DeleteProductAsync(product.ProductId);
+                var response = _authService.IsDealer
+                    ? await _apiService.DeleteDealerProductAsync(product.ProductId)
+                    : await _apiService.DeleteProductAsync(product.ProductId);
                 if (response?.Success == true)
                 {
                     _allProducts.Remove(product);

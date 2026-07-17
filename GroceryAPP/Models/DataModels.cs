@@ -601,8 +601,34 @@ public class CreateOrderRequest
         }
     }
 
+    [JsonPropertyName("customerMobileNumber")]
+    public string CustomerMobileNumberAlias
+    {
+        get => MobileNumber;
+        set
+        {
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                MobileNumber = value;
+            }
+        }
+    }
+
     [JsonPropertyName("customerAddress")]
     public string CustomerAddressAlias
+    {
+        get => DeliveryAddress;
+        set
+        {
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                DeliveryAddress = value;
+            }
+        }
+    }
+
+    [JsonPropertyName("address")]
+    public string AddressAlias
     {
         get => DeliveryAddress;
         set

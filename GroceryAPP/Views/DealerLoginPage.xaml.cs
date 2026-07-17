@@ -26,7 +26,7 @@ public partial class DealerLoginPage : ContentPage
 
         if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(password))
         {
-            ErrorLabel.Text = "Please enter dealer mobile number and password";
+            ErrorLabel.Text = "Please enter shopkeeper mobile number and password";
             ErrorLabel.IsVisible = true;
             return;
         }
@@ -65,13 +65,13 @@ public partial class DealerLoginPage : ContentPage
                     }
                 }
 
-                ErrorLabel.Text = "This account is not allowed for dealer login.";
+                ErrorLabel.Text = "This account is not allowed for shopkeeper login.";
                 ErrorLabel.IsVisible = true;
             }
             else
             {
                 ErrorLabel.Text = string.IsNullOrWhiteSpace(_authService.LastErrorMessage)
-                    ? "Invalid dealer credentials"
+                    ? "Invalid shopkeeper credentials"
                     : _authService.LastErrorMessage;
                 ErrorLabel.IsVisible = true;
             }

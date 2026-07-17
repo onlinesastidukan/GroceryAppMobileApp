@@ -1,6 +1,7 @@
 using GroceryApp.ViewModels;
 using GroceryApp.Services;
 using GroceryApp.Models;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace GroceryApp.Views;
 
@@ -8,12 +9,14 @@ public partial class AdminProductsPage : ContentPage
 {
     private readonly AdminProductsViewModel _viewModel;
     private readonly ApiService _apiService;
+    private readonly AuthService _authService;
 
-    public AdminProductsPage(AdminProductsViewModel viewModel, ApiService apiService)
+    public AdminProductsPage(AdminProductsViewModel viewModel, ApiService apiService, AuthService authService)
     {
         InitializeComponent();
         _viewModel = viewModel;
         _apiService = apiService;
+        _authService = authService;
         BindingContext = _viewModel;
     }
 
@@ -31,7 +34,7 @@ public partial class AdminProductsPage : ContentPage
 
         try
         {
-            var addProductPage = new AdminAddProductPage(_apiService);
+            var addProductPage = new AdminAddProductPage(_apiService, _authService);
             await Navigation.PushAsync(addProductPage);
         }
         catch (Exception ex)
@@ -48,7 +51,7 @@ public partial class AdminProductsPage : ContentPage
         {
             if (sender is Button button && button.CommandParameter is Product product)
             {
-                var editProductPage = new AdminEditProductPage(_apiService, product);
+                var editProductPage = new AdminEditProductPage(_apiService, _authService, product);
                 await Navigation.PushAsync(editProductPage);
             }
             else
@@ -70,7 +73,7 @@ public partial class AdminProductsPage : ContentPage
         {
             if (sender is Button button && button.CommandParameter is Product product)
             {
-                var editProductPage = new AdminEditProductPage(_apiService, product);
+                var editProductPage = new AdminEditProductPage(_apiService, _authService, product);
                 await Navigation.PushAsync(editProductPage);
             }
             else

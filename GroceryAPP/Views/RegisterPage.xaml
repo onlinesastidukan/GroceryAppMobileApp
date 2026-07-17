@@ -2,10 +2,11 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GroceryApp.Views.RegisterPage"
-             Title="Dealer Registration"
+             Title="Shopkeeper Registration"
              BackgroundColor="{StaticResource AppBackground}">
-    <ScrollView>
-        <VerticalStackLayout Padding="24" Spacing="20" VerticalOptions="Center">
+    <Grid RowDefinitions="*">
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Padding="24" Spacing="20">
 
             <!-- Header -->
             <VerticalStackLayout Spacing="8" Margin="0,20,0,10" HorizontalOptions="Center">
@@ -47,10 +48,10 @@
 
 
                     <VerticalStackLayout Spacing="6">
-                        <Label Text="Full Name" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+                        <Label Text="Shop Name" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
                         <Frame Padding="0" CornerRadius="12" HasShadow="False" BorderColor="{StaticResource BorderSubtle}" BackgroundColor="{StaticResource Surface}">
                             <Entry x:Name="FullNameEntry"
-                                   Placeholder="Enter your full name"
+                                   Placeholder="Enter your shop name"
                                    ReturnType="Next"
                                    BackgroundColor="{StaticResource Surface}"
                                    TextColor="{StaticResource TextPrimary}"
@@ -128,11 +129,17 @@
                 </VerticalStackLayout>
             </Frame>
 
-            <ActivityIndicator x:Name="LoadingIndicator"
-                               IsRunning="False"
-                               IsVisible="False"
-                               Color="#00b366"
-                               Margin="0,20"/>
+            <BoxView HeightRequest="80" Color="Transparent"/>
         </VerticalStackLayout>
     </ScrollView>
+
+    <Grid Padding="16,10,16,16" BackgroundColor="#66000000" InputTransparent="False" IsVisible="{Binding Source={x:Reference LoadingIndicator}, Path=IsVisible}">
+        <ActivityIndicator x:Name="LoadingIndicator"
+                           IsRunning="False"
+                           IsVisible="False"
+                           Color="#00b366"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+    </Grid>
+</Grid>
 </ContentPage>

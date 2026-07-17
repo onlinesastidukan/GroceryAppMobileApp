@@ -58,7 +58,7 @@ public partial class LoginPage : ContentPage
 			var dealerLogin = _serviceProvider.GetService<DealerLoginPage>();
 			if (dealerLogin == null)
 			{
-				ErrorLabel.Text = "Unable to open dealer login.";
+				ErrorLabel.Text = "Unable to open shopkeeper login.";
 				ErrorLabel.IsVisible = true;
 				return;
 			}

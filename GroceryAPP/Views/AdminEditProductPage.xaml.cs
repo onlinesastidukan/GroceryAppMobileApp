@@ -6,15 +6,17 @@ namespace GroceryApp.Views;
 public partial class AdminEditProductPage : ContentPage
 {
     private readonly ApiService _apiService;
+    private readonly AuthService _authService;
     private readonly Product _product;
     private List<Category> _categories = new();
     private string _selectedImageBase64 = string.Empty;
     private byte[] _previewImageBytes;
 
-    public AdminEditProductPage(ApiService apiService, Product product)
+    public AdminEditProductPage(ApiService apiService, AuthService authService, Product product)
     {
         InitializeComponent();
         _apiService = apiService;
+        _authService = authService;
         _product = product;
     }
 
@@ -70,7 +72,9 @@ public partial class AdminEditProductPage : ContentPage
     {
         try
         {
-            var response = await _apiService.GetAllCategoriesAdminAsync();
+            var response = _authService.IsDealer
+                ? await _apiService.GetDealerShopsAsync()
+                : await _apiService.GetAllCategoriesAdminAsync();
             if (response?.Success == true && response.Data != null)
             {
                 _categories = response.Data.Where(c => c.IsActive).ToList();
@@ -79,6 +83,10 @@ public partial class AdminEditProductPage : ContentPage
                     CategoryPicker.ItemsSource = _categories.Select(c => c.Name).ToList();
                     var index = _categories.FindIndex(c => c.CategoryId == _product.CategoryId);
                     CategoryPicker.SelectedIndex = index >= 0 ? index : -1;
+                    if (_authService.IsDealer)
+                    {
+                        CategoryPicker.IsEnabled = false;
+                    }
                 });
             }
         }
@@ -137,7 +145,9 @@ public partial class AdminEditProductPage : ContentPage
                 IsActive = true
             };
 
-            var response = await _apiService.UpdateProductAsync(request);
+            var response = _authService.IsDealer
+                ? await _apiService.UpdateDealerProductAsync(request)
+                : await _apiService.UpdateProductAsync(request);
             if (response?.Success == true)
             {
                 await DisplayAlert("Success", "Product updated successfully", "OK");

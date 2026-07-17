@@ -113,10 +113,10 @@
                     </VerticalStackLayout>
                     
                     <VerticalStackLayout Spacing="6">
-                        <Label Text="Category" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
+                        <Label Text="Shop" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
                         <Frame Padding="0" CornerRadius="10" HasShadow="False" BorderColor="#e0e0e0">
                             <Picker x:Name="CategoryPicker" 
-                                    Title="Select Category"
+                                    Title="Select Shop"
                                     BackgroundColor="Transparent"
                                     TitleColor="#9a9a9a"
                                     TextColor="#1a1a1a"

@@ -15,12 +15,12 @@ public partial class RegisterPage : ContentPage
 
     private async void OnCreateAccountClicked(object sender, EventArgs e)
     {
-        var fullName = FullNameEntry.Text?.Trim();
+        var shopName = FullNameEntry.Text?.Trim();
         var password = PasswordEntry.Text;
         var mobileNumber = MobileEntry.Text?.Trim();
         var address = AddressEntry.Text?.Trim();
 
-        if (string.IsNullOrWhiteSpace(fullName) ||
+        if (string.IsNullOrWhiteSpace(shopName) ||
             string.IsNullOrWhiteSpace(password) ||
             string.IsNullOrWhiteSpace(mobileNumber) ||
             string.IsNullOrWhiteSpace(address))
@@ -41,7 +41,7 @@ public partial class RegisterPage : ContentPage
             var request = new RegisterRequest
             {
                 UserId = userId,
-                FullName = fullName,
+                FullName = shopName,
                 Password = password,
                 MobileNumber = mobileNumber,
                 Address = address
@@ -50,7 +50,7 @@ public partial class RegisterPage : ContentPage
             var response = await _apiService.RegisterAsync(request);
             if (response?.Success == true)
             {
-                await DisplayAlert("Success", "Dealer account created successfully. Please log in.", "OK");
+                await DisplayAlert("Success", "Shopkeeper account created successfully. Please log in.", "OK");
                 await Navigation.PopAsync();
             }
             else
