@@ -12,6 +12,7 @@ public partial class AdminAddProductPage : ContentPage
     private List<Product> _products = new();
     private string _selectedImageBase64 = string.Empty;
     private byte[] _previewImageBytes;
+    private int _resolvedDealerShopCategoryId = -1;
 
     public AdminAddProductPage(ApiService apiService, AuthService authService)
     {
@@ -55,6 +56,10 @@ public partial class AdminAddProductPage : ContentPage
                         CategoryPicker.SelectedIndex = preferredIndex >= 0 ? preferredIndex : (_categories.Count > 0 ? 0 : -1);
                         CategoryPicker.IsEnabled = false;
 
+                        _resolvedDealerShopCategoryId = CategoryPicker.SelectedIndex >= 0 && CategoryPicker.SelectedIndex < _categories.Count
+                            ? _categories[CategoryPicker.SelectedIndex].CategoryId
+                            : -1;
+
                         var selectedName = CategoryPicker.SelectedIndex >= 0 && CategoryPicker.SelectedIndex < _categories.Count
                             ? _categories[CategoryPicker.SelectedIndex].Name
                             : (_authService.CurrentUser?.FullName ?? "Your Shop");
@@ -65,6 +70,7 @@ public partial class AdminAddProductPage : ContentPage
                     }
                     else
                     {
+                        _resolvedDealerShopCategoryId = -1;
                         ShopDisplayContainer.IsVisible = false;
                         ShopPickerContainer.IsVisible = true;
                     }
@@ -122,10 +128,16 @@ public partial class AdminAddProductPage : ContentPage
         var stockText = StockQuantityEntry.Text;
         var photoUrl = _selectedImageBase64;
         var categoryIndex = CategoryPicker.SelectedIndex;
+        var selectedCategoryId = _authService.IsDealer
+            ? _resolvedDealerShopCategoryId
+            : (categoryIndex >= 0 && categoryIndex < _categories.Count ? _categories[categoryIndex].CategoryId : -1);
 
-        if (string.IsNullOrWhiteSpace(productName) || string.IsNullOrWhiteSpace(priceText) || string.IsNullOrWhiteSpace(stockText) || categoryIndex < 0)
+        if (string.IsNullOrWhiteSpace(productName) || string.IsNullOrWhiteSpace(priceText) || string.IsNullOrWhiteSpace(stockText) || selectedCategoryId <= 0)
         {
-            await DisplayAlert("Validation", "Please fill all required fields", "OK");
+            var message = _authService.IsDealer && selectedCategoryId <= 0
+                ? "Shop is not assigned to this account. Please contact admin."
+                : "Please fill all required fields";
+            await DisplayAlert("Validation", message, "OK");
             return;
         }
 
@@ -152,7 +164,7 @@ public partial class AdminAddProductPage : ContentPage
                 Description = description ?? "",
                 PhotoUrl = photoUrl ?? "",
                 StockQuantity = stockQuantity,
-                CategoryId = _categories[categoryIndex].CategoryId
+                CategoryId = selectedCategoryId
             };
 
             var response = _authService.IsDealer
