@@ -43,9 +43,14 @@ public partial class AdminAddProductPage : ContentPage
                     CategoryPicker.ItemsSource = _categories.Select(c => c.Name).ToList();
                     if (_authService.IsDealer)
                     {
-                        var preferredIndex = _categories.FindIndex(c =>
-                            !string.IsNullOrWhiteSpace(_authService.CurrentUser?.FullName) &&
-                            string.Equals(c.Name?.Trim(), _authService.CurrentUser.FullName?.Trim(), StringComparison.OrdinalIgnoreCase));
+                        var currentUserId = _authService.CurrentUser?.UserId ?? 0;
+                        var preferredIndex = _categories.FindIndex(c => c.DealerId == currentUserId);
+
+                        if (preferredIndex < 0 && !string.IsNullOrWhiteSpace(_authService.CurrentUser?.FullName))
+                        {
+                            preferredIndex = _categories.FindIndex(c =>
+                                string.Equals(c.Name?.Trim(), _authService.CurrentUser.FullName?.Trim(), StringComparison.OrdinalIgnoreCase));
+                        }
 
                         CategoryPicker.SelectedIndex = preferredIndex >= 0 ? preferredIndex : (_categories.Count > 0 ? 0 : -1);
                         CategoryPicker.IsEnabled = false;

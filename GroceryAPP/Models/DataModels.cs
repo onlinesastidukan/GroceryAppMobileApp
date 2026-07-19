@@ -240,6 +240,16 @@ public class Category
         set { if (!string.IsNullOrWhiteSpace(value)) PhotoUrl = value; }
     }
 
+    [JsonPropertyName("dealerId")]
+    public int? DealerId { get; set; }
+
+    [JsonPropertyName("shopkeeperId")]
+    public int? ShopkeeperIdAlias
+    {
+        get => DealerId;
+        set => DealerId = value;
+    }
+
     public List<Product> Products { get; set; } = new();
 }
 
