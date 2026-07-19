@@ -6,6 +6,7 @@ namespace GroceryApp.Views;
 public partial class RegisterPage : ContentPage
 {
     private readonly ApiService _apiService;
+    private string _selectedShopImageBase64 = string.Empty;
 
     public RegisterPage(ApiService apiService)
     {
@@ -44,7 +45,8 @@ public partial class RegisterPage : ContentPage
                 FullName = shopName,
                 Password = password,
                 MobileNumber = mobileNumber,
-                Address = address
+                Address = address,
+                ShopImageUrl = _selectedShopImageBase64
             };
 
             var response = await _apiService.RegisterAsync(request);
@@ -68,6 +70,38 @@ public partial class RegisterPage : ContentPage
         {
             LoadingIndicator.IsRunning = false;
             LoadingIndicator.IsVisible = false;
+        }
+    }
+
+    private async void OnPickShopImageClicked(object sender, EventArgs e)
+    {
+        try
+        {
+            var result = await MediaPicker.Default.PickPhotoAsync(new MediaPickerOptions
+            {
+                Title = "Select Shop Image"
+            });
+
+            if (result == null) return;
+
+            using var stream = await result.OpenReadAsync();
+            using var ms = new MemoryStream();
+            await stream.CopyToAsync(ms);
+            var imageBytes = ms.ToArray();
+
+            var extension = Path.GetExtension(result.FileName)?.TrimStart('.').ToLowerInvariant() ?? "jpeg";
+            var mimeType = extension == "png" ? "image/png" : "image/jpeg";
+            _selectedShopImageBase64 = $"data:{mimeType};base64,{Convert.ToBase64String(imageBytes)}";
+
+            ShopImagePreview.Source = ImageSource.FromStream(() => new MemoryStream(imageBytes));
+            ShopImagePreview.IsVisible = true;
+            ShopImagePlaceholder.IsVisible = false;
+            ShopImageStatusLabel.Text = $"✓ {result.FileName}";
+            ShopImageStatusLabel.IsVisible = true;
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", $"Could not pick shop image: {ex.Message}", "OK");
         }
     }
 

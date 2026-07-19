@@ -4,7 +4,7 @@
              x:Class="GroceryApp.Views.RegisterPage"
              Title="Shopkeeper Registration"
              BackgroundColor="{StaticResource AppBackground}">
-    <Grid RowDefinitions="*">
+    <Grid RowDefinitions="*,Auto">
         <ScrollView Grid.Row="0">
             <VerticalStackLayout Padding="24" Spacing="20">
 
@@ -106,34 +106,71 @@
                         </Frame>
                     </VerticalStackLayout>
 
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Shop Image" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+                        <Frame Padding="8" CornerRadius="12" HasShadow="False" BorderColor="{StaticResource BorderSubtle}" HeightRequest="140" BackgroundColor="#fafafa">
+                            <Grid>
+                                <VerticalStackLayout x:Name="ShopImagePlaceholder"
+                                                     HorizontalOptions="Center"
+                                                     VerticalOptions="Center"
+                                                     Spacing="6">
+                                    <Label Text="🏪" FontSize="38" HorizontalTextAlignment="Center"/>
+                                    <Label Text="No image selected" FontSize="12" TextColor="#999999" HorizontalTextAlignment="Center"/>
+                                </VerticalStackLayout>
+                                <Image x:Name="ShopImagePreview"
+                                       Aspect="AspectFit"
+                                       IsVisible="False"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center"/>
+                            </Grid>
+                        </Frame>
+                        <Button Text="📷 Pick Shop Image"
+                                Clicked="OnPickShopImageClicked"
+                                BackgroundColor="#f0f0f0"
+                                TextColor="#333333"
+                                FontSize="13"
+                                Padding="12,8"
+                                CornerRadius="10"/>
+                        <Label x:Name="ShopImageStatusLabel"
+                               Text=""
+                               FontSize="11"
+                               TextColor="#00b366"
+                               IsVisible="False"/>
+                    </VerticalStackLayout>
+
                     <Label x:Name="ErrorLabel"
                            Text=""
                            TextColor="#e74c3c"
                            FontSize="12"
                            IsVisible="False"
                            HorizontalTextAlignment="Center"/>
-
-                    <Button x:Name="CreateAccountButton"
-                            Text="✅ दुकान जोड़ें"
-                            Style="{StaticResource PrimaryCtaButton}"
-                            Clicked="OnCreateAccountClicked">
-                        <Button.Shadow>
-                            <Shadow Brush="#00b366" Opacity="0.4" Radius="10" Offset="0,5"/>
-                        </Button.Shadow>
-                    </Button>
-
-                    <Button x:Name="BackToLoginButton"
-                            Text="Back to Login"
-                            Style="{StaticResource SecondaryCtaButton}"
-                            Clicked="OnBackToLoginClicked"/>
                 </VerticalStackLayout>
             </Frame>
 
-            <BoxView HeightRequest="80" Color="Transparent"/>
+            <BoxView HeightRequest="120" Color="Transparent"/>
         </VerticalStackLayout>
     </ScrollView>
 
-    <Grid Padding="16,10,16,16" BackgroundColor="#66000000" InputTransparent="False" IsVisible="{Binding Source={x:Reference LoadingIndicator}, Path=IsVisible}">
+    <Grid Grid.Row="1" Padding="16,10,16,16" RowDefinitions="Auto,Auto" BackgroundColor="{StaticResource AppBackground}">
+        <Button x:Name="CreateAccountButton"
+                Grid.Row="0"
+                Text="✅ दुकान जोड़ें"
+                Style="{StaticResource PrimaryCtaButton}"
+                Clicked="OnCreateAccountClicked">
+            <Button.Shadow>
+                <Shadow Brush="#00b366" Opacity="0.4" Radius="10" Offset="0,5"/>
+            </Button.Shadow>
+        </Button>
+
+        <Button x:Name="BackToLoginButton"
+                Grid.Row="1"
+                Text="Back to Login"
+                Style="{StaticResource SecondaryCtaButton}"
+                Margin="0,10,0,0"
+                Clicked="OnBackToLoginClicked"/>
+    </Grid>
+
+    <Grid Grid.RowSpan="2" Padding="16,10,16,16" BackgroundColor="#66000000" InputTransparent="False" IsVisible="{Binding Source={x:Reference LoadingIndicator}, Path=IsVisible}">
         <ActivityIndicator x:Name="LoadingIndicator"
                            IsRunning="False"
                            IsVisible="False"

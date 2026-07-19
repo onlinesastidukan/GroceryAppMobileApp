@@ -44,6 +44,8 @@ public class RegisterRequest
 
     [Required(ErrorMessage = "Address is required")]
     public string Address { get; set; }
+
+    public string ShopImageUrl { get; set; }
 }
 
 public class RegisterResponse
