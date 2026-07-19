@@ -114,7 +114,8 @@
                     
                     <VerticalStackLayout Spacing="6">
                         <Label Text="Shop" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
-                        <Frame Padding="0" CornerRadius="10" HasShadow="False" BorderColor="#e0e0e0">
+
+                        <Frame x:Name="ShopPickerContainer" Padding="0" CornerRadius="10" HasShadow="False" BorderColor="#e0e0e0">
                             <Picker x:Name="CategoryPicker" 
                                     Title="Select Shop"
                                     BackgroundColor="Transparent"
@@ -122,6 +123,14 @@
                                     TextColor="#1a1a1a"
                                     FontSize="14"
                                     Margin="12,8"/>
+                        </Frame>
+
+                        <Frame x:Name="ShopDisplayContainer" IsVisible="False" Padding="12,10" CornerRadius="10" HasShadow="False" BorderColor="#e0e0e0" BackgroundColor="#f8f8f8">
+                            <Label x:Name="ShopDisplayLabel"
+                                   Text=""
+                                   FontSize="14"
+                                   FontAttributes="Bold"
+                                   TextColor="#1a1a1a"/>
                         </Frame>
                     </VerticalStackLayout>
                     

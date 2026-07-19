@@ -54,6 +54,19 @@ public partial class AdminAddProductPage : ContentPage
 
                         CategoryPicker.SelectedIndex = preferredIndex >= 0 ? preferredIndex : (_categories.Count > 0 ? 0 : -1);
                         CategoryPicker.IsEnabled = false;
+
+                        var selectedName = CategoryPicker.SelectedIndex >= 0 && CategoryPicker.SelectedIndex < _categories.Count
+                            ? _categories[CategoryPicker.SelectedIndex].Name
+                            : (_authService.CurrentUser?.FullName ?? "Your Shop");
+
+                        ShopDisplayLabel.Text = selectedName;
+                        ShopDisplayContainer.IsVisible = true;
+                        ShopPickerContainer.IsVisible = false;
+                    }
+                    else
+                    {
+                        ShopDisplayContainer.IsVisible = false;
+                        ShopPickerContainer.IsVisible = true;
                     }
                 });
             }
