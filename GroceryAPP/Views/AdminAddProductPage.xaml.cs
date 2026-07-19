@@ -41,9 +41,13 @@ public partial class AdminAddProductPage : ContentPage
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
                     CategoryPicker.ItemsSource = _categories.Select(c => c.Name).ToList();
-                    if (_authService.IsDealer && _categories.Count > 0)
+                    if (_authService.IsDealer)
                     {
-                        CategoryPicker.SelectedIndex = 0;
+                        var preferredIndex = _categories.FindIndex(c =>
+                            !string.IsNullOrWhiteSpace(_authService.CurrentUser?.FullName) &&
+                            string.Equals(c.Name?.Trim(), _authService.CurrentUser.FullName?.Trim(), StringComparison.OrdinalIgnoreCase));
+
+                        CategoryPicker.SelectedIndex = preferredIndex >= 0 ? preferredIndex : (_categories.Count > 0 ? 0 : -1);
                         CategoryPicker.IsEnabled = false;
                     }
                 });

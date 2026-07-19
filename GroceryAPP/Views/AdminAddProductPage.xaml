@@ -4,7 +4,7 @@
              x:Class="GroceryApp.Views.AdminAddProductPage"
              Title="सस्ती दुकान - Add Product"
              BackgroundColor="{StaticResource AppBackground}">
-    <Grid RowDefinitions="0.55*,0.45*" Padding="16" RowSpacing="12">
+    <Grid RowDefinitions="0.52*,Auto,0.44*" Padding="16" RowSpacing="8">
         <ScrollView Grid.Row="0">
             <VerticalStackLayout Spacing="20">
             
@@ -155,8 +155,17 @@
             </VerticalStackLayout>
         </ScrollView>
 
+        <!-- Visual cue to indicate more content below -->
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto" VerticalOptions="Center" Padding="0,2,0,2">
+            <Label Grid.Column="0" Text="↓" FontSize="14" TextColor="#9a9a9a" VerticalTextAlignment="Center"/>
+            <Label Grid.Column="1" Text="Scroll down for existing products"
+                   FontSize="12" TextColor="#888888"
+                   HorizontalTextAlignment="Center"/>
+            <Label Grid.Column="2" Text="↓" FontSize="14" TextColor="#9a9a9a" VerticalTextAlignment="Center"/>
+        </Grid>
+
         <!-- Existing Products -->
-        <VerticalStackLayout Grid.Row="1" Spacing="8" Margin="0,2,0,0">
+        <VerticalStackLayout Grid.Row="2" Spacing="8" Margin="0,2,0,0">
             <Label Text="Existing Products" FontSize="18" FontAttributes="Bold" TextColor="#1a1a1a"/>
             <CollectionView x:Name="ProductsCollectionView"
                             SelectionMode="None"
