@@ -4,6 +4,12 @@
              x:Class="GroceryApp.Views.AdminProductsPage"
              Title="सस्ती दुकान - Manage Products"
              BackgroundColor="{StaticResource AppBackground}">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Logout"
+                     Order="Primary"
+                     Priority="0"
+                     Clicked="OnLogoutClicked" />
+    </ContentPage.ToolbarItems>
     <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="16" RowSpacing="12">
         <Grid Grid.Row="0" Margin="0,0,0,6">
             <VerticalStackLayout Spacing="2">

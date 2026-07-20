@@ -91,4 +91,24 @@ public partial class AdminProductsPage : ContentPage
     {
         _viewModel.DismissError();
     }
+
+    private async void OnLogoutClicked(object sender, EventArgs e)
+    {
+        var confirm = await DisplayAlert("Logout", "Are you sure you want to logout?", "Yes", "No");
+        if (!confirm)
+        {
+            return;
+        }
+
+        await _authService.LogoutAsync(_apiService);
+
+        var loginPage = Application.Current?.Handler?.MauiContext?.Services?.GetService<LoginPage>();
+        if (loginPage == null)
+        {
+            await DisplayAlert("Navigation Error", "Unable to load Login page.", "OK");
+            return;
+        }
+
+        Application.Current!.MainPage = new NavigationPage(loginPage);
+    }
 }
