@@ -4,9 +4,8 @@
              x:Class="GroceryApp.Views.RegisterPage"
              Title="Shopkeeper Registration"
              BackgroundColor="{StaticResource AppBackground}">
-    <Grid RowDefinitions="*,Auto">
-        <ScrollView Grid.Row="0">
-            <VerticalStackLayout Padding="24" Spacing="20">
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="20">
 
             <!-- Header -->
             <VerticalStackLayout Spacing="8" Margin="0,20,0,10" HorizontalOptions="Center">
@@ -147,30 +146,26 @@
                 </VerticalStackLayout>
             </Frame>
 
-            <BoxView HeightRequest="120" Color="Transparent"/>
+            <!-- Buttons inside ScrollView -->
+            <VerticalStackLayout Spacing="10" Margin="0,10,0,16">
+                <Button x:Name="CreateAccountButton"
+                        Text="✅ दुकान जोड़ें"
+                        Style="{StaticResource PrimaryCtaButton}"
+                        Clicked="OnCreateAccountClicked">
+                    <Button.Shadow>
+                        <Shadow Brush="#00b366" Opacity="0.4" Radius="10" Offset="0,5"/>
+                    </Button.Shadow>
+                </Button>
+
+                <Button x:Name="BackToLoginButton"
+                        Text="Back to Login"
+                        Style="{StaticResource SecondaryCtaButton}"
+                        Clicked="OnBackToLoginClicked"/>
+            </VerticalStackLayout>
         </VerticalStackLayout>
     </ScrollView>
 
-    <Grid Grid.Row="1" Padding="16,10,16,16" RowDefinitions="Auto,Auto" BackgroundColor="{StaticResource AppBackground}">
-        <Button x:Name="CreateAccountButton"
-                Grid.Row="0"
-                Text="✅ दुकान जोड़ें"
-                Style="{StaticResource PrimaryCtaButton}"
-                Clicked="OnCreateAccountClicked">
-            <Button.Shadow>
-                <Shadow Brush="#00b366" Opacity="0.4" Radius="10" Offset="0,5"/>
-            </Button.Shadow>
-        </Button>
-
-        <Button x:Name="BackToLoginButton"
-                Grid.Row="1"
-                Text="Back to Login"
-                Style="{StaticResource SecondaryCtaButton}"
-                Margin="0,10,0,0"
-                Clicked="OnBackToLoginClicked"/>
-    </Grid>
-
-    <Grid Grid.RowSpan="2" Padding="16,10,16,16" BackgroundColor="#66000000" InputTransparent="False" IsVisible="{Binding Source={x:Reference LoadingIndicator}, Path=IsVisible}">
+    <Grid Padding="16,10,16,16" BackgroundColor="#66000000" InputTransparent="False" IsVisible="{Binding Source={x:Reference LoadingIndicator}, Path=IsVisible}">
         <ActivityIndicator x:Name="LoadingIndicator"
                            IsRunning="False"
                            IsVisible="False"
@@ -178,5 +173,4 @@
                            HorizontalOptions="Center"
                            VerticalOptions="Center"/>
     </Grid>
-</Grid>
 </ContentPage>
