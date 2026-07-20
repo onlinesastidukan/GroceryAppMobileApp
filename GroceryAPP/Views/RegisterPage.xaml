@@ -148,7 +148,7 @@
             </Frame>
 
             <!-- Buttons inside ScrollView -->
-            <VerticalStackLayout Spacing="10" Margin="0,10,0,120">
+            <VerticalStackLayout Spacing="10" Margin="0,20,0,400">
                 <Button x:Name="CreateAccountButton"
                         Text="✅ दुकान जोड़ें"
                         Style="{StaticResource PrimaryCtaButton}"
