@@ -73,6 +73,19 @@
 		<PackageReference Include="System.Net.Http.Json" Version="8.0.0" />
 	</ItemGroup>
 
+	<!-- Firebase Cloud Messaging (Android only) -->
+	<ItemGroup Condition="$(TargetFramework.Contains('android'))">
+		<PackageReference Include="Xamarin.Firebase.Messaging" Version="125.1.1" />
+		<PackageReference Include="Xamarin.GooglePlayServices.Base" Version="118.10.0.2" />
+		<!-- Force AndroidX SavedState alignment to avoid duplicate ViewKt class -->
+		<PackageReference Include="Xamarin.AndroidX.SavedState" Version="1.5.0.1" />
+		<PackageReference Include="Xamarin.AndroidX.SavedState.SavedState.Ktx" Version="1.5.0.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<GoogleServicesJson Include="Platforms\Android\google-services.json" />
+	</ItemGroup>
+
 	<ItemGroup>
 	  <MauiXaml Update="Views\DealerLoginPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>

@@ -214,6 +214,9 @@ public partial class CartViewModel : BaseViewModel
     private decimal totalPrice;
 
     [ObservableProperty]
+    private string customerName = "";
+
+    [ObservableProperty]
     private string deliveryAddress = "";
 
     [ObservableProperty]
@@ -308,6 +311,12 @@ public partial class CartViewModel : BaseViewModel
             return;
         }
 
+        if (string.IsNullOrWhiteSpace(CustomerName))
+        {
+            SetError("Please enter customer name");
+            return;
+        }
+
         if (string.IsNullOrWhiteSpace(DeliveryAddress))
         {
             SetError("Please enter delivery address");
@@ -327,6 +336,7 @@ public partial class CartViewModel : BaseViewModel
 
             var orderRequest = new CreateOrderRequest
             {
+                CustomerName = CustomerName,
                 DeliveryAddress = DeliveryAddress,
                 MobileNumber = MobileNumber,
                 Items = CartItems.Select(x => new CreateOrderItem

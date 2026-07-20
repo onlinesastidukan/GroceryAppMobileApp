@@ -4,162 +4,186 @@
              x:Class="GroceryApp.Views.CartPage"
              Title="Sasti Dukan - Cart"
              BackgroundColor="{StaticResource AppBackground}">
-    <ScrollView>
-        <VerticalStackLayout Spacing="16" Padding="16,12,16,80">
-            <!-- Header -->
-            <VerticalStackLayout Spacing="2">
-                <Label Text="Checkout" FontSize="28" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
-                <Label Text="Review items and place your order securely" FontSize="12" TextColor="{StaticResource TextSecondary}"/>
-            </VerticalStackLayout>
-            
-            <Label Text="{Binding ErrorMessage}" 
-                   IsVisible="{Binding HasError}" 
-                   TextColor="{StaticResource Danger}" 
-                   FontSize="12"
-                   Margin="0,0,0,8"/>
-            
-            <!-- Cart Items -->
-            <VerticalStackLayout BindableLayout.ItemsSource="{Binding CartItems}" Spacing="10">
-                <BindableLayout.ItemTemplate>
-                    <DataTemplate>
-                        <Frame Padding="0" CornerRadius="14" HasShadow="False" BorderColor="{StaticResource BorderSubtle}" BackgroundColor="{StaticResource Surface}" Margin="0">
-                            <Grid RowDefinitions="*" ColumnDefinitions="70,*" Padding="12" ColumnSpacing="12">
-                                    <!-- Product Image -->
-                                <Frame Grid.Column="0" 
-                                       Padding="8" 
-                                       CornerRadius="8" 
-                                       HasShadow="False" 
-                                       BackgroundColor="#f8f8f8"
-                                       WidthRequest="70"
-                                       HeightRequest="70">
-                                     <Image Source="{Binding ImageUrl}"
-                                         Aspect="AspectFit"
-                                         WidthRequest="52"
-                                         HeightRequest="52"
-                                         HorizontalOptions="Center"
-                                         VerticalOptions="Center"/>
-                                </Frame>
-                                
-                                <!-- Product Info + Controls -->
-                                <VerticalStackLayout Grid.Column="1" Spacing="6" VerticalOptions="Center">
-                                    <Label Text="{Binding ProductName}" FontSize="14" FontAttributes="Bold" TextColor="#1a1a1a" MaxLines="2" LineBreakMode="TailTruncation"/>
-                                    <Label Text="{Binding TotalPrice, StringFormat='₹{0:F0}'}" FontSize="16" FontAttributes="Bold" TextColor="#00b366"/>
-                                    
-                                    <!-- Quantity +/- Row -->
-                                    <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto" ColumnSpacing="6">
-                                        <!-- Decrease / Remove -->
-                                        <Button Grid.Column="0"
-                                                Text="−"
-                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DecreaseQuantityCommand}"
-                                                CommandParameter="{Binding .}"
-                                                BackgroundColor="#f0f0f0"
-                                                TextColor="#333333"
-                                                FontSize="18"
-                                                FontAttributes="Bold"
-                                                WidthRequest="36"
-                                                HeightRequest="36"
-                                                CornerRadius="8"
-                                                Padding="0"/>
-                                        <!-- Quantity Label -->
-                                        <Label Grid.Column="1"
-                                               Text="{Binding Quantity}"
-                                               FontSize="15"
-                                               FontAttributes="Bold"
-                                               TextColor="#1a1a1a"
-                                               VerticalOptions="Center"
-                                               HorizontalTextAlignment="Center"
-                                               MinimumWidthRequest="28"/>
-                                        <!-- Increase -->
-                                        <Button Grid.Column="2"
-                                                Text="+"
-                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.IncreaseQuantityCommand}"
-                                                CommandParameter="{Binding .}"
-                                                BackgroundColor="#00b366"
-                                                TextColor="White"
-                                                FontSize="18"
-                                                FontAttributes="Bold"
-                                                WidthRequest="36"
-                                                HeightRequest="36"
-                                                CornerRadius="8"
-                                                Padding="0"/>
-                                        <!-- Remove Button -->
-                                        <Button Grid.Column="4"
-                                                Text="🗑"
-                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RemoveFromCartCommand}"
-                                                CommandParameter="{Binding .}"
-                                                BackgroundColor="#ffebee"
-                                                TextColor="#e74c3c"
-                                                FontSize="14"
-                                                WidthRequest="36"
-                                                HeightRequest="36"
-                                                Padding="0"
-                                                CornerRadius="8"
-                                                VerticalOptions="Center"/>
-                                    </Grid>
-                                </VerticalStackLayout>
-                            </Grid>
-                        </Frame>
-                    </DataTemplate>
-                </BindableLayout.ItemTemplate>
-            </VerticalStackLayout>
-            
-            <ActivityIndicator IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}" Color="#00b366" Margin="0,12"/>
-            
-            <!-- Order Summary Card -->
-            <Frame Padding="0" CornerRadius="14" HasShadow="False" BorderColor="{StaticResource BorderSubtle}" BackgroundColor="{StaticResource Surface}" Margin="0,8,0,0">
-                <VerticalStackLayout Spacing="12" Padding="16">
-                    <!-- Total -->
-                    <Grid ColumnDefinitions="*,Auto">
-                        <Label Grid.Column="0" Text="Total Amount" FontSize="15" TextColor="#666666" VerticalOptions="Center"/>
-                        <Label Grid.Column="1" Text="{Binding TotalPrice, StringFormat='₹{0:F2}'}" FontSize="24" FontAttributes="Bold" TextColor="#1a1a1a" VerticalOptions="Center"/>
-                    </Grid>
-                    
-                    <BoxView HeightRequest="1" BackgroundColor="#f0f0f0" Margin="0,4"/>
-                    
-                    <!-- Contact Number -->
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="Mobile Number" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
-                        <Frame Padding="0" CornerRadius="8" HasShadow="False" BorderColor="#cccccc" BackgroundColor="#ffffff">
-                            <Entry Text="{Binding MobileNumber}"
-                                   Placeholder="Enter your mobile number"
-                                   Keyboard="Telephone"
-                                   BackgroundColor="#ffffff"
-                                   TextColor="#1a1a1a"
-                                   PlaceholderColor="#9a9a9a"
-                                   FontSize="13"
-                                   Margin="12,8"/>
-                        </Frame>
-                    </VerticalStackLayout>
-
-                    <!-- Delivery Address -->
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="Delivery Address" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
-                        <Frame Padding="0" CornerRadius="8" HasShadow="False" BorderColor="#cccccc" BackgroundColor="#ffffff">
-                            <Entry Text="{Binding DeliveryAddress}" 
-                                   Placeholder="Enter your full delivery address"
-                                   BackgroundColor="#ffffff"
-                                   TextColor="#1a1a1a"
-                                   PlaceholderColor="#9a9a9a"
-                                   FontSize="13"
-                                   Margin="12,8"/>
-                        </Frame>
-                    </VerticalStackLayout>
-
-                    <Frame Padding="10,8" CornerRadius="8" HasShadow="False" BorderColor="#dff5e9" BackgroundColor="#f6fffa">
-                        <Label Text="Payment Mode: Cash on Delivery only"
-                               FontSize="12"
-                               FontAttributes="Bold"
-                               TextColor="#0d8d58"/>
-                    </Frame>
-                    
-                    <!-- Place Order Button -->
-                    <Button Text="Place Order" 
-                            Clicked="OnPlaceOrderClicked"
-                            Style="{StaticResource PrimaryCtaButton}"
-                            Margin="0,4,0,0"/>
+    <Grid RowDefinitions="*,Auto">
+        <!-- Scrollable content -->
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Spacing="16" Padding="16,12,16,16">
+                <!-- Header -->
+                <VerticalStackLayout Spacing="2">
+                    <Label Text="Checkout" FontSize="28" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+                    <Label Text="Review items and place your order securely" FontSize="12" TextColor="{StaticResource TextSecondary}"/>
                 </VerticalStackLayout>
-            </Frame>
-            
-        </VerticalStackLayout>
-    </ScrollView>
+
+                <Label Text="{Binding ErrorMessage}" 
+                       IsVisible="{Binding HasError}" 
+                       TextColor="{StaticResource Danger}" 
+                       FontSize="12"
+                       Margin="0,0,0,8"/>
+
+                <!-- Cart Items -->
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding CartItems}" Spacing="10">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <Frame Padding="0" CornerRadius="14" HasShadow="False" BorderColor="{StaticResource BorderSubtle}" BackgroundColor="{StaticResource Surface}" Margin="0">
+                                <Grid RowDefinitions="*" ColumnDefinitions="70,*" Padding="12" ColumnSpacing="12">
+                                        <!-- Product Image -->
+                                    <Frame Grid.Column="0" 
+                                           Padding="8" 
+                                           CornerRadius="8" 
+                                           HasShadow="False" 
+                                           BackgroundColor="#f8f8f8"
+                                           WidthRequest="70"
+                                           HeightRequest="70">
+                                         <Image Source="{Binding ImageUrl}"
+                                             Aspect="AspectFit"
+                                             WidthRequest="52"
+                                             HeightRequest="52"
+                                             HorizontalOptions="Center"
+                                             VerticalOptions="Center"/>
+                                    </Frame>
+
+                                    <!-- Product Info + Controls -->
+                                    <VerticalStackLayout Grid.Column="1" Spacing="6" VerticalOptions="Center">
+                                        <Label Text="{Binding ProductName}" FontSize="14" FontAttributes="Bold" TextColor="#1a1a1a" MaxLines="2" LineBreakMode="TailTruncation"/>
+                                        <Label Text="{Binding TotalPrice, StringFormat='₹{0:F0}'}" FontSize="16" FontAttributes="Bold" TextColor="#00b366"/>
+
+                                        <!-- Quantity +/- Row -->
+                                        <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto" ColumnSpacing="6">
+                                            <!-- Decrease / Remove -->
+                                            <Button Grid.Column="0"
+                                                    Text="−"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DecreaseQuantityCommand}"
+                                                    CommandParameter="{Binding .}"
+                                                    BackgroundColor="#f0f0f0"
+                                                    TextColor="#333333"
+                                                    FontSize="18"
+                                                    FontAttributes="Bold"
+                                                    WidthRequest="36"
+                                                    HeightRequest="36"
+                                                    CornerRadius="8"
+                                                    Padding="0"/>
+                                            <!-- Quantity Label -->
+                                            <Label Grid.Column="1"
+                                                   Text="{Binding Quantity}"
+                                                   FontSize="15"
+                                                   FontAttributes="Bold"
+                                                   TextColor="#1a1a1a"
+                                                   VerticalOptions="Center"
+                                                   HorizontalTextAlignment="Center"
+                                                   MinimumWidthRequest="28"/>
+                                            <!-- Increase -->
+                                            <Button Grid.Column="2"
+                                                    Text="+"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.IncreaseQuantityCommand}"
+                                                    CommandParameter="{Binding .}"
+                                                    BackgroundColor="#00b366"
+                                                    TextColor="White"
+                                                    FontSize="18"
+                                                    FontAttributes="Bold"
+                                                    WidthRequest="36"
+                                                    HeightRequest="36"
+                                                    CornerRadius="8"
+                                                    Padding="0"/>
+                                            <!-- Remove Button -->
+                                            <Button Grid.Column="4"
+                                                    Text="🗑"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RemoveFromCartCommand}"
+                                                    CommandParameter="{Binding .}"
+                                                    BackgroundColor="#ffebee"
+                                                    TextColor="#e74c3c"
+                                                    FontSize="14"
+                                                    WidthRequest="36"
+                                                    HeightRequest="36"
+                                                    Padding="0"
+                                                    CornerRadius="8"
+                                                    VerticalOptions="Center"/>
+                                        </Grid>
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Frame>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
+                <ActivityIndicator IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}" Color="#00b366" Margin="0,12"/>
+
+                <!-- Order Summary Card -->
+                <Frame Padding="0" CornerRadius="14" HasShadow="False" BorderColor="{StaticResource BorderSubtle}" BackgroundColor="{StaticResource Surface}" Margin="0,8,0,0">
+                    <VerticalStackLayout Spacing="12" Padding="16">
+                        <!-- Total -->
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Grid.Column="0" Text="Total Amount" FontSize="15" TextColor="#666666" VerticalOptions="Center"/>
+                            <Label Grid.Column="1" Text="{Binding TotalPrice, StringFormat='₹{0:F2}'}" FontSize="24" FontAttributes="Bold" TextColor="#1a1a1a" VerticalOptions="Center"/>
+                        </Grid>
+
+                        <BoxView HeightRequest="1" BackgroundColor="#f0f0f0" Margin="0,4"/>
+
+                        <!-- Customer Name -->
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="Customer Name" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
+                            <Frame Padding="0" CornerRadius="8" HasShadow="False" BorderColor="#cccccc" BackgroundColor="#ffffff">
+                                <Entry Text="{Binding CustomerName}"
+                                       Placeholder="Enter your full name"
+                                       BackgroundColor="#ffffff"
+                                       TextColor="#1a1a1a"
+                                       PlaceholderColor="#9a9a9a"
+                                       FontSize="13"
+                                       Margin="12,8"/>
+                            </Frame>
+                        </VerticalStackLayout>
+
+                        <!-- Contact Number -->
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="Mobile Number" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
+                            <Frame Padding="0" CornerRadius="8" HasShadow="False" BorderColor="#cccccc" BackgroundColor="#ffffff">
+                                <Entry Text="{Binding MobileNumber}"
+                                       Placeholder="Enter your mobile number"
+                                       Keyboard="Telephone"
+                                       BackgroundColor="#ffffff"
+                                       TextColor="#1a1a1a"
+                                       PlaceholderColor="#9a9a9a"
+                                       FontSize="13"
+                                       Margin="12,8"/>
+                            </Frame>
+                        </VerticalStackLayout>
+
+                        <!-- Delivery Address -->
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="Delivery Address" FontSize="13" FontAttributes="Bold" TextColor="#1a1a1a"/>
+                            <Frame Padding="0" CornerRadius="8" HasShadow="False" BorderColor="#cccccc" BackgroundColor="#ffffff">
+                                <Entry Text="{Binding DeliveryAddress}" 
+                                       Placeholder="Enter your full delivery address"
+                                       BackgroundColor="#ffffff"
+                                       TextColor="#1a1a1a"
+                                       PlaceholderColor="#9a9a9a"
+                                       FontSize="13"
+                                       Margin="12,8"/>
+                            </Frame>
+                        </VerticalStackLayout>
+
+                        <Frame Padding="10,8" CornerRadius="8" HasShadow="False" BorderColor="#dff5e9" BackgroundColor="#f6fffa">
+                            <Label Text="Payment Mode: Cash on Delivery only"
+                                   FontSize="12"
+                                   FontAttributes="Bold"
+                                   TextColor="#0d8d58"/>
+                        </Frame>
+                    </VerticalStackLayout>
+                </Frame>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Sticky bottom action area (always visible above keyboard) -->
+        <Grid Grid.Row="1" 
+              BackgroundColor="{StaticResource Surface}" 
+              Padding="16,12,16,16">
+            <Grid.Shadow>
+                <Shadow Brush="#000000" Opacity="0.1" Radius="12" Offset="0,-4"/>
+            </Grid.Shadow>
+
+            <Button Text="Place Order" 
+                    Clicked="OnPlaceOrderClicked"
+                    Style="{StaticResource PrimaryCtaButton}"/>
+        </Grid>
+    </Grid>
 </ContentPage>

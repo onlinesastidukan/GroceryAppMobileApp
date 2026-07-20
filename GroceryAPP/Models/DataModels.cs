@@ -580,6 +580,9 @@ public class OrderItem
 
 public class CreateOrderRequest
 {
+    [JsonPropertyName("customerName")]
+    public string CustomerName { get; set; }
+
     [Required]
     [JsonPropertyName("deliveryAddress")]
     public string DeliveryAddress { get; set; }

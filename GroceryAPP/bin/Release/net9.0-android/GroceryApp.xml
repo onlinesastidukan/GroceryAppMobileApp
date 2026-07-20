@@ -228,6 +228,9 @@
         <member name="P:GroceryApp.ViewModels.CartViewModel.TotalPrice">
             <inheritdoc cref="F:GroceryApp.ViewModels.CartViewModel.totalPrice"/>
         </member>
+        <member name="P:GroceryApp.ViewModels.CartViewModel.CustomerName">
+            <inheritdoc cref="F:GroceryApp.ViewModels.CartViewModel.customerName"/>
+        </member>
         <member name="P:GroceryApp.ViewModels.CartViewModel.DeliveryAddress">
             <inheritdoc cref="F:GroceryApp.ViewModels.CartViewModel.deliveryAddress"/>
         </member>
@@ -522,6 +525,9 @@
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TotalPrice">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TotalPrice" generated properties.</summary>
         </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.CustomerName">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "CustomerName" generated properties.</summary>
+        </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.DeliveryAddress">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "DeliveryAddress" generated properties.</summary>
         </member>
@@ -617,6 +623,9 @@
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TotalPrice">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TotalPrice" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.CustomerName">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "CustomerName" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.DeliveryAddress">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "DeliveryAddress" generated properties.</summary>

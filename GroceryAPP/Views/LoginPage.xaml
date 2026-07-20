@@ -60,7 +60,7 @@
                            HorizontalTextAlignment="Center"/>
 
                     <Button x:Name="GoToShopCustomerButton"
-                            Text="🛍️ Customer"
+                            Text="🛍️ Customer (ग्राहक)"
                             Style="{StaticResource PrimaryCtaButton}"
                             Clicked="OnGoToShopCustomerClicked">
                         <Button.Shadow>
@@ -68,22 +68,12 @@
                         </Button.Shadow>
                     </Button>
 
-                    <Label Text="Browse shops and place orders without login"
-                           FontSize="13"
-                           HorizontalTextAlignment="Center"
-                           TextColor="{StaticResource TextSecondary}"/>
-
                     <BoxView HeightRequest="1" BackgroundColor="{StaticResource BorderSubtle}" Margin="2,4"/>
 
                     <Button x:Name="GoToDealerButton"
-                            Text="🏪 Shopkeeper"
+                            Text="🏪 Shopkeeper (दुकानदार)"
                             Style="{StaticResource SecondaryCtaButton}"
                             Clicked="OnGoToDealerClicked"/>
-
-                    <Label Text="Login or register as shopkeeper to manage products and orders"
-                           FontSize="13"
-                           HorizontalTextAlignment="Center"
-                           TextColor="{StaticResource TextSecondary}"/>
 
                     <Label x:Name="ErrorLabel"
                            Text=""
