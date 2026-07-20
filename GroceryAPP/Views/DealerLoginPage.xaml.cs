@@ -43,6 +43,30 @@ public partial class DealerLoginPage : ContentPage
             {
                 _apiService.SetAuthToken(_authService.CurrentUser.Token);
 
+                // Update FCM token after successful login
+                try
+                {
+                    var firebaseService = _serviceProvider.GetService<IFirebaseService>();
+                    if (firebaseService != null)
+                    {
+                        var fcmToken = await firebaseService.GetTokenAsync();
+                        if (!string.IsNullOrEmpty(fcmToken))
+                        {
+                            System.Diagnostics.Debug.WriteLine($"[Mobile] Updating FCM token after login (length: {fcmToken.Length})");
+                            await _apiService.UpdateFcmTokenAsync(fcmToken);
+                        }
+                        else
+                        {
+                            System.Diagnostics.Debug.WriteLine("[Mobile] No FCM token available");
+                        }
+                    }
+                }
+                catch (Exception fcmEx)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[Mobile] Error updating FCM token: {fcmEx.Message}");
+                    // Don't block login if FCM fails
+                }
+
                 if (_authService.IsAdmin)
                 {
                     var adminDashboard = _serviceProvider.GetService<AdminDashboardPage>();

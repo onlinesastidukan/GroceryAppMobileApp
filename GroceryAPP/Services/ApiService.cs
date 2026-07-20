@@ -344,6 +344,56 @@ public class ApiService
         }
     }
 
+    public async Task<bool> UpdateFcmTokenAsync(string fcmToken)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(fcmToken))
+            {
+                Log("[API] UpdateFcmToken: Empty token provided");
+                return false;
+            }
+
+            var networkAccess = Connectivity.Current.NetworkAccess;
+            if (networkAccess != NetworkAccess.Internet)
+            {
+                Log($"[API] UpdateFcmToken blocked, network access: {networkAccess}");
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(_authToken))
+            {
+                Log("[API] UpdateFcmToken: No auth token set");
+                return false;
+            }
+
+            var url = "auth/update-fcm-token";
+            var request = new { FcmToken = fcmToken };
+
+            Log($"[API] Updating FCM token (length: {fcmToken.Length})");
+            var response = await PostAsJsonAsyncWithRetry(url, request);
+            var content = await response.Content.ReadAsStringAsync();
+
+            Log($"[API] UpdateFcmToken response status: {(int)response.StatusCode} {response.StatusCode}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                Log("[API] FCM token updated successfully");
+                return true;
+            }
+            else
+            {
+                Log($"[API] UpdateFcmToken failed: {content}");
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            Log($"[API] UpdateFcmToken error: {ex.Message}");
+            return false;
+        }
+    }
+
     private static void Log(string message)
     {
         System.Diagnostics.Debug.WriteLine(message);
