@@ -75,6 +75,22 @@ public class UserLoginInfo
     public string Token { get; set; }
 }
 
+
+public class DealerDashboard
+{
+    [JsonPropertyName("totalOrders")]
+    public int TotalOrders { get; set; }
+
+    [JsonPropertyName("pendingOrders")]
+    public int PendingOrders { get; set; }
+
+    [JsonPropertyName("totalRevenue")]
+    public decimal TotalRevenue { get; set; }
+
+    [JsonPropertyName("totalProducts")]
+    public int TotalProducts { get; set; }
+}
+
 public class AppUser
 {
     [JsonPropertyName("id")]

@@ -1763,6 +1763,47 @@ public class ApiService
         }
     }
 
+    public async Task<ApiResponse<DealerDashboard>> GetDealerDashboardAsync()
+    {
+        try
+        {
+            var response = await GetAsyncWithRetry("dealer/dashboard");
+            var content = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Log($"[API] GetDealerDashboard failed: {(int)response.StatusCode} - {content}");
+                return new ApiResponse<DealerDashboard>
+                {
+                    Success = false,
+                    Message = $"Failed to load dashboard: {response.ReasonPhrase}"
+                };
+            }
+
+            var dashboard = JsonSerializer.Deserialize<DealerDashboard>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            if (dashboard != null)
+            {
+                return new ApiResponse<DealerDashboard>
+                {
+                    Success = true,
+                    Message = "Dashboard loaded",
+                    Data = dashboard
+                };
+            }
+
+            return new ApiResponse<DealerDashboard>
+            {
+                Success = false,
+                Message = "Failed to parse dashboard data"
+            };
+        }
+        catch (Exception ex)
+        {
+            Log($"[API] GetDealerDashboard error: {ex.Message}");
+            return new ApiResponse<DealerDashboard> { Success = false, Message = $"Error: {ex.Message}" };
+        }
+    }
+
     public async Task<ApiResponse<List<Order>>> GetDealerOrdersAsync()
     {
         try

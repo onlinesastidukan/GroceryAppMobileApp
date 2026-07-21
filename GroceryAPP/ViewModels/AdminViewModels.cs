@@ -13,6 +13,7 @@ namespace GroceryApp.ViewModels;
 public partial class AdminDashboardViewModel : BaseViewModel
 {
     private readonly ApiService _apiService;
+    private readonly AuthService _authService;
 
     [ObservableProperty]
     private int totalOrders;
@@ -29,9 +30,10 @@ public partial class AdminDashboardViewModel : BaseViewModel
     [ObservableProperty]
     private int totalCategories;
 
-    public AdminDashboardViewModel(ApiService apiService)
+    public AdminDashboardViewModel(ApiService apiService, AuthService authService)
     {
         _apiService = apiService;
+        _authService = authService;
     }
 
     [RelayCommand]
@@ -44,72 +46,101 @@ public partial class AdminDashboardViewModel : BaseViewModel
 
             var loadErrors = new List<string>();
 
-            // Load dashboard statistics
-            var ordersResponse = await _apiService.GetAllOrdersAdminAsync();
-            if (ordersResponse?.Success == true && ordersResponse.Data != null)
+            // Check if user is a dealer
+            if (_authService.IsDealer)
             {
-                TotalOrders = ordersResponse.Data.Count;
-                PendingOrders = ordersResponse.Data.Count(x =>
-                    string.Equals(x.Status, "Pending", StringComparison.OrdinalIgnoreCase));
-                TotalRevenue = ordersResponse.Data.Sum(x => x.TotalAmount);
-            }
-            else
-            {
-                TotalOrders = 0;
-                PendingOrders = 0;
-                TotalRevenue = 0;
-                if (!string.IsNullOrWhiteSpace(ordersResponse?.Message))
+                // Use dealer-specific dashboard endpoint
+                var dashboardResponse = await _apiService.GetDealerDashboardAsync();
+                if (dashboardResponse?.Success == true && dashboardResponse.Data != null)
                 {
-                    loadErrors.Add($"Orders: {ordersResponse.Message}");
+                    TotalOrders = dashboardResponse.Data.TotalOrders;
+                    PendingOrders = dashboardResponse.Data.PendingOrders;
+                    TotalRevenue = dashboardResponse.Data.TotalRevenue;
+                    TotalProducts = dashboardResponse.Data.TotalProducts;
+                    TotalCategories = 0; // Dealers don't need category count
+                }
+                else
+                {
+                    TotalOrders = 0;
+                    PendingOrders = 0;
+                    TotalRevenue = 0;
+                    TotalProducts = 0;
+                    TotalCategories = 0;
+                    if (!string.IsNullOrWhiteSpace(dashboardResponse?.Message))
+                    {
+                        loadErrors.Add($"Dashboard: {dashboardResponse.Message}");
+                    }
                 }
             }
-
-            // Use the public categories endpoint — it is server-side filtered to active-only,
-            // so the count is always accurate regardless of isActive deserialization.
-            var categoriesResponse = await _apiService.GetCategoriesAsync();
-
-            bool categoriesLoaded = false;
-            var activeCategoryIds = new HashSet<int>();
-            if (categoriesResponse?.Success == true && categoriesResponse.Data != null)
-            {
-                // Apply client-side filter too as a safety net
-                var activeCategories = categoriesResponse.Data.Where(c => c.IsActive).ToList();
-                // If server already filtered (all returned are active), IsActive may default false —
-                // in that case use the full list since the server guarantees they are all active.
-                if (activeCategories.Count == 0 && categoriesResponse.Data.Count > 0)
-                    activeCategories = categoriesResponse.Data;
-                TotalCategories = activeCategories.Count;
-                activeCategoryIds = activeCategories.Select(c => c.CategoryId).ToHashSet();
-                categoriesLoaded = true;
-            }
             else
             {
-                TotalCategories = 0;
-                if (!string.IsNullOrWhiteSpace(categoriesResponse?.Message))
+                // Admin flow - Load dashboard statistics
+                var ordersResponse = await _apiService.GetAllOrdersAdminAsync();
+                if (ordersResponse?.Success == true && ordersResponse.Data != null)
                 {
-                    loadErrors.Add($"Categories: {categoriesResponse.Message}");
+                    TotalOrders = ordersResponse.Data.Count;
+                    PendingOrders = ordersResponse.Data.Count(x =>
+                        string.Equals(x.Status, "Pending", StringComparison.OrdinalIgnoreCase));
+                    TotalRevenue = ordersResponse.Data.Sum(x => x.TotalAmount);
                 }
-            }
-
-            var productsResponse = await _apiService.GetAllProductsAdminAsync();
-            if (productsResponse?.Success != true || productsResponse.Data == null)
-            {
-                productsResponse = await _apiService.GetProductsAsync();
-            }
-
-            if (productsResponse?.Success == true && productsResponse.Data != null)
-            {
-                // Count only products belonging to active categories (consistent with category view)
-                TotalProducts = categoriesLoaded
-                    ? productsResponse.Data.Count(p => activeCategoryIds.Contains(p.CategoryId))
-                    : productsResponse.Data.Count;
-            }
-            else
-            {
-                TotalProducts = 0;
-                if (!string.IsNullOrWhiteSpace(productsResponse?.Message))
+                else
                 {
-                    loadErrors.Add($"Products: {productsResponse.Message}");
+                    TotalOrders = 0;
+                    PendingOrders = 0;
+                    TotalRevenue = 0;
+                    if (!string.IsNullOrWhiteSpace(ordersResponse?.Message))
+                    {
+                        loadErrors.Add($"Orders: {ordersResponse.Message}");
+                    }
+                }
+
+                // Use the public categories endpoint — it is server-side filtered to active-only,
+                // so the count is always accurate regardless of isActive deserialization.
+                var categoriesResponse = await _apiService.GetCategoriesAsync();
+
+                bool categoriesLoaded = false;
+                var activeCategoryIds = new HashSet<int>();
+                if (categoriesResponse?.Success == true && categoriesResponse.Data != null)
+                {
+                    // Apply client-side filter too as a safety net
+                    var activeCategories = categoriesResponse.Data.Where(c => c.IsActive).ToList();
+                    // If server already filtered (all returned are active), IsActive may default false —
+                    // in that case use the full list since the server guarantees they are all active.
+                    if (activeCategories.Count == 0 && categoriesResponse.Data.Count > 0)
+                        activeCategories = categoriesResponse.Data;
+                    TotalCategories = activeCategories.Count;
+                    activeCategoryIds = activeCategories.Select(c => c.CategoryId).ToHashSet();
+                    categoriesLoaded = true;
+                }
+                else
+                {
+                    TotalCategories = 0;
+                    if (!string.IsNullOrWhiteSpace(categoriesResponse?.Message))
+                    {
+                        loadErrors.Add($"Categories: {categoriesResponse.Message}");
+                    }
+                }
+
+                var productsResponse = await _apiService.GetAllProductsAdminAsync();
+                if (productsResponse?.Success != true || productsResponse.Data == null)
+                {
+                    productsResponse = await _apiService.GetProductsAsync();
+                }
+
+                if (productsResponse?.Success == true && productsResponse.Data != null)
+                {
+                    // Count only products belonging to active categories (consistent with category view)
+                    TotalProducts = categoriesLoaded
+                        ? productsResponse.Data.Count(p => activeCategoryIds.Contains(p.CategoryId))
+                        : productsResponse.Data.Count;
+                }
+                else
+                {
+                    TotalProducts = 0;
+                    if (!string.IsNullOrWhiteSpace(productsResponse?.Message))
+                    {
+                        loadErrors.Add($"Products: {productsResponse.Message}");
+                    }
                 }
             }
 
