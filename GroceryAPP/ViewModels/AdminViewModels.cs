@@ -137,13 +137,15 @@ public partial class AdminDashboardViewModel : BaseViewModel
 public partial class AdminOrdersViewModel : BaseViewModel
 {
     private readonly ApiService _apiService;
+    private readonly AuthService _authService;
 
     [ObservableProperty]
     private ObservableCollection<Order> orders;
 
-    public AdminOrdersViewModel(ApiService apiService)
+    public AdminOrdersViewModel(ApiService apiService, AuthService authService)
     {
         _apiService = apiService;
+        _authService = authService;
         Orders = new ObservableCollection<Order>();
     }
 
@@ -157,21 +159,64 @@ public partial class AdminOrdersViewModel : BaseViewModel
             IsLoading = true;
             ClearError();
 
-            var response = await _apiService.GetAllOrdersAdminAsync();
-            if (response?.Success == true && response.Data != null)
+            ApiResponse<List<Order>> response;
+            List<Order> visibleOrders;
+
+            if (_authService.IsDealer)
             {
-                Orders.Clear();
-                foreach (var order in response.Data.OrderByDescending(x => x.OrderDate))
+                response = await _apiService.GetDealerOrdersAsync();
+
+                if (response?.Success == true && response.Data != null)
                 {
-                    Orders.Add(order);
+                    visibleOrders = response.Data;
                 }
-                OnPropertyChanged(nameof(HasNoOrders));
+                else
+                {
+                    // Strict fallback: derive dealer shop ownership from dealer products
+                    var dealerProductsResponse = await _apiService.GetDealerProductsAsync();
+                    if (dealerProductsResponse?.Success != true || dealerProductsResponse.Data == null)
+                    {
+                        SetError(response?.Message ?? "Unable to load your shop orders.");
+                        OnPropertyChanged(nameof(HasNoOrders));
+                        return;
+                    }
+
+                    var dealerProductIds = dealerProductsResponse.Data
+                        .Select(p => p.ProductId)
+                        .ToHashSet();
+
+                    if (dealerProductIds.Count == 0)
+                    {
+                        Orders.Clear();
+                        OnPropertyChanged(nameof(HasNoOrders));
+                        return;
+                    }
+
+                    var allOrdersResponse = await _apiService.GetAllOrdersAdminAsync();
+                    if (allOrdersResponse?.Success != true || allOrdersResponse.Data == null)
+                    {
+                        SetError(response?.Message ?? allOrdersResponse?.Message ?? "Unable to load your shop orders.");
+                        OnPropertyChanged(nameof(HasNoOrders));
+                        return;
+                    }
+
+                    visibleOrders = allOrdersResponse.Data
+                        .Where(order => order.OrderItems != null && order.OrderItems.Any(item => dealerProductIds.Contains(item.ProductId)))
+                        .ToList();
+                }
             }
             else
             {
-                SetError(response?.Message ?? "Failed to load orders");
-                OnPropertyChanged(nameof(HasNoOrders));
+                response = await _apiService.GetAllOrdersAdminAsync();
+                visibleOrders = response?.Data ?? new List<Order>();
             }
+
+            Orders.Clear();
+            foreach (var order in visibleOrders.OrderByDescending(x => x.OrderDate))
+            {
+                Orders.Add(order);
+            }
+            OnPropertyChanged(nameof(HasNoOrders));
         }
         catch (Exception ex)
         {

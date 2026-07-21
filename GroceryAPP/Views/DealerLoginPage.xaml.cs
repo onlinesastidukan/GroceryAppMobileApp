@@ -49,11 +49,24 @@ public partial class DealerLoginPage : ContentPage
                     var firebaseService = _serviceProvider.GetService<IFirebaseService>();
                     if (firebaseService != null)
                     {
+                        // Check if notification permission is granted
+                        var hasPermission = await firebaseService.IsNotificationPermissionGrantedAsync();
+                        System.Diagnostics.Debug.WriteLine($"[Mobile] Notification permission granted: {hasPermission}");
+
+                        if (!hasPermission)
+                        {
+                            System.Diagnostics.Debug.WriteLine("[Mobile] WARNING: Notification permission not granted. Dealer will not receive order notifications.");
+                            await DisplayAlert("Notification Permission", 
+                                "Please enable notifications in app settings to receive order alerts.", 
+                                "OK");
+                        }
+
                         var fcmToken = await firebaseService.GetTokenAsync();
                         if (!string.IsNullOrEmpty(fcmToken))
                         {
                             System.Diagnostics.Debug.WriteLine($"[Mobile] Updating FCM token after login (length: {fcmToken.Length})");
-                            await _apiService.UpdateFcmTokenAsync(fcmToken);
+                            var tokenUpdated = await _apiService.UpdateFcmTokenAsync(fcmToken);
+                            System.Diagnostics.Debug.WriteLine($"[Mobile] FCM token update success: {tokenUpdated}");
                         }
                         else
                         {

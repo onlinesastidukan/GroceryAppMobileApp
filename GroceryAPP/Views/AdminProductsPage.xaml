@@ -3,20 +3,32 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GroceryApp.Views.AdminProductsPage"
              Title="सस्ती दुकान - Manage Products"
+             NavigationPage.HasNavigationBar="False"
              BackgroundColor="{StaticResource AppBackground}">
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Logout"
-                     Order="Primary"
-                     Priority="0"
-                     Clicked="OnLogoutClicked" />
-    </ContentPage.ToolbarItems>
-    <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="16" RowSpacing="12">
-        <Grid Grid.Row="0" Margin="0,0,0,6">
-            <VerticalStackLayout Spacing="2">
-                <Label Text="Products" FontSize="28" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" VerticalOptions="Center"/>
-                <Label Text="Manage your inventory" FontSize="13" TextColor="{StaticResource TextSecondary}"/>
-            </VerticalStackLayout>
-            <Button Text="+ Add" 
+
+    <Grid>
+        <!-- Main Content -->
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto,*" Padding="16" RowSpacing="12">
+            <!-- Header with Hamburger Menu -->
+            <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="0,10,0,6" ColumnSpacing="15">
+                <Button Grid.Column="0"
+                        Text="☰"
+                        FontSize="22"
+                        WidthRequest="44"
+                        HeightRequest="44"
+                        CornerRadius="8"
+                        BackgroundColor="#f0f0f0"
+                        TextColor="#1a1a1a"
+                        Padding="0"
+                        Clicked="OnMenuClicked"
+                        VerticalOptions="Center"/>
+
+                <VerticalStackLayout Grid.Column="1" Spacing="2">
+                    <Label Text="Products" FontSize="28" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" VerticalOptions="Center"/>
+                    <Label Text="Manage your inventory" FontSize="13" TextColor="{StaticResource TextSecondary}"/>
+                </VerticalStackLayout>
+
+                <Button Grid.Column="2" Text="+ Add" 
                     Clicked="OnAddProductClicked" 
                     BackgroundColor="{StaticResource BrandPrimary}" 
                     TextColor="White" 
@@ -58,7 +70,7 @@
                        CancelButtonColor="#00b366"/>
         </Frame>
 
-        <CollectionView Grid.Row="3"
+        <CollectionView Grid.Row="4"
                         ItemsSource="{Binding Products}"
                         SelectionMode="None"
                         IsVisible="{Binding IsLoading, Converter={StaticResource InvertBoolConverter}}">
@@ -173,7 +185,7 @@
         </CollectionView>
 
         <!-- Loading overlay for product list -->
-        <Grid Grid.Row="3"
+        <Grid Grid.Row="4"
               IsVisible="{Binding IsLoading}"
               InputTransparent="False"
               BackgroundColor="#F8F9FA">
@@ -190,5 +202,67 @@
                        FontAutoScalingEnabled="False"/>
             </VerticalStackLayout>
         </Grid>
+    </Grid>
+
+        <!-- Overlay for menu -->
+        <BoxView x:Name="Overlay"
+                 BackgroundColor="#80000000"
+                 Opacity="0"
+                 IsVisible="False"
+                 InputTransparent="True"
+                 ZIndex="1">
+            <BoxView.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnOverlayTapped"/>
+            </BoxView.GestureRecognizers>
+        </BoxView>
+
+        <!-- Side Menu -->
+        <Frame x:Name="SideMenu"
+               BackgroundColor="White"
+               CornerRadius="0"
+               Padding="0"
+               IsVisible="False"
+               HorizontalOptions="Start"
+               WidthRequest="300"
+               VerticalOptions="Fill"
+               ZIndex="2">
+            <VerticalStackLayout Spacing="0">
+                <Grid Padding="20,26,20,18" BackgroundColor="{StaticResource BrandPrimary}" ColumnDefinitions="*,Auto">
+                    <Label Text="दुकानदार Menu" FontSize="22" FontAttributes="Bold" TextColor="White" VerticalOptions="Center"/>
+                    <Button Grid.Column="1" Text="✕" Clicked="OnCloseMenuClicked" BackgroundColor="Transparent" TextColor="White" FontSize="18"/>
+                </Grid>
+
+                <VerticalStackLayout Spacing="4" Padding="12,10">
+                    <Border Stroke="#e9e9e9" StrokeThickness="1" StrokeShape="RoundRectangle 10" Padding="12,10">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnMenuDashboardClicked"/>
+                        </Border.GestureRecognizers>
+                        <Label Text="📊 Dashboard" FontSize="15" TextColor="#1a1a1a"/>
+                    </Border>
+
+                    <Border Stroke="#e9e9e9" StrokeThickness="1" StrokeShape="RoundRectangle 10" Padding="12,10">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnMenuOrdersClicked"/>
+                        </Border.GestureRecognizers>
+                        <Label Text="📦 Orders" FontSize="15" TextColor="#1a1a1a"/>
+                    </Border>
+
+                    <Border Stroke="#e9e9e9" StrokeThickness="1" StrokeShape="RoundRectangle 10" Padding="12,10">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnMenuProductsClicked"/>
+                        </Border.GestureRecognizers>
+                        <Label Text="🛒 Products" FontSize="15" TextColor="#1a1a1a"/>
+                    </Border>
+
+                    <Border Stroke="#ffe1e1" StrokeThickness="1" StrokeShape="RoundRectangle 10" Padding="12,10">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnMenuLogoutClicked"/>
+                        </Border.GestureRecognizers>
+                        <Label Text="🚪 Logout" FontSize="15" TextColor="#d64545"/>
+                    </Border>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </Frame>
+
     </Grid>
 </ContentPage>

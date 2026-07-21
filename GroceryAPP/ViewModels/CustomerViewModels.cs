@@ -354,7 +354,18 @@ public partial class CartViewModel : BaseViewModel
                 var placedOrderId = response.Data?.OrderId ?? 0;
                 if (placedOrderId > 0)
                 {
-                    _ = _apiService.TriggerOrderPlacedNotificationAsync(placedOrderId, MobileNumber);
+                    try
+                    {
+                        var notificationResult = await _apiService.TriggerOrderPlacedNotificationAsync(placedOrderId, MobileNumber);
+                        if (notificationResult?.Success != true)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"[ORDER] Notification trigger not confirmed: {notificationResult?.Message}");
+                        }
+                    }
+                    catch (Exception notifyEx)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[ORDER] Notification trigger error: {notifyEx.Message}");
+                    }
                 }
 
                 _cartService.ClearCart();
@@ -442,6 +453,7 @@ public partial class CustomerOrderHistoryViewModel : BaseViewModel
 #endregion
 
 #region CustomerOrderDetailViewModel
+[QueryProperty(nameof(OrderId), "OrderId")]
 public partial class CustomerOrderDetailViewModel : BaseViewModel
 {
     private readonly ApiService _apiService;

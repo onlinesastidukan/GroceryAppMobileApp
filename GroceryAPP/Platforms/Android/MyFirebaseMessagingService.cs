@@ -15,16 +15,40 @@ namespace GroceryApp.Platforms.Android
         {
             Log.Debug(TAG, "From: " + message.From);
 
+            string? title = null;
+            string? body = null;
+
             if (message.Data != null && message.Data.Count > 0)
             {
                 Log.Debug(TAG, "Message data payload: " + message.Data);
+
+                if (message.Data.TryGetValue("title", out var dataTitle))
+                {
+                    title = dataTitle;
+                }
+
+                if (message.Data.TryGetValue("body", out var dataBody))
+                {
+                    body = dataBody;
+                }
+
+                if (string.IsNullOrWhiteSpace(title) && message.Data.TryGetValue("message", out var dataMessage))
+                {
+                    body = dataMessage;
+                }
             }
 
             if (message.GetNotification() != null)
             {
-                Log.Debug(TAG, "Message Notification Body: " + message.GetNotification().Body);
-                SendNotification(message.GetNotification().Title, message.GetNotification().Body);
+                var notification = message.GetNotification();
+                Log.Debug(TAG, "Message Notification Body: " + notification.Body);
+                title ??= notification.Title;
+                body ??= notification.Body;
             }
+
+            title ??= "New Order";
+            body ??= "A new order has been placed.";
+            SendNotification(title, body);
         }
 
         public override void OnNewToken(string token)

@@ -7,6 +7,7 @@ namespace GroceryApp.Services
         Task<string> GetTokenAsync();
         Task SubscribeToTopicAsync(string topic);
         Task UnsubscribeFromTopicAsync(string topic);
+        Task<bool> IsNotificationPermissionGrantedAsync();
     }
 
     public class FirebaseService : IFirebaseService
@@ -38,7 +39,32 @@ namespace GroceryApp.Services
 #endif
         }
 
+        public async Task<bool> IsNotificationPermissionGrantedAsync()
+        {
 #if ANDROID
+            return await CheckAndroidNotificationPermissionAsync();
+#else
+            return await Task.FromResult(true); // iOS handles permissions differently
+#endif
+        }
+
+#if ANDROID
+        private async Task<bool> CheckAndroidNotificationPermissionAsync()
+        {
+            if (Android.OS.Build.VERSION.SdkInt >= Android.OS.BuildVersionCodes.Tiramisu)
+            {
+                var context = Android.App.Application.Context;
+                var permission = AndroidX.Core.Content.ContextCompat.CheckSelfPermission(
+                    context, 
+                    Android.Manifest.Permission.PostNotifications);
+
+                return await Task.FromResult(permission == Android.Content.PM.Permission.Granted);
+            }
+
+            // For Android 12 and below, notification permission is granted by default
+            return await Task.FromResult(true);
+        }
+
         private async Task<string> GetAndroidTokenAsync()
         {
             var tcs = new TaskCompletionSource<string>();

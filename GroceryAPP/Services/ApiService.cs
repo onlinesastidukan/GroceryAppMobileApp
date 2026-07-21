@@ -1252,6 +1252,10 @@ public class ApiService
         // Try the dedicated admin status endpoint first, then fallbacks.
         var attempts = new (Func<Task<HttpResponseMessage>> send, string label)[]
         {
+            (() => PutAsJsonAsyncWithRetry($"dealer/orders/{orderId}/status", statusPayload), "PUT  dealer/orders/{id}/status"),
+            (() => PatchAsJsonAsyncWithRetry($"dealer/orders/{orderId}/status", statusPayload), "PATCH dealer/orders/{id}/status"),
+            (() => PutAsJsonAsyncWithRetry($"{AppConfig.OrderController}/{orderId}/status", statusPayload), "PUT  orders/{id}/status"),
+            (() => PatchAsJsonAsyncWithRetry($"{AppConfig.OrderController}/{orderId}/status", statusPayload), "PATCH orders/{id}/status"),
             (() => PutAsJsonAsyncWithRetry($"{AppConfig.AdminController}/orders/{orderId}/status", statusPayload), "PUT  admin/orders/{id}/status"),
             (() => PatchAsJsonAsyncWithRetry($"{AppConfig.AdminController}/orders/{orderId}/status", statusPayload), "PATCH admin/orders/{id}/status"),
             (() => PatchAsJsonAsyncWithRetry($"{AppConfig.AdminController}/orders/{orderId}", statusPayload),        "PATCH admin/orders/{id}"),
@@ -1721,7 +1725,7 @@ public class ApiService
         {
             var response = await GetAsyncWithRetry($"{AppConfig.AdminController}/orders");
             var content = await response.Content.ReadAsStringAsync();
-            
+
             if (response.IsSuccessStatusCode)
             {
                 try
@@ -1733,7 +1737,7 @@ public class ApiService
                     }
                 }
                 catch { }
-                
+
                 var directList = JsonSerializer.Deserialize<List<Order>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                 if (directList != null)
                 {
@@ -1744,7 +1748,7 @@ public class ApiService
                         Data = directList 
                     };
                 }
-                
+
                 return new ApiResponse<List<Order>> { Success = false, Message = "Failed to parse orders" };
             }
             else
@@ -1755,6 +1759,71 @@ public class ApiService
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"[API] GetAllOrdersAdmin error: {ex.Message}");
+            return new ApiResponse<List<Order>> { Success = false, Message = $"Error: {ex.Message}" };
+        }
+    }
+
+    public async Task<ApiResponse<List<Order>>> GetDealerOrdersAsync()
+    {
+        try
+        {
+            var endpoints = new[]
+            {
+                "dealer/orders",
+                $"{AppConfig.AdminController}/orders/my-shop",
+                $"{AppConfig.OrderController}/dealer",
+                $"{AppConfig.OrderController}/my-shop"
+            };
+
+            foreach (var endpoint in endpoints)
+            {
+                try
+                {
+                    var response = await GetAsyncWithRetry(endpoint);
+                    var content = await response.Content.ReadAsStringAsync();
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        Log($"[API] GetDealerOrders {endpoint} failed: {(int)response.StatusCode}");
+                        continue;
+                    }
+
+                    try
+                    {
+                        var wrapped = JsonSerializer.Deserialize<ApiResponse<List<Order>>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        if (wrapped?.Data != null)
+                        {
+                            wrapped.Success = true;
+                            return wrapped;
+                        }
+                    }
+                    catch { }
+
+                    var directList = JsonSerializer.Deserialize<List<Order>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (directList != null)
+                    {
+                        return new ApiResponse<List<Order>>
+                        {
+                            Success = true,
+                            Message = "Orders loaded",
+                            Data = directList
+                        };
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log($"[API] GetDealerOrders exception on {endpoint}: {ex.Message}");
+                }
+            }
+
+            return new ApiResponse<List<Order>>
+            {
+                Success = false,
+                Message = "Failed to load dealer orders"
+            };
+        }
+        catch (Exception ex)
+        {
             return new ApiResponse<List<Order>> { Success = false, Message = $"Error: {ex.Message}" };
         }
     }
