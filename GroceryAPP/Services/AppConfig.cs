@@ -12,7 +12,7 @@ public static class AppConfig
     // the URL below. Free tier: 100,000 requests/day.
     // Deploy at: https://dash.cloudflare.com → Workers & Pages → Create Worker
     // Worker code: https://github.com/your-repo/cf-worker-proxy (5-line proxy)
-    private const string CloudflareWorkerUrl = "https://gentle-glitter-76c9.rohitkranti1976.workers.dev/api";
+    private const string CloudflareWorkerUrl = "https://divine-star-89c3.onlinesastidukan7727.workers.dev/api";
 
     public static readonly string[] ApiBaseUrls = string.IsNullOrWhiteSpace(CloudflareWorkerUrl)
         ? new[]
