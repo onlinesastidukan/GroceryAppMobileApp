@@ -2,3 +2,7 @@
 **/obj/
 *.user
 *.suo
+
+# Allow APK and AAB files in bin folder for distribution
+!**/bin/**/*.apk
+!**/bin/**/*.aab
