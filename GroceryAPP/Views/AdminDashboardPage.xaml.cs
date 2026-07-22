@@ -111,6 +111,12 @@ public partial class AdminDashboardPage : ContentPage
     private async void OnMenuCategoriesClicked(object sender, TappedEventArgs e)
     {
         await CloseMenu();
+
+        if (_authService.IsDealer)
+        {
+            return;
+        }
+
         await NavigateToPageAsync<AdminCategoriesPage>("Shops");
     }
 

@@ -805,33 +805,61 @@ public class ApiService
     {
         try
         {
-            var response = await GetAsyncWithRetry($"{AppConfig.OrderController}/{orderId}");
-            var content = await response.Content.ReadAsStringAsync();
-            
-            if (response.IsSuccessStatusCode)
+            var endpoints = new[]
             {
+                $"{AppConfig.OrderController}/{orderId}",
+                $"{AppConfig.OrderController}/details/{orderId}",
+                $"{AppConfig.AdminController}/orders/{orderId}"
+            };
+
+            foreach (var endpoint in endpoints)
+            {
+                HttpResponseMessage response;
+                string content;
+
+                try
+                {
+                    response = await GetAsyncWithRetry(endpoint);
+                    content = await response.Content.ReadAsStringAsync();
+                }
+                catch (Exception ex)
+                {
+                    Log($"[API] GetOrderById {endpoint} exception: {ex.Message}");
+                    continue;
+                }
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    Log($"[API] GetOrderById {endpoint} failed: {(int)response.StatusCode} {response.ReasonPhrase}");
+                    continue;
+                }
+
                 try
                 {
                     var wrappedResponse = JsonSerializer.Deserialize<ApiResponse<Order>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    if (wrappedResponse != null && wrappedResponse.Success)
+                    if (wrappedResponse?.Data != null)
                     {
+                        wrappedResponse.Success = true;
                         return wrappedResponse;
                     }
                 }
                 catch { }
-                
-                var directObj = JsonSerializer.Deserialize<Order>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                if (directObj != null)
-                {
-                    return new ApiResponse<Order> 
-                    { 
-                        Success = true, 
-                        Message = "Order loaded",
-                        Data = directObj 
-                    };
-                }
 
-                // Envelope compatibility: { data: { ... } }, { order: { ... } }, { result: { ... } }
+                try
+                {
+                    var directObj = JsonSerializer.Deserialize<Order>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (directObj != null && directObj.OrderId > 0)
+                    {
+                        return new ApiResponse<Order>
+                        {
+                            Success = true,
+                            Message = "Order loaded",
+                            Data = directObj
+                        };
+                    }
+                }
+                catch { }
+
                 try
                 {
                     using var document = JsonDocument.Parse(content);
@@ -839,7 +867,10 @@ public class ApiService
                     {
                         var order = TryReadOrder(document.RootElement, "data")
                             ?? TryReadOrder(document.RootElement, "order")
-                            ?? TryReadOrder(document.RootElement, "result");
+                            ?? TryReadOrder(document.RootElement, "result")
+                            ?? (document.RootElement.TryGetProperty("data", out var dataNode) && dataNode.ValueKind == JsonValueKind.Object
+                                ? TryReadOrder(dataNode, "order") ?? TryReadOrder(dataNode, "result")
+                                : null);
 
                         if (order != null)
                         {
@@ -854,15 +885,11 @@ public class ApiService
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine($"[API] Order detail envelope parse error: {ex.Message}");
+                    Log($"[API] Order detail envelope parse error for {endpoint}: {ex.Message}");
                 }
-                
-                return new ApiResponse<Order> { Success = false, Message = "Order not found" };
             }
-            else
-            {
-                return new ApiResponse<Order> { Success = false, Message = "Order not found" };
-            }
+
+            return new ApiResponse<Order> { Success = false, Message = "Order not found" };
         }
         catch (Exception ex)
         {

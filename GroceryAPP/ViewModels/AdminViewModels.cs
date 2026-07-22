@@ -30,10 +30,14 @@ public partial class AdminDashboardViewModel : BaseViewModel
     [ObservableProperty]
     private int totalCategories;
 
+    [ObservableProperty]
+    private bool isAdminUser;
+
     public AdminDashboardViewModel(ApiService apiService, AuthService authService)
     {
         _apiService = apiService;
         _authService = authService;
+        IsAdminUser = !_authService.IsDealer;
     }
 
     [RelayCommand]
@@ -43,6 +47,8 @@ public partial class AdminDashboardViewModel : BaseViewModel
         {
             IsLoading = true;
             ClearError();
+
+            IsAdminUser = !_authService.IsDealer;
 
             var loadErrors = new List<string>();
 

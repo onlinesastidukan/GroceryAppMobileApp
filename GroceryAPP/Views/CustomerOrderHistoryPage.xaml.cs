@@ -95,6 +95,7 @@ public partial class CustomerOrderHistoryPage : ContentPage
             var detailPage = Application.Current?.Handler?.MauiContext?.Services?.GetService<CustomerOrderDetailPage>();
             if (detailPage?.BindingContext is CustomerOrderDetailViewModel detailVm)
             {
+                detailVm.SetPreloadedOrder(order);
                 detailVm.OrderId = order.OrderId;
                 await Navigation.PushAsync(detailPage);
                 return;

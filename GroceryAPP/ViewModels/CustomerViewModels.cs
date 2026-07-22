@@ -467,12 +467,39 @@ public partial class CustomerOrderDetailViewModel : BaseViewModel
     [ObservableProperty]
     private ObservableCollection<OrderItem> orderItems;
 
+    private Order _preloadedOrder;
+
     public bool HasNoItems => OrderItems == null || OrderItems.Count == 0;
 
     public CustomerOrderDetailViewModel(ApiService apiService)
     {
         _apiService = apiService;
         OrderItems = new ObservableCollection<OrderItem>();
+    }
+
+    public void SetPreloadedOrder(Order order)
+    {
+        _preloadedOrder = order;
+        if (order?.OrderId > 0)
+        {
+            OrderId = order.OrderId;
+        }
+    }
+
+    private void ApplyOrderToUi(Order sourceOrder)
+    {
+        Order = sourceOrder;
+        OrderItems.Clear();
+
+        if (sourceOrder?.OrderItems != null)
+        {
+            foreach (var item in sourceOrder.OrderItems)
+            {
+                OrderItems.Add(item);
+            }
+        }
+
+        OnPropertyChanged(nameof(HasNoItems));
     }
 
     protected override async Task InitializeAsync()
@@ -482,28 +509,35 @@ public partial class CustomerOrderDetailViewModel : BaseViewModel
             IsLoading = true;
             ClearError();
 
+            if (_preloadedOrder != null)
+            {
+                ApplyOrderToUi(_preloadedOrder);
+            }
+
             if (OrderId > 0)
             {
                 var response = await _apiService.GetOrderByIdAsync(OrderId);
                 if (response?.Success == true && response.Data != null)
                 {
-                    Order = response.Data;
-                    OrderItems.Clear();
-                    foreach (var item in Order.OrderItems)
-                    {
-                        OrderItems.Add(item);
-                    }
-                    OnPropertyChanged(nameof(HasNoItems));
+                    ApplyOrderToUi(response.Data);
+                    _preloadedOrder = response.Data;
                 }
-                else
+                else if (Order == null)
                 {
                     SetError(response?.Message ?? "Failed to load order");
                 }
             }
+            else if (Order == null)
+            {
+                SetError("Order ID is missing.");
+            }
         }
         catch (Exception ex)
         {
-            SetError($"Error: {ex.Message}");
+            if (Order == null)
+            {
+                SetError($"Error: {ex.Message}");
+            }
         }
         finally
         {

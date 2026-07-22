@@ -140,12 +140,7 @@
                                        HorizontalTextAlignment="Center"
                                        MaxLines="2"
                                        LineBreakMode="TailTruncation"/>
-                                <Label Text="{Binding Description}"
-                                       FontSize="11"
-                                       TextColor="{StaticResource TextSecondary}"
-                                       HorizontalTextAlignment="Center"
-                                       MaxLines="2"
-                                       LineBreakMode="TailTruncation"/>
+
                             </VerticalStackLayout>
                         </VerticalStackLayout>
                     </Frame>
