@@ -452,7 +452,7 @@ public class ApiService
                 };
             }
 
-            var response = await GetAsyncWithRetry($"{AppConfig.CategoryController}");
+            var response = await GetAsyncWithRetry($"{AppConfig.CategoryController}?includeImage=false");
             var content = await response.Content.ReadAsStringAsync();
             Log($"[API] GetCategories response status: {(int)response.StatusCode} {response.StatusCode}. Base={_httpClient.BaseAddress}");
 
@@ -562,8 +562,8 @@ public class ApiService
             }
 
             var url = categoryId == 0
-                ? $"{AppConfig.ProductController}"
-                : $"{AppConfig.ProductController}?categoryId={categoryId}";
+                ? $"{AppConfig.ProductController}?includeImage=false"
+                : $"{AppConfig.ProductController}?categoryId={categoryId}&includeImage=false";
 
             var response = await GetAsyncWithRetry(url);
             var content = await response.Content.ReadAsStringAsync();
@@ -734,8 +734,8 @@ public class ApiService
                 return new ApiResponse<List<Order>> { Success = false, Message = "No internet connection" };
             }
 
-            var primaryPath = $"{AppConfig.OrderController}/my";
-            var fallbackPath = $"{AppConfig.OrderController}";
+            var primaryPath = $"{AppConfig.OrderController}/my?includeItems=false";
+            var fallbackPath = $"{AppConfig.OrderController}?includeItems=false";
 
             var response = await GetAsyncWithRetry(primaryPath);
             if (!response.IsSuccessStatusCode && (int)response.StatusCode == 404)
@@ -852,11 +852,11 @@ public class ApiService
 
             var endpoints = new[]
             {
-                $"{AppConfig.OrderController}/mobile/{encodedMobile}",
+                $"{AppConfig.OrderController}/mobile/{encodedMobile}?includeItems=false",
                 $"{AppConfig.OrderController}/by-mobile/{encodedMobile}",
-                $"{AppConfig.OrderController}/search?mobileNumber={encodedMobile}",
-                $"{AppConfig.OrderController}?mobileNumber={encodedMobile}",
-                $"{AppConfig.OrderController}?mobile={encodedMobile}",
+                $"{AppConfig.OrderController}/search?mobileNumber={encodedMobile}&includeItems=false",
+                $"{AppConfig.OrderController}?mobileNumber={encodedMobile}&includeItems=false",
+                $"{AppConfig.OrderController}?mobile={encodedMobile}&includeItems=false",
                 $"{AppConfig.OrderController}"
             };
 
@@ -1916,7 +1916,7 @@ public class ApiService
     {
         try
         {
-            var response = await GetAsyncWithRetry($"{AppConfig.AdminController}/orders");
+            var response = await GetAsyncWithRetry($"{AppConfig.AdminController}/orders?includeItems=false");
             var content = await response.Content.ReadAsStringAsync();
 
             if (response.IsSuccessStatusCode)
@@ -2003,7 +2003,7 @@ public class ApiService
         {
             var endpoints = new[]
             {
-                "dealer/orders",
+                "dealer/orders?includeItems=false",
                 $"{AppConfig.AdminController}/orders/my-shop",
                 $"{AppConfig.OrderController}/dealer",
                 $"{AppConfig.OrderController}/my-shop"

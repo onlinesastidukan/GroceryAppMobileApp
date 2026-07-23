@@ -426,6 +426,7 @@ public partial class CustomerOrderHistoryViewModel : BaseViewModel
                 Orders.Clear();
                 foreach (var order in response.Data.OrderByDescending(x => x.OrderDate))
                 {
+                    order.OrderItems ??= new List<OrderItem>();
                     Orders.Add(order);
                 }
                 OnPropertyChanged(nameof(HasNoOrders));

@@ -205,6 +205,13 @@ public partial class AdminOrdersViewModel : BaseViewModel
 
                 if (response?.Success == true && response.Data != null)
                 {
+                    // Dealer order list may intentionally be summary-only (Items omitted)
+                    // for performance; detail page fetch will load full order items.
+                    foreach (var order in response.Data)
+                    {
+                        order.OrderItems ??= new List<OrderItem>();
+                    }
+
                     visibleOrders = response.Data;
                 }
                 else
@@ -246,6 +253,10 @@ public partial class AdminOrdersViewModel : BaseViewModel
             {
                 response = await _apiService.GetAllOrdersAdminAsync();
                 visibleOrders = response?.Data ?? new List<Order>();
+                foreach (var order in visibleOrders)
+                {
+                    order.OrderItems ??= new List<OrderItem>();
+                }
             }
 
             Orders.Clear();
