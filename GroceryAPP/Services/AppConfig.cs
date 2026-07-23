@@ -4,29 +4,16 @@ namespace GroceryApp.Services;
 
 public static class AppConfig
 {
-    // Railway Production URL - Already deployed
-    public const string ApiBaseUrl = "https://groceryappapi-production.up.railway.app/api";
+    // Railway Production URL (direct backend)
+    public const string ApiBaseUrl = "https://groceryappapi-production-d706.up.railway.app/api";
 
-    // Cloudflare Worker proxy URL — resolves from all ISPs/WiFi networks because
-    // Cloudflare's anycast IPs are globally trusted. Deploy the Worker once and set
-    // the URL below. Free tier: 100,000 requests/day.
-    // Deploy at: https://dash.cloudflare.com → Workers & Pages → Create Worker
-    // Worker code: https://github.com/your-repo/cf-worker-proxy (5-line proxy)
-    private const string CloudflareWorkerUrl = "https://divine-star-89c3.onlinesastidukan7727.workers.dev";
+    // Direct Railway only (Cloudflare disabled for troubleshooting network/TLS path).
+    private const string CloudflareWorkerUrl = "";
 
-    public static readonly string[] ApiBaseUrls = string.IsNullOrWhiteSpace(CloudflareWorkerUrl)
-        ? new[]
-        {
-            ApiBaseUrl,
-            "https://groceryappapi-production.railway.app/api"
-        }
-        : new[]
-        {
-            // Cloudflare Worker is tried FIRST — bypasses ISP DNS blocks
-            CloudflareWorkerUrl,
-            ApiBaseUrl,
-            "https://groceryappapi-production.railway.app/api"
-        };
+    public static readonly string[] ApiBaseUrls = new[]
+    {
+        ApiBaseUrl
+    };
     
     public const string AuthController = "auth";
     public const string ProductController = "products";

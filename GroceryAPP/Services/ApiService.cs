@@ -441,71 +441,112 @@ public class ApiService
     {
         try
         {
+            var networkAccess = Connectivity.Current.NetworkAccess;
+            if (networkAccess != NetworkAccess.Internet)
+            {
+                Log($"[API] GetCategories blocked, network access: {networkAccess}");
+                return new ApiResponse<List<Category>>
+                {
+                    Success = false,
+                    Message = "No internet connection"
+                };
+            }
+
             var response = await GetAsyncWithRetry($"{AppConfig.CategoryController}");
             var content = await response.Content.ReadAsStringAsync();
-            
-            if (response.IsSuccessStatusCode)
-            {
-                try
-                {
-                    var wrappedResponse = JsonSerializer.Deserialize<ApiResponse<List<Category>>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    if (wrappedResponse != null && wrappedResponse.Success)
-                    {
-                        return wrappedResponse;
-                    }
-                }
-                catch { }
-                
-                try
-                {
-                    var directList = JsonSerializer.Deserialize<List<Category>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    if (directList != null)
-                    {
-                        return new ApiResponse<List<Category>> 
-                        { 
-                            Success = true, 
-                            Message = "Categories loaded",
-                            Data = directList 
-                        };
-                    }
-                }
-                catch { }
+            Log($"[API] GetCategories response status: {(int)response.StatusCode} {response.StatusCode}. Base={_httpClient.BaseAddress}");
 
-                // Try 3: Root is an object with a different wrapper — extract first array property
-                try
+            if (!response.IsSuccessStatusCode)
+            {
+                Log($"[API] GetCategories failed body: {Preview(content, 300)}");
+                return new ApiResponse<List<Category>>
                 {
-                    using var doc = JsonDocument.Parse(content);
-                    var root = doc.RootElement;
-                    if (root.ValueKind == JsonValueKind.Object)
+                    Success = false,
+                    Message = string.IsNullOrWhiteSpace(ExtractApiErrorMessage(content))
+                        ? "Failed to load categories"
+                        : ExtractApiErrorMessage(content)!
+                };
+            }
+
+            try
+            {
+                var wrappedResponse = JsonSerializer.Deserialize<ApiResponse<List<Category>>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (wrappedResponse?.Data != null)
+                {
+                    wrappedResponse.Success = true;
+                    return wrappedResponse;
+                }
+            }
+            catch { }
+
+            try
+            {
+                var directList = JsonSerializer.Deserialize<List<Category>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (directList != null)
+                {
+                    return new ApiResponse<List<Category>>
                     {
-                        var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                        foreach (var key in new[] { "data", "categories", "items", "result", "results" })
+                        Success = true,
+                        Message = "Categories loaded",
+                        Data = directList
+                    };
+                }
+            }
+            catch { }
+
+            try
+            {
+                using var doc = JsonDocument.Parse(content);
+                var root = doc.RootElement;
+                if (root.ValueKind == JsonValueKind.Object)
+                {
+                    var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    foreach (var key in new[] { "data", "categories", "items", "result", "results" })
+                    {
+                        if (root.TryGetProperty(key, out var elem) && elem.ValueKind == JsonValueKind.Array)
                         {
-                            if (root.TryGetProperty(key, out var elem) && elem.ValueKind == JsonValueKind.Array)
+                            var list = JsonSerializer.Deserialize<List<Category>>(elem.GetRawText(), opts);
+                            if (list != null)
                             {
-                                var list = JsonSerializer.Deserialize<List<Category>>(elem.GetRawText(), opts);
-                                if (list != null)
-                                    return new ApiResponse<List<Category>> { Success = true, Message = "Categories loaded", Data = list };
+                                return new ApiResponse<List<Category>> { Success = true, Message = "Categories loaded", Data = list };
                             }
                         }
                     }
                 }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"[API] Category parse error: {ex.Message}");
-                }
-
-                return new ApiResponse<List<Category>> { Success = false, Message = "Failed to parse categories" };
             }
-            else
+            catch (Exception ex)
             {
-                return new ApiResponse<List<Category>> { Success = false, Message = "Failed to load categories" };
+                Log($"[API] Category parse error: {ex.Message}");
             }
+
+            return new ApiResponse<List<Category>> { Success = false, Message = "Failed to parse categories" };
+        }
+        catch (HttpRequestException ex)
+        {
+            Log($"[API] GetCategories HttpRequestException: {ex.Message}");
+            return new ApiResponse<List<Category>>
+            {
+                Success = false,
+                Message = ClassifyNetworkError(ex)
+            };
+        }
+        catch (TaskCanceledException ex)
+        {
+            Log($"[API] GetCategories timeout: {ex.Message}");
+            return new ApiResponse<List<Category>>
+            {
+                Success = false,
+                Message = "Request timeout"
+            };
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"[API] GetCategories error: {ex.Message}");
-            return new ApiResponse<List<Category>> { Success = false, Message = $"Error: {ex.Message}" };
+            Log($"[API] GetCategories error: {ex.Message}");
+            return new ApiResponse<List<Category>>
+            {
+                Success = false,
+                Message = $"Error: {ex.Message}"
+            };
         }
     }
 
@@ -513,79 +554,102 @@ public class ApiService
     {
         try
         {
-            var url = string.IsNullOrEmpty(categoryId.ToString()) || categoryId == 0 
-                ? $"{AppConfig.ProductController}" 
+            var networkAccess = Connectivity.Current.NetworkAccess;
+            if (networkAccess != NetworkAccess.Internet)
+            {
+                Log($"[API] GetProducts blocked, network access: {networkAccess}");
+                return new ApiResponse<List<Product>> { Success = false, Message = "No internet connection" };
+            }
+
+            var url = categoryId == 0
+                ? $"{AppConfig.ProductController}"
                 : $"{AppConfig.ProductController}?categoryId={categoryId}";
-            
+
             var response = await GetAsyncWithRetry(url);
             var content = await response.Content.ReadAsStringAsync();
-            
-            if (response.IsSuccessStatusCode)
-            {
-                try
-                {
-                    var wrappedResponse = JsonSerializer.Deserialize<ApiResponse<List<Product>>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    if (wrappedResponse != null && wrappedResponse.Success)
-                    {
-                        NormalizeProductImageUrls(wrappedResponse.Data);
-                        return wrappedResponse;
-                    }
-                }
-                catch { }
-                
-                try
-                {
-                    var directList = JsonSerializer.Deserialize<List<Product>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    if (directList != null)
-                    {
-                        NormalizeProductImageUrls(directList);
-                        return new ApiResponse<List<Product>> 
-                        { 
-                            Success = true, 
-                            Message = "Products loaded",
-                            Data = directList 
-                        };
-                    }
-                }
-                catch { }
+            Log($"[API] GetProducts response status: {(int)response.StatusCode} {response.StatusCode}. Base={_httpClient.BaseAddress}");
 
-                // Try 3: Root is an object with a different wrapper — extract first array property
-                try
+            if (!response.IsSuccessStatusCode)
+            {
+                Log($"[API] GetProducts failed body: {Preview(content, 300)}");
+                return new ApiResponse<List<Product>>
                 {
-                    using var doc = JsonDocument.Parse(content);
-                    var root = doc.RootElement;
-                    if (root.ValueKind == JsonValueKind.Object)
+                    Success = false,
+                    Message = string.IsNullOrWhiteSpace(ExtractApiErrorMessage(content))
+                        ? "Failed to load products"
+                        : ExtractApiErrorMessage(content)!
+                };
+            }
+
+            try
+            {
+                var wrappedResponse = JsonSerializer.Deserialize<ApiResponse<List<Product>>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (wrappedResponse?.Data != null)
+                {
+                    wrappedResponse.Success = true;
+                    NormalizeProductImageUrls(wrappedResponse.Data);
+                    return wrappedResponse;
+                }
+            }
+            catch { }
+
+            try
+            {
+                var directList = JsonSerializer.Deserialize<List<Product>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (directList != null)
+                {
+                    NormalizeProductImageUrls(directList);
+                    return new ApiResponse<List<Product>>
                     {
-                        var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                        foreach (var key in new[] { "data", "products", "items", "result", "results" })
+                        Success = true,
+                        Message = "Products loaded",
+                        Data = directList
+                    };
+                }
+            }
+            catch { }
+
+            try
+            {
+                using var doc = JsonDocument.Parse(content);
+                var root = doc.RootElement;
+                if (root.ValueKind == JsonValueKind.Object)
+                {
+                    var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    foreach (var key in new[] { "data", "products", "items", "result", "results" })
+                    {
+                        if (root.TryGetProperty(key, out var elem) && elem.ValueKind == JsonValueKind.Array)
                         {
-                            if (root.TryGetProperty(key, out var elem) && elem.ValueKind == JsonValueKind.Array)
+                            var list = JsonSerializer.Deserialize<List<Product>>(elem.GetRawText(), opts);
+                            if (list != null)
                             {
-                                var list = JsonSerializer.Deserialize<List<Product>>(elem.GetRawText(), opts);
-                                if (list != null)
-                                {
-                                    NormalizeProductImageUrls(list);
-                                    return new ApiResponse<List<Product>> { Success = true, Message = "Products loaded", Data = list };
-                                }
+                                NormalizeProductImageUrls(list);
+                                return new ApiResponse<List<Product>> { Success = true, Message = "Products loaded", Data = list };
                             }
                         }
                     }
                 }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"[API] Product parse error: {ex.Message}");
-                }
-
-                return new ApiResponse<List<Product>> { Success = false, Message = "Failed to parse products" };
             }
-            else
+            catch (Exception ex)
             {
-                return new ApiResponse<List<Product>> { Success = false, Message = "Failed to load products" };
+                Log($"[API] Product parse error: {ex.Message}");
             }
+
+            return new ApiResponse<List<Product>> { Success = false, Message = "Failed to parse products" };
+        }
+        catch (HttpRequestException ex)
+        {
+            Log($"[API] GetProducts HttpRequestException: {ex.Message}");
+            return new ApiResponse<List<Product>> { Success = false, Message = ClassifyNetworkError(ex) };
+        }
+        catch (TaskCanceledException ex)
+        {
+            Log($"[API] GetProducts timeout: {ex.Message}");
+            return new ApiResponse<List<Product>> { Success = false, Message = "Request timeout" };
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"[API] GetProducts error: {ex.Message}");
+            Log($"[API] GetProducts error: {ex.Message}");
             return new ApiResponse<List<Product>> { Success = false, Message = $"Error: {ex.Message}" };
         }
     }
@@ -594,44 +658,67 @@ public class ApiService
     {
         try
         {
+            var networkAccess = Connectivity.Current.NetworkAccess;
+            if (networkAccess != NetworkAccess.Internet)
+            {
+                Log($"[API] GetProductById blocked, network access: {networkAccess}");
+                return new ApiResponse<Product> { Success = false, Message = "No internet connection" };
+            }
+
             var response = await GetAsyncWithRetry($"{AppConfig.ProductController}/{productId}");
             var content = await response.Content.ReadAsStringAsync();
-            
-            if (response.IsSuccessStatusCode)
+            Log($"[API] GetProductById/{productId} response status: {(int)response.StatusCode} {response.StatusCode}. Base={_httpClient.BaseAddress}");
+
+            if (!response.IsSuccessStatusCode)
             {
-                try
+                return new ApiResponse<Product>
                 {
-                    var wrappedResponse = JsonSerializer.Deserialize<ApiResponse<Product>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    if (wrappedResponse != null && wrappedResponse.Success)
-                    {
-                        NormalizeProductImageUrl(wrappedResponse.Data);
-                        return wrappedResponse;
-                    }
-                }
-                catch { }
-                
-                var directObj = JsonSerializer.Deserialize<Product>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                if (directObj != null)
-                {
-                    NormalizeProductImageUrl(directObj);
-                    return new ApiResponse<Product> 
-                    { 
-                        Success = true, 
-                        Message = "Product loaded",
-                        Data = directObj 
-                    };
-                }
-                
-                return new ApiResponse<Product> { Success = false, Message = "Product not found" };
+                    Success = false,
+                    Message = string.IsNullOrWhiteSpace(ExtractApiErrorMessage(content))
+                        ? "Product not found"
+                        : ExtractApiErrorMessage(content)!
+                };
             }
-            else
+
+            try
             {
-                return new ApiResponse<Product> { Success = false, Message = "Product not found" };
+                var wrappedResponse = JsonSerializer.Deserialize<ApiResponse<Product>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (wrappedResponse?.Data != null)
+                {
+                    wrappedResponse.Success = true;
+                    NormalizeProductImageUrl(wrappedResponse.Data);
+                    return wrappedResponse;
+                }
             }
+            catch { }
+
+            var directObj = JsonSerializer.Deserialize<Product>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            if (directObj != null)
+            {
+                NormalizeProductImageUrl(directObj);
+                return new ApiResponse<Product>
+                {
+                    Success = true,
+                    Message = "Product loaded",
+                    Data = directObj
+                };
+            }
+
+            return new ApiResponse<Product> { Success = false, Message = "Product not found" };
+        }
+        catch (HttpRequestException ex)
+        {
+            Log($"[API] GetProductById HttpRequestException: {ex.Message}");
+            return new ApiResponse<Product> { Success = false, Message = ClassifyNetworkError(ex) };
+        }
+        catch (TaskCanceledException ex)
+        {
+            Log($"[API] GetProductById timeout: {ex.Message}");
+            return new ApiResponse<Product> { Success = false, Message = "Request timeout" };
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"[API] GetProductById error: {ex.Message}");
+            Log($"[API] GetProductById error: {ex.Message}");
             return new ApiResponse<Product> { Success = false, Message = $"Error: {ex.Message}" };
         }
     }
@@ -640,8 +727,13 @@ public class ApiService
     {
         try
         {
-            // Backend customer orders endpoint is /orders/my.
-            // Keep /orders as a fallback for compatibility with older API variants.
+            var networkAccess = Connectivity.Current.NetworkAccess;
+            if (networkAccess != NetworkAccess.Internet)
+            {
+                Log($"[API] GetOrders blocked, network access: {networkAccess}");
+                return new ApiResponse<List<Order>> { Success = false, Message = "No internet connection" };
+            }
+
             var primaryPath = $"{AppConfig.OrderController}/my";
             var fallbackPath = $"{AppConfig.OrderController}";
 
@@ -652,74 +744,89 @@ public class ApiService
             }
 
             var content = await response.Content.ReadAsStringAsync();
-            
-            if (response.IsSuccessStatusCode)
+            Log($"[API] GetOrders response status: {(int)response.StatusCode} {response.StatusCode}. Base={_httpClient.BaseAddress}");
+
+            if (!response.IsSuccessStatusCode)
             {
-                try
+                Log($"[API] GetOrders failed body: {Preview(content, 300)}");
+                return new ApiResponse<List<Order>>
                 {
-                    var wrappedResponse = JsonSerializer.Deserialize<ApiResponse<List<Order>>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    if (wrappedResponse != null && wrappedResponse.Success)
+                    Success = false,
+                    Message = string.IsNullOrWhiteSpace(ExtractApiErrorMessage(content))
+                        ? "Failed to load orders"
+                        : ExtractApiErrorMessage(content)!
+                };
+            }
+
+            try
+            {
+                var wrappedResponse = JsonSerializer.Deserialize<ApiResponse<List<Order>>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (wrappedResponse?.Data != null)
+                {
+                    wrappedResponse.Success = true;
+                    return wrappedResponse;
+                }
+            }
+            catch { }
+
+            var directList = JsonSerializer.Deserialize<List<Order>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            if (directList != null)
+            {
+                return new ApiResponse<List<Order>>
+                {
+                    Success = true,
+                    Message = "Orders loaded",
+                    Data = directList
+                };
+            }
+
+            try
+            {
+                using var document = JsonDocument.Parse(content);
+                if (document.RootElement.ValueKind == JsonValueKind.Object)
+                {
+                    var list = TryReadOrderArray(document.RootElement, "data")
+                        ?? TryReadOrderArray(document.RootElement, "items")
+                        ?? TryReadOrderArray(document.RootElement, "orders");
+
+                    if (list == null && document.RootElement.TryGetProperty("data", out var dataNode) && dataNode.ValueKind == JsonValueKind.Object)
                     {
-                        return wrappedResponse;
+                        list = TryReadOrderArray(dataNode, "items")
+                            ?? TryReadOrderArray(dataNode, "orders")
+                            ?? TryReadOrderArray(dataNode, "result");
+                    }
+
+                    if (list != null)
+                    {
+                        return new ApiResponse<List<Order>>
+                        {
+                            Success = true,
+                            Message = "Orders loaded",
+                            Data = list
+                        };
                     }
                 }
-                catch { }
-                
-                var directList = JsonSerializer.Deserialize<List<Order>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                if (directList != null)
-                {
-                    return new ApiResponse<List<Order>> 
-                    { 
-                        Success = true, 
-                        Message = "Orders loaded",
-                        Data = directList 
-                    };
-                }
-
-                // Some backend variants return orders inside envelopes like:
-                // { data: [...] }, { items: [...] }, { orders: [...] } or { data: { items: [...] } }.
-                try
-                {
-                    using var document = JsonDocument.Parse(content);
-                    if (document.RootElement.ValueKind == JsonValueKind.Object)
-                    {
-                        var list = TryReadOrderArray(document.RootElement, "data")
-                            ?? TryReadOrderArray(document.RootElement, "items")
-                            ?? TryReadOrderArray(document.RootElement, "orders");
-
-                        if (list == null && document.RootElement.TryGetProperty("data", out var dataNode) && dataNode.ValueKind == JsonValueKind.Object)
-                        {
-                            list = TryReadOrderArray(dataNode, "items")
-                                ?? TryReadOrderArray(dataNode, "orders")
-                                ?? TryReadOrderArray(dataNode, "result");
-                        }
-
-                        if (list != null)
-                        {
-                            return new ApiResponse<List<Order>>
-                            {
-                                Success = true,
-                                Message = "Orders loaded",
-                                Data = list
-                            };
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"[API] Orders envelope parse error: {ex.Message}");
-                }
-                
-                return new ApiResponse<List<Order>> { Success = false, Message = "Failed to parse orders" };
             }
-            else
+            catch (Exception ex)
             {
-                return new ApiResponse<List<Order>> { Success = false, Message = "Failed to load orders" };
+                Log($"[API] Orders envelope parse error: {ex.Message}");
             }
+
+            return new ApiResponse<List<Order>> { Success = false, Message = "Failed to parse orders" };
+        }
+        catch (HttpRequestException ex)
+        {
+            Log($"[API] GetOrders HttpRequestException: {ex.Message}");
+            return new ApiResponse<List<Order>> { Success = false, Message = ClassifyNetworkError(ex) };
+        }
+        catch (TaskCanceledException ex)
+        {
+            Log($"[API] GetOrders timeout: {ex.Message}");
+            return new ApiResponse<List<Order>> { Success = false, Message = "Request timeout" };
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"[API] GetOrders error: {ex.Message}");
+            Log($"[API] GetOrders error: {ex.Message}");
             return new ApiResponse<List<Order>> { Success = false, Message = $"Error: {ex.Message}" };
         }
     }
@@ -733,6 +840,13 @@ public class ApiService
 
         try
         {
+            var networkAccess = Connectivity.Current.NetworkAccess;
+            if (networkAccess != NetworkAccess.Internet)
+            {
+                Log($"[API] GetOrdersByMobile blocked, network access: {networkAccess}");
+                return new ApiResponse<List<Order>> { Success = false, Message = "No internet connection" };
+            }
+
             var normalizedMobile = NormalizeMobileForCompare(mobileNumber);
             var encodedMobile = Uri.EscapeDataString(mobileNumber.Trim());
 
@@ -764,6 +878,7 @@ public class ApiService
 
                 if (!response.IsSuccessStatusCode)
                 {
+                    Log($"[API] GetOrdersByMobile '{endpoint}' failed: {(int)response.StatusCode}");
                     continue;
                 }
 
@@ -794,9 +909,19 @@ public class ApiService
                 Data = new List<Order>()
             };
         }
+        catch (HttpRequestException ex)
+        {
+            Log($"[API] GetOrdersByMobile HttpRequestException: {ex.Message}");
+            return new ApiResponse<List<Order>> { Success = false, Message = ClassifyNetworkError(ex) };
+        }
+        catch (TaskCanceledException ex)
+        {
+            Log($"[API] GetOrdersByMobile timeout: {ex.Message}");
+            return new ApiResponse<List<Order>> { Success = false, Message = "Request timeout" };
+        }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"[API] GetOrdersByMobile error: {ex.Message}");
+            Log($"[API] GetOrdersByMobile error: {ex.Message}");
             return new ApiResponse<List<Order>> { Success = false, Message = $"Error: {ex.Message}" };
         }
     }
@@ -805,6 +930,13 @@ public class ApiService
     {
         try
         {
+            var networkAccess = Connectivity.Current.NetworkAccess;
+            if (networkAccess != NetworkAccess.Internet)
+            {
+                Log($"[API] GetOrderById blocked, network access: {networkAccess}");
+                return new ApiResponse<Order> { Success = false, Message = "No internet connection" };
+            }
+
             var endpoints = new[]
             {
                 $"{AppConfig.OrderController}/{orderId}",
@@ -891,9 +1023,19 @@ public class ApiService
 
             return new ApiResponse<Order> { Success = false, Message = "Order not found" };
         }
+        catch (HttpRequestException ex)
+        {
+            Log($"[API] GetOrderById HttpRequestException: {ex.Message}");
+            return new ApiResponse<Order> { Success = false, Message = ClassifyNetworkError(ex) };
+        }
+        catch (TaskCanceledException ex)
+        {
+            Log($"[API] GetOrderById timeout: {ex.Message}");
+            return new ApiResponse<Order> { Success = false, Message = "Request timeout" };
+        }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"[API] GetOrderById error: {ex.Message}");
+            Log($"[API] GetOrderById error: {ex.Message}");
             return new ApiResponse<Order> { Success = false, Message = $"Error: {ex.Message}" };
         }
     }
@@ -902,56 +1044,80 @@ public class ApiService
     {
         try
         {
+            var networkAccess = Connectivity.Current.NetworkAccess;
+            if (networkAccess != NetworkAccess.Internet)
+            {
+                Log($"[API] GetAdminOrderById blocked, network access: {networkAccess}");
+                return new ApiResponse<Order> { Success = false, Message = "No internet connection" };
+            }
+
             var response = await GetAsyncWithRetry($"{AppConfig.AdminController}/orders/{orderId}");
             var content = await response.Content.ReadAsStringAsync();
             Log($"[API] GetAdminOrderById/{orderId} → {(int)response.StatusCode}. Body: {Preview(content, 300)}");
 
-            if (response.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
             {
-                // 1. Wrapped ApiResponse<Order>
-                try
+                return new ApiResponse<Order>
                 {
-                    var wrapped = JsonSerializer.Deserialize<ApiResponse<Order>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    if (wrapped?.Success == true && wrapped.Data != null) return wrapped;
-                }
-                catch { }
+                    Success = false,
+                    Message = string.IsNullOrWhiteSpace(ExtractApiErrorMessage(content))
+                        ? "Order not found"
+                        : ExtractApiErrorMessage(content)!
+                };
+            }
 
-                // 2. Direct Order object
-                try
+            try
+            {
+                var wrapped = JsonSerializer.Deserialize<ApiResponse<Order>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (wrapped?.Data != null)
                 {
-                    var direct = JsonSerializer.Deserialize<Order>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    if (direct != null && direct.OrderId > 0)
-                        return new ApiResponse<Order> { Success = true, Message = "Order loaded", Data = direct };
+                    wrapped.Success = true;
+                    return wrapped;
                 }
-                catch { }
+            }
+            catch { }
 
-                // 3. Envelope: { data: {...} }, { order: {...} }, { result: {...} }
-                try
+            try
+            {
+                var direct = JsonSerializer.Deserialize<Order>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (direct != null && direct.OrderId > 0)
+                    return new ApiResponse<Order> { Success = true, Message = "Order loaded", Data = direct };
+            }
+            catch { }
+
+            try
+            {
+                using var document = JsonDocument.Parse(content);
+                if (document.RootElement.ValueKind == JsonValueKind.Object)
                 {
-                    using var document = JsonDocument.Parse(content);
-                    if (document.RootElement.ValueKind == JsonValueKind.Object)
-                    {
-                        var order = TryReadOrder(document.RootElement, "data")
-                            ?? TryReadOrder(document.RootElement, "order")
-                            ?? TryReadOrder(document.RootElement, "result");
+                    var order = TryReadOrder(document.RootElement, "data")
+                        ?? TryReadOrder(document.RootElement, "order")
+                        ?? TryReadOrder(document.RootElement, "result");
 
-                        if (order != null)
-                            return new ApiResponse<Order> { Success = true, Message = "Order loaded", Data = order };
-                    }
+                    if (order != null)
+                        return new ApiResponse<Order> { Success = true, Message = "Order loaded", Data = order };
                 }
-                catch (Exception ex)
-                {
-                    Log($"[API] GetAdminOrderById envelope parse error: {ex.Message}");
-                }
-
-                return new ApiResponse<Order> { Success = false, Message = "Order not found" };
+            }
+            catch (Exception ex)
+            {
+                Log($"[API] GetAdminOrderById envelope parse error: {ex.Message}");
             }
 
             return new ApiResponse<Order> { Success = false, Message = "Order not found" };
         }
+        catch (HttpRequestException ex)
+        {
+            Log($"[API] GetAdminOrderById HttpRequestException: {ex.Message}");
+            return new ApiResponse<Order> { Success = false, Message = ClassifyNetworkError(ex) };
+        }
+        catch (TaskCanceledException ex)
+        {
+            Log($"[API] GetAdminOrderById timeout: {ex.Message}");
+            return new ApiResponse<Order> { Success = false, Message = "Request timeout" };
+        }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"[API] GetAdminOrderById error: {ex.Message}");
+            Log($"[API] GetAdminOrderById error: {ex.Message}");
             return new ApiResponse<Order> { Success = false, Message = $"Error: {ex.Message}" };
         }
     }
