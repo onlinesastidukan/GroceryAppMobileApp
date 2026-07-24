@@ -337,8 +337,14 @@ public partial class AdminOrderDetailViewModel : BaseViewModel
             if (fetchId > 0)
             {
                 var response = await _apiService.GetAdminOrderByIdAsync(fetchId);
-                if (response?.Success != true)
-                    response = await _apiService.GetOrderByIdAsync(fetchId);
+                if (response?.Success != true || response.Data == null || response.Data.OrderItems == null || response.Data.OrderItems.Count == 0)
+                {
+                    var fallback = await _apiService.GetOrderByIdAsync(fetchId);
+                    if (fallback?.Success == true && fallback.Data != null)
+                    {
+                        response = fallback;
+                    }
+                }
 
                 // If admin endpoint responded but has no mobile, also try the customer endpoint
                 // which often embeds user contact info directly in the order payload.
@@ -445,8 +451,6 @@ public partial class AdminOrderDetailViewModel : BaseViewModel
                 UpdateOrderStatusCommand.NotifyCanExecuteChanged();
                 OnPropertyChanged(nameof(Order));
 
-                if (SelectedStatus == "Delivered")
-                    await ReduceStockOnDeliveryAsync();
 
                 bool isTerminal = SelectedStatus.Equals("Cancelled", StringComparison.OrdinalIgnoreCase)
                     || SelectedStatus.Equals("Delivered", StringComparison.OrdinalIgnoreCase);
@@ -471,32 +475,6 @@ public partial class AdminOrderDetailViewModel : BaseViewModel
         }
     }
 
-    private async Task ReduceStockOnDeliveryAsync()
-    {
-        foreach (var item in OrderItems)
-        {
-            try
-            {
-                var productResp = await _apiService.GetProductByIdAsync(item.ProductId);
-                if (productResp?.Success == true && productResp.Data != null)
-                {
-                    var p = productResp.Data;
-                    await _apiService.UpdateProductAsync(new UpdateProductRequest
-                    {
-                        ProductId = p.ProductId,
-                        Name = p.Name,
-                        Description = p.Description ?? "",
-                        Price = p.Price,
-                        StockQuantity = Math.Max(0, p.Stock - item.Quantity),
-                        CategoryId = p.CategoryId,
-                        PhotoUrl = p.ImageUrl ?? "",
-                        IsActive = true
-                    });
-                }
-            }
-            catch { /* best-effort — don't fail the status update */ }
-        }
-    }
 }
 #endregion
 

@@ -939,8 +939,13 @@ public class ApiService
 
             var endpoints = new[]
             {
+                $"dealer/orders/{orderId}",
+                $"dealer/orders/{orderId}?includeItems=true",
+                $"{AppConfig.OrderController}/{orderId}?includeItems=true",
                 $"{AppConfig.OrderController}/{orderId}",
+                $"{AppConfig.OrderController}/details/{orderId}?includeItems=true",
                 $"{AppConfig.OrderController}/details/{orderId}",
+                $"{AppConfig.AdminController}/orders/{orderId}?includeItems=true",
                 $"{AppConfig.AdminController}/orders/{orderId}"
             };
 
@@ -1051,56 +1056,79 @@ public class ApiService
                 return new ApiResponse<Order> { Success = false, Message = "No internet connection" };
             }
 
-            var response = await GetAsyncWithRetry($"{AppConfig.AdminController}/orders/{orderId}");
-            var content = await response.Content.ReadAsStringAsync();
-            Log($"[API] GetAdminOrderById/{orderId} → {(int)response.StatusCode}. Body: {Preview(content, 300)}");
-
-            if (!response.IsSuccessStatusCode)
+            var endpoints = new[]
             {
-                return new ApiResponse<Order>
-                {
-                    Success = false,
-                    Message = string.IsNullOrWhiteSpace(ExtractApiErrorMessage(content))
-                        ? "Order not found"
-                        : ExtractApiErrorMessage(content)!
-                };
-            }
+                $"dealer/orders/{orderId}",
+                $"dealer/orders/{orderId}?includeItems=true",
+                $"{AppConfig.AdminController}/orders/{orderId}?includeItems=true",
+                $"{AppConfig.AdminController}/orders/{orderId}",
+                $"{AppConfig.OrderController}/{orderId}?includeItems=true",
+                $"{AppConfig.OrderController}/{orderId}",
+                $"{AppConfig.OrderController}/details/{orderId}?includeItems=true",
+                $"{AppConfig.OrderController}/details/{orderId}"
+            };
 
-            try
+            foreach (var endpoint in endpoints)
             {
-                var wrapped = JsonSerializer.Deserialize<ApiResponse<Order>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                if (wrapped?.Data != null)
+                HttpResponseMessage response;
+                string content;
+
+                try
                 {
-                    wrapped.Success = true;
-                    return wrapped;
+                    response = await GetAsyncWithRetry(endpoint);
+                    content = await response.Content.ReadAsStringAsync();
+                    Log($"[API] GetAdminOrderById {endpoint} → {(int)response.StatusCode}. Body: {Preview(content, 300)}");
                 }
-            }
-            catch { }
-
-            try
-            {
-                var direct = JsonSerializer.Deserialize<Order>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                if (direct != null && direct.OrderId > 0)
-                    return new ApiResponse<Order> { Success = true, Message = "Order loaded", Data = direct };
-            }
-            catch { }
-
-            try
-            {
-                using var document = JsonDocument.Parse(content);
-                if (document.RootElement.ValueKind == JsonValueKind.Object)
+                catch (Exception ex)
                 {
-                    var order = TryReadOrder(document.RootElement, "data")
-                        ?? TryReadOrder(document.RootElement, "order")
-                        ?? TryReadOrder(document.RootElement, "result");
-
-                    if (order != null)
-                        return new ApiResponse<Order> { Success = true, Message = "Order loaded", Data = order };
+                    Log($"[API] GetAdminOrderById {endpoint} exception: {ex.Message}");
+                    continue;
                 }
-            }
-            catch (Exception ex)
-            {
-                Log($"[API] GetAdminOrderById envelope parse error: {ex.Message}");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    continue;
+                }
+
+                try
+                {
+                    var wrapped = JsonSerializer.Deserialize<ApiResponse<Order>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (wrapped?.Data != null)
+                    {
+                        wrapped.Success = true;
+                        return wrapped;
+                    }
+                }
+                catch { }
+
+                try
+                {
+                    var direct = JsonSerializer.Deserialize<Order>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (direct != null && direct.OrderId > 0)
+                        return new ApiResponse<Order> { Success = true, Message = "Order loaded", Data = direct };
+                }
+                catch { }
+
+                try
+                {
+                    using var document = JsonDocument.Parse(content);
+                    if (document.RootElement.ValueKind == JsonValueKind.Object)
+                    {
+                        var order = TryReadOrder(document.RootElement, "data")
+                            ?? TryReadOrder(document.RootElement, "order")
+                            ?? TryReadOrder(document.RootElement, "result")
+                            ?? (document.RootElement.TryGetProperty("data", out var dataNode) && dataNode.ValueKind == JsonValueKind.Object
+                                ? TryReadOrder(dataNode, "order") ?? TryReadOrder(dataNode, "result")
+                                : null);
+
+                        if (order != null)
+                            return new ApiResponse<Order> { Success = true, Message = "Order loaded", Data = order };
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log($"[API] GetAdminOrderById envelope parse error for {endpoint}: {ex.Message}");
+                }
             }
 
             return new ApiResponse<Order> { Success = false, Message = "Order not found" };
@@ -1380,19 +1408,44 @@ public class ApiService
 
     public async Task<ApiResponse> UpdateOrderStatusAsync(int orderId, string status)
     {
-        var statusPayload = new { status };
+        if (orderId <= 0 || string.IsNullOrWhiteSpace(status))
+            return new ApiResponse { Success = false, Message = "Invalid order status request" };
 
-        // Try the dedicated admin status endpoint first, then fallbacks.
+        var statusPayload = new { status };
+        var statusPayloadAlt = new { orderStatus = status };
+
+        // Try broad compatibility matrix because backend variants use different routes/actions.
+        var adminActionPath = status.Trim().ToLowerInvariant() switch
+        {
+            "confirmed" => "confirm",
+            "shipped" => "ship",
+            "delivered" => "deliver",
+            "cancelled" => "cancel",
+            _ => string.Empty
+        };
+
         var attempts = new (Func<Task<HttpResponseMessage>> send, string label)[]
         {
-            (() => PutAsJsonAsyncWithRetry($"dealer/orders/{orderId}/status", statusPayload), "PUT  dealer/orders/{id}/status"),
-            (() => PatchAsJsonAsyncWithRetry($"dealer/orders/{orderId}/status", statusPayload), "PATCH dealer/orders/{id}/status"),
-            (() => PutAsJsonAsyncWithRetry($"{AppConfig.OrderController}/{orderId}/status", statusPayload), "PUT  orders/{id}/status"),
-            (() => PatchAsJsonAsyncWithRetry($"{AppConfig.OrderController}/{orderId}/status", statusPayload), "PATCH orders/{id}/status"),
-            (() => PutAsJsonAsyncWithRetry($"{AppConfig.AdminController}/orders/{orderId}/status", statusPayload), "PUT  admin/orders/{id}/status"),
-            (() => PatchAsJsonAsyncWithRetry($"{AppConfig.AdminController}/orders/{orderId}/status", statusPayload), "PATCH admin/orders/{id}/status"),
-            (() => PatchAsJsonAsyncWithRetry($"{AppConfig.AdminController}/orders/{orderId}", statusPayload),        "PATCH admin/orders/{id}"),
-            (() => PutAsJsonAsyncWithRetry($"{AppConfig.AdminController}/orders/{orderId}", new UpdateOrderStatusRequest { OrderId = orderId, Status = status }), "PUT  admin/orders/{id}"),
+            (() => PutAsJsonAsyncWithRetry($"dealer/orders/{orderId}/status", statusPayload), "PUT  dealer/orders/{id}/status {status}"),
+            (() => PatchAsJsonAsyncWithRetry($"dealer/orders/{orderId}/status", statusPayload), "PATCH dealer/orders/{id}/status {status}"),
+            (() => PutAsJsonAsyncWithRetry($"dealer/orders/{orderId}", statusPayload), "PUT  dealer/orders/{id} {status}"),
+            (() => PatchAsJsonAsyncWithRetry($"dealer/orders/{orderId}", statusPayload), "PATCH dealer/orders/{id} {status}"),
+
+            (() => PutAsJsonAsyncWithRetry($"{AppConfig.OrderController}/{orderId}/status", statusPayload), "PUT  orders/{id}/status {status}"),
+            (() => PatchAsJsonAsyncWithRetry($"{AppConfig.OrderController}/{orderId}/status", statusPayload), "PATCH orders/{id}/status {status}"),
+            (() => PutAsJsonAsyncWithRetry($"{AppConfig.OrderController}/{orderId}", statusPayload), "PUT  orders/{id} {status}"),
+            (() => PatchAsJsonAsyncWithRetry($"{AppConfig.OrderController}/{orderId}", statusPayload), "PATCH orders/{id} {status}"),
+
+            (() => PutAsJsonAsyncWithRetry($"{AppConfig.AdminController}/orders/{orderId}/status", statusPayload), "PUT  admin/orders/{id}/status {status}"),
+            (() => PatchAsJsonAsyncWithRetry($"{AppConfig.AdminController}/orders/{orderId}/status", statusPayload), "PATCH admin/orders/{id}/status {status}"),
+            (() => PatchAsJsonAsyncWithRetry($"{AppConfig.AdminController}/orders/{orderId}", statusPayload), "PATCH admin/orders/{id} {status}"),
+            (() => PutAsJsonAsyncWithRetry($"{AppConfig.AdminController}/orders/{orderId}", new UpdateOrderStatusRequest { OrderId = orderId, Status = status }), "PUT  admin/orders/{id} typed payload"),
+            (() => PutAsJsonAsyncWithRetry($"{AppConfig.AdminController}/orders/{orderId}", statusPayloadAlt), "PUT  admin/orders/{id} {orderStatus}"),
+
+            (() => !string.IsNullOrEmpty(adminActionPath)
+                ? PutAsJsonAsyncWithRetry($"{AppConfig.AdminController}/orders/{orderId}/{adminActionPath}", new { })
+                : PutAsJsonAsyncWithRetry($"{AppConfig.AdminController}/orders/{orderId}/status", statusPayload),
+                "PUT  admin/orders/{id}/{mappedAction}")
         };
 
         string lastServerError = "Failed to update order status";
@@ -1402,21 +1455,34 @@ public class ApiService
             try
             {
                 var response = await send();
-                var content  = await response.Content.ReadAsStringAsync();
+                var content = await response.Content.ReadAsStringAsync();
                 System.Diagnostics.Debug.WriteLine($"[API] {label} → {(int)response.StatusCode}: {Preview(content, 200)}");
 
                 if (response.IsSuccessStatusCode)
                 {
-                    try
+                    if (!string.IsNullOrWhiteSpace(content))
                     {
-                        var result = JsonSerializer.Deserialize<ApiResponse>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                        if (result != null) return result;
+                        try
+                        {
+                            var result = JsonSerializer.Deserialize<ApiResponse>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                            if (result != null)
+                            {
+                                result.Success = true;
+                                if (string.IsNullOrWhiteSpace(result.Message))
+                                    result.Message = "Order status updated";
+                                return result;
+                            }
+                        }
+                        catch { }
                     }
-                    catch { }
+
                     return new ApiResponse { Success = true, Message = "Order status updated" };
                 }
 
-                if (!string.IsNullOrWhiteSpace(content))
+                var extracted = ExtractApiErrorMessage(content);
+                if (!string.IsNullOrWhiteSpace(extracted))
+                    lastServerError = extracted!;
+                else if (!string.IsNullOrWhiteSpace(content))
                     lastServerError = content.Length > 200 ? content[..200] : content;
             }
             catch (Exception ex)

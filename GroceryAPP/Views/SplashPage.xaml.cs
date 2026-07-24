@@ -32,6 +32,25 @@ public partial class SplashPage : ContentPage
                         if (restored && _authService.CurrentUser?.Token is { Length: > 0 } token && (_authService.IsAdmin || _authService.IsDealer))
                         {
                             _apiService.SetAuthToken(token);
+
+                            try
+                            {
+                                var firebaseService = services?.GetService<IFirebaseService>();
+                                if (firebaseService != null)
+                                {
+                                    var fcmToken = await firebaseService.GetTokenAsync();
+                                    if (!string.IsNullOrWhiteSpace(fcmToken))
+                                    {
+                                        var updated = await _apiService.UpdateFcmTokenAsync(fcmToken);
+                                        System.Diagnostics.Debug.WriteLine($"[SPLASH] FCM token re-sync on restore: {updated}");
+                                    }
+                                }
+                            }
+                            catch (Exception fcmEx)
+                            {
+                                System.Diagnostics.Debug.WriteLine($"[SPLASH] FCM token re-sync failed: {fcmEx.Message}");
+                            }
+
                             if (_authService.IsAdmin)
                             {
                                 nextPage = services?.GetService<AdminDashboardPage>();
