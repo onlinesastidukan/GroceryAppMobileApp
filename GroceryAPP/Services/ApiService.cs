@@ -452,7 +452,7 @@ public class ApiService
                 };
             }
 
-            var response = await GetAsyncWithRetry($"{AppConfig.CategoryController}?includeImage=false");
+            var response = await GetAsyncWithRetry($"{AppConfig.CategoryController}?includeImage=true");
             var content = await response.Content.ReadAsStringAsync();
             Log($"[API] GetCategories response status: {(int)response.StatusCode} {response.StatusCode}. Base={_httpClient.BaseAddress}");
 
@@ -562,8 +562,8 @@ public class ApiService
             }
 
             var url = categoryId == 0
-                ? $"{AppConfig.ProductController}?includeImage=false"
-                : $"{AppConfig.ProductController}?categoryId={categoryId}&includeImage=false";
+                ? $"{AppConfig.ProductController}?includeImage=true"
+                : $"{AppConfig.ProductController}?categoryId={categoryId}&includeImage=true";
 
             var response = await GetAsyncWithRetry(url);
             var content = await response.Content.ReadAsStringAsync();

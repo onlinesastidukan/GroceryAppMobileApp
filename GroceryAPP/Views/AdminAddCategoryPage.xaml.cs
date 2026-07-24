@@ -5,6 +5,7 @@ namespace GroceryApp.Views;
 
 public partial class AdminAddCategoryPage : ContentPage
 {
+    private const int MaxImageUploadBytes = 50 * 1024;
     private readonly ApiService _apiService;
     private string _selectedImageBase64 = string.Empty;
     private byte[] _previewImageBytes;
@@ -83,6 +84,19 @@ public partial class AdminAddCategoryPage : ContentPage
             using var ms = new MemoryStream();
             await stream.CopyToAsync(ms);
             _previewImageBytes = ms.ToArray();
+
+            if (_previewImageBytes.Length > MaxImageUploadBytes)
+            {
+                _previewImageBytes = Array.Empty<byte>();
+                _selectedImageBase64 = string.Empty;
+                CategoryImagePreview.Source = null;
+                CategoryImagePreview.IsVisible = false;
+                ImagePlaceholder.IsVisible = true;
+                ImageStatusLabel.Text = "Image must be 50 KB or smaller.";
+                ImageStatusLabel.IsVisible = true;
+                await DisplayAlert("Image Too Large", "Please choose an image of 50 KB or smaller.", "OK");
+                return;
+            }
 
             var extension = Path.GetExtension(result.FileName)?.TrimStart('.').ToLowerInvariant() ?? "jpeg";
             var mimeType = extension == "png" ? "image/png" : "image/jpeg";

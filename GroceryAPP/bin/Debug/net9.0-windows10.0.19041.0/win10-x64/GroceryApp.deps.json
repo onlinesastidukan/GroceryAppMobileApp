@@ -7,7 +7,7 @@
   "targets": {
     ".NETCoreApp,Version=v9.0": {},
     ".NETCoreApp,Version=v9.0/win10-x64": {
-      "GroceryApp/1.0": {
+      "GroceryApp/1.0.1": {
         "dependencies": {
           "CommunityToolkit.Maui": "7.0.1",
           "CommunityToolkit.Mvvm": "8.2.1",
@@ -524,7 +524,7 @@
     }
   },
   "libraries": {
-    "GroceryApp/1.0": {
+    "GroceryApp/1.0.1": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
