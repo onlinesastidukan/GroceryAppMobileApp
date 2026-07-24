@@ -1,7 +1,20 @@
-.vs/
+﻿.vs/
 **/obj/
 *.user
 *.suo
+
+# Keystore and signing files (SECURITY)
+*.keystore
+*.jks
+*.p12
+*.pfx
+release.keystore
+
+# Secrets and sensitive data (SECURITY)
+SECRETS.md
+SECRETS*.md
+*.secrets.md
+firebase-adminsdk.json
 
 # Allow APK and AAB files in bin folder for distribution
 !**/bin/**/*.apk

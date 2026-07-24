@@ -147,6 +147,18 @@ Install-Package FirebaseAdmin
 ```
 
 ### Step 7.2: Add Service Account JSON to Backend
+You have two supported backend setup modes:
+
+#### Option A: Railway / cloud deployment (recommended)
+Use an environment variable instead of committing the file.
+
+- Variable name: `FIREBASE_SERVICE_ACCOUNT_JSON`
+- Variable value: paste the **entire service account JSON** as the variable value
+- Redeploy the Railway service after saving the variable
+
+**Important:** the JSON must remain valid, including the `private_key` field with `\n` newlines preserved inside the string.
+
+#### Option B: Local file-based setup (optional for local development)
 1. Create a folder `Firebase` in your backend project root
 2. Copy the service account JSON file (from Step 5.2) into this folder
 3. Rename it to `firebase-adminsdk.json` for simplicity
@@ -154,6 +166,7 @@ Install-Package FirebaseAdmin
 5. Set **Copy to Output Directory**: `Copy if newer`
 
 ### Step 7.3: Add Firebase Configuration to appsettings.json
+For local file-based development:
 ```json
 {
   "Firebase": {
@@ -162,6 +175,8 @@ Install-Package FirebaseAdmin
   }
 }
 ```
+
+For Railway, prefer the `FIREBASE_SERVICE_ACCOUNT_JSON` environment variable instead of relying on `ServiceAccountPath`.
 
 ---
 
@@ -214,6 +229,12 @@ After completing this setup guide, the development team will:
 - Search for "Firebase Cloud Messaging API"
 - Click Enable
 
+### "Firebase not initialized, skipping notification"
+- On Railway, verify `FIREBASE_SERVICE_ACCOUNT_JSON` is set with the full JSON content
+- Redeploy the backend service after saving variables
+- Do not depend on `Firebase:ServiceAccountPath` unless the file truly exists in the deployed container
+- Check logs for: `Using Firebase credentials from FIREBASE_SERVICE_ACCOUNT_JSON.` and `Firebase Admin SDK initialized successfully`
+
 ### "Invalid package name"
 - Package name in Firebase must EXACTLY match `ApplicationId` in your `.csproj`
 - Check for typos, case-sensitivity
@@ -237,6 +258,12 @@ For a small to medium grocery app:
 - **Firebase Documentation**: https://firebase.google.com/docs
 - **FCM Documentation**: https://firebase.google.com/docs/cloud-messaging
 - **Support**: https://firebase.google.com/support
+
+## Security Reminder
+If a service account JSON or its `private_key` is ever shared in chat, screenshots, or source control:
+- revoke/delete that key in Firebase / Google Cloud immediately
+- generate a new private key
+- update Railway with the new JSON
 
 ---
 

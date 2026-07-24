@@ -1206,66 +1206,6 @@ public class ApiService
         }
     }
 
-    public async Task<ApiResponse> TriggerOrderPlacedNotificationAsync(int orderId, string customerMobileNumber)
-    {
-        if (orderId <= 0)
-        {
-            return new ApiResponse { Success = false, Message = "Order ID is required" };
-        }
-
-        var payload = new
-        {
-            orderId,
-            customerMobileNumber = customerMobileNumber?.Trim() ?? string.Empty,
-            eventType = "OrderPlaced"
-        };
-
-        var endpoints = new[]
-        {
-            $"notifications/order-placed",
-            $"notifications/orders/{orderId}",
-            $"notifications/trigger/order-placed",
-            $"admin/orders/{orderId}/notify"
-        };
-
-        foreach (var endpoint in endpoints)
-        {
-            try
-            {
-                var response = await PostAsJsonAsyncWithRetry(endpoint, payload);
-                var content = await response.Content.ReadAsStringAsync();
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    Log($"[API] TriggerOrderPlacedNotification '{endpoint}' failed: {(int)response.StatusCode}. Body: {Preview(content, 200)}");
-                    continue;
-                }
-
-                try
-                {
-                    var parsed = JsonSerializer.Deserialize<ApiResponse>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    if (parsed != null)
-                    {
-                        parsed.Success = true;
-                        return parsed;
-                    }
-                }
-                catch { }
-
-                return new ApiResponse { Success = true, Message = "Notification triggered" };
-            }
-            catch (Exception ex)
-            {
-                Log($"[API] TriggerOrderPlacedNotification '{endpoint}' exception: {ex.Message}");
-            }
-        }
-
-        return new ApiResponse
-        {
-            Success = false,
-            Message = "Order placed, but notification endpoint is not available on this backend yet."
-        };
-    }
 
     public async Task<ApiResponse<List<Category>>> GetDealerShopsAsync()
     {

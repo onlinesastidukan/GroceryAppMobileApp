@@ -351,23 +351,8 @@ public partial class CartViewModel : BaseViewModel
             {
                 await _guestSessionService.SaveGuestMobileAsync(MobileNumber);
 
-                var placedOrderId = response.Data?.OrderId ?? 0;
-                if (placedOrderId > 0)
-                {
-                    try
-                    {
-                        var notificationResult = await _apiService.TriggerOrderPlacedNotificationAsync(placedOrderId, MobileNumber);
-                        if (notificationResult?.Success != true)
-                        {
-                            System.Diagnostics.Debug.WriteLine($"[ORDER] Notification trigger not confirmed: {notificationResult?.Message}");
-                        }
-                    }
-                    catch (Exception notifyEx)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"[ORDER] Notification trigger error: {notifyEx.Message}");
-                    }
-                }
-
+                // Backend CreateOrder already creates dealer notifications and attempts FCM push.
+                // Do not call legacy client-side notification trigger endpoints because they no longer exist.
                 _cartService.ClearCart();
                 CartItems.Clear();
                 OrderPlacedSuccessfully = true;
