@@ -4,11 +4,11 @@ namespace GroceryApp.Services;
 
 public static class AppConfig
 {
-    // Primary Railway Production URL (stable public hostname)
-    public const string ApiBaseUrl = "https://groceryappapi-production.up.railway.app/api";
+    // The d706 Railway public hostname is the currently live backend endpoint.
+    public const string ApiBaseUrl = "https://groceryappapi-production-d706.up.railway.app/api";
 
-    // Optional alternate hostnames (kept for resilience during Railway hostname changes)
-    private const string LegacyRailwayApiBaseUrl = "https://groceryappapi-production-d706.up.railway.app/api";
+    // Keep the non-suffixed hostname as fallback in case Railway switches back to it later.
+    private const string LegacyRailwayApiBaseUrl = "https://groceryappapi-production.up.railway.app/api";
 
     // Direct Railway only (Cloudflare disabled for troubleshooting network/TLS path).
     private const string CloudflareWorkerUrl = "";

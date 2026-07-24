@@ -120,6 +120,13 @@ public class ApiService
             try
             {
                 var response = await operation();
+                if (attempt < MaxRetryAttempts && await ShouldRetryWithNextBaseUrlAsync(response))
+                {
+                    TrySwitchToNextBaseUrl();
+                    await Task.Delay(TimeSpan.FromMilliseconds(250 * attempt));
+                    continue;
+                }
+
                 if (attempt < MaxRetryAttempts && IsTransientHttpStatus(response.StatusCode))
                 {
                     await Task.Delay(TimeSpan.FromMilliseconds(400 * attempt));
@@ -151,6 +158,27 @@ public class ApiService
         }
 
         return await operation();
+    }
+
+    private async Task<bool> ShouldRetryWithNextBaseUrlAsync(HttpResponseMessage response)
+    {
+        if (response.StatusCode != HttpStatusCode.NotFound)
+        {
+            return false;
+        }
+
+        if (response.RequestMessage?.RequestUri is Uri requestUri)
+        {
+            Log($"[API] 404 received from {requestUri}");
+        }
+
+        var contentType = response.Content.Headers.ContentType?.MediaType ?? string.Empty;
+        var content = await response.Content.ReadAsStringAsync();
+        var normalized = content.Trim();
+
+        return contentType.Contains("text/html", StringComparison.OrdinalIgnoreCase) ||
+               normalized.Contains("application not found", StringComparison.OrdinalIgnoreCase) ||
+               normalized.Contains("railway", StringComparison.OrdinalIgnoreCase);
     }
 
     private Task<HttpResponseMessage> GetAsyncWithRetry(string url)
