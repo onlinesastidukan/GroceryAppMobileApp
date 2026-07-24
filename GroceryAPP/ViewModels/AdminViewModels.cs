@@ -236,7 +236,7 @@ public partial class AdminOrdersViewModel : BaseViewModel
                         return;
                     }
 
-                    var allOrdersResponse = await _apiService.GetAllOrdersAdminAsync();
+                    var allOrdersResponse = await _apiService.GetAllOrdersAdminAsync(includeItems: true);
                     if (allOrdersResponse?.Success != true || allOrdersResponse.Data == null)
                     {
                         SetError(response?.Message ?? allOrdersResponse?.Message ?? "Unable to load your shop orders.");

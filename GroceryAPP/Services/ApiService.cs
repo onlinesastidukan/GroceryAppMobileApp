@@ -383,13 +383,13 @@ public class ApiService
             }
             else
             {
-                Log($"[API] UpdateFcmToken failed: {content}");
+                Log($"[API] UpdateFcmToken failed: {Preview(content, 300)}");
                 return false;
             }
         }
         catch (Exception ex)
         {
-            Log($"[API] UpdateFcmToken error: {ex.Message}");
+            Log($"[API] UpdateFcmToken error: {ex}");
             return false;
         }
     }
@@ -1918,11 +1918,11 @@ public class ApiService
         }
     }
 
-    public async Task<ApiResponse<List<Order>>> GetAllOrdersAdminAsync()
+    public async Task<ApiResponse<List<Order>>> GetAllOrdersAdminAsync(bool includeItems = false)
     {
         try
         {
-            var response = await GetAsyncWithRetry($"{AppConfig.AdminController}/orders?includeItems=false");
+            var response = await GetAsyncWithRetry($"{AppConfig.AdminController}/orders?includeItems={includeItems.ToString().ToLowerInvariant()}");
             var content = await response.Content.ReadAsStringAsync();
 
             if (response.IsSuccessStatusCode)
@@ -2009,7 +2009,7 @@ public class ApiService
         {
             var endpoints = new[]
             {
-                "dealer/orders?includeItems=false",
+                "dealer/orders?includeItems=true",
                 $"{AppConfig.AdminController}/orders/my-shop",
                 $"{AppConfig.OrderController}/dealer",
                 $"{AppConfig.OrderController}/my-shop"
@@ -2064,6 +2064,7 @@ public class ApiService
         }
         catch (Exception ex)
         {
+            Log($"[API] GetDealerOrders error: {ex}");
             return new ApiResponse<List<Order>> { Success = false, Message = $"Error: {ex.Message}" };
         }
     }
